@@ -1,0 +1,7 @@
+FROM node:alpine
+WORKDIR /lec-app
+COPY package.json .
+RUN npm i
+RUN apk add --no-cache bash
+COPY . .
+CMD ["npm", "start"]
