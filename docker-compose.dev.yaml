@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: front-lec-dev-c
+    build:
+      context: front/lec-app
+      dockerfile: Dockerfile.dev
+    volumes:
+      - './front/lec-app:/lec-app'
+      - '/lec-app/node_modules'
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - FAST_REFRESH=false
+      - WDS_SOCKET_PORT=3000
+      
+    
