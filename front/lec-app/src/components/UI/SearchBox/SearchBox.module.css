@@ -1,0 +1,10 @@
+
+
+.selectContainer {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; /* para asegurarte de que está por encima del mapa */
+    width: 250; /* o cualquier ancho que desees para el select */
+  }
