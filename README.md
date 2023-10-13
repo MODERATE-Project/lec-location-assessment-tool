@@ -8,7 +8,7 @@
 1. Clone the repository
 `git clone https://github.com/MODERATE-Project/lec-location-assessment-tool.git`
 3. Run docker container
-`docker-compose  -f docker-compose.dev.yaml run`
+`docker-compose  -f docker-compose.prod.yaml run`
 
 ## Running the app:
 ### Development
