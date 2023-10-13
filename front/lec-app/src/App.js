@@ -1,16 +1,22 @@
 import logo from './logo.svg';
 import './App.css';
 import OlMap from './components/OlMap/OlMap';
-import Button from './components/UI/Button/Button';
 import SearchBox from './components/UI/SearchBox/SearchBox';
+import React, { useState } from 'react';
 
 
 function App() {
+
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  const handleLocationSelected = (location) => {
+      setSelectedLocation(location);
+  };
+
   return (
     <div className="App">
-      <OlMap>
-        <Button label="Aceptar"/>
-        <SearchBox/>
+      <OlMap location={selectedLocation}>
+        <SearchBox onLocationSelected={handleLocationSelected}/>
 
       </OlMap>
     </div>
