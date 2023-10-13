@@ -8,6 +8,8 @@ const options = [
 ];
 
 const SearchBox = ({ onLocationSelected }) => {
+
+    
   return (
     <div className={classes.selectContainer}>
       <Select

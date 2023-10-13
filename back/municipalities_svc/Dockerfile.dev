@@ -1,0 +1,8 @@
+FROM python:3.9
+WORKDIR /municipalities_svc
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+COPY src /municipalities_svc/src
+COPY data /municipalities_svc/data
+ENV FLASK_APP=src/municipalities_svc.py
+CMD ["flask", "run", "--host=0.0.0.0"]

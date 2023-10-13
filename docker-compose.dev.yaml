@@ -17,5 +17,15 @@ services:
       - WATCHPACK_POLLING=true
       - FAST_REFRESH=false
       - WDS_SOCKET_PORT=3000
-      
+  municipalities_service:
+    build:
+      context: back/municipalities_svc
+      dockerfile: Dockerfile.dev
+    volumes:
+      - './back/municipalities_svc/src:/municipalities_svc/src'
+      - './back/municipalities_svc/data:/municipalities_svc/data'
+    ports:
+      - "5001:5000"
+    environment:
+      - DEBUG=True
     
