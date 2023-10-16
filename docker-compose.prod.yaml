@@ -4,17 +4,20 @@ services:
     build:
       context: front/lec-app
       dockerfile: Dockerfile.prod
-    ports:
-      - "80:80"
     environment:
       - NODE_ENV=production
       - WDS_SOCKET_PORT=3000
     restart: always
+    ports:
+      - 80:80
 
   municipalities_service:
     build:
       context: back/municipalities_svc
       dockerfile: Dockerfile.prod
     ports:
-      - "5001:5000"
+      - 5000:5000
     restart: always
+    environment:
+      - PYTHONPATH=/municipalities_svc/src
+

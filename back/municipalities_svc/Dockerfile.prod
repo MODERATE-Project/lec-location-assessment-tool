@@ -1,18 +1,9 @@
-# Usar una imagen base más ligera
-FROM python:3.9-slim
-
+FROM python:3.9
 WORKDIR /municipalities_svc
-
 COPY requirements.prod.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-
 COPY src /municipalities_svc/src
 COPY data /municipalities_svc/data
-
-
 RUN adduser --disabled-password --no-create-home appuser
 USER appuser
-
-
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "src.municipalities_svc:app"]
