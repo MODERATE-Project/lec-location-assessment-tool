@@ -9,13 +9,11 @@ const SearchBox = ({ onLocationSelected }) => {
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
-    // Reemplaza con tu llamada API
-    fetch("http://127.0.0.1/municipalities")
+    
+    fetch(process.env.REACT_APP_MUNICIPALITIES_API_URL)
       .then((response) => response.json())
       .then((data) => {
-        // Asume que los datos son un array de objetos con forma { value: '...', label: '...' }
-        // Si no es así, tendrás que transformarlos
-
+     
         const transformedData = data.municipalities.map((item) => {
           return {
             value: item.name,
@@ -25,7 +23,7 @@ const SearchBox = ({ onLocationSelected }) => {
        
         setOptions(transformedData);
       });
-  }, []); // El array vacío significa que este useEffect se ejecuta solo una vez, similar a componentDidMount
+  }, []); 
 
   return (
     <div className={classes.selectContainer}>
