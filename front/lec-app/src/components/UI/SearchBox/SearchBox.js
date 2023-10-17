@@ -11,7 +11,12 @@ const SearchBox = ({ onLocationSelected }) => {
   useEffect(() => {
     
     fetch(process.env.REACT_APP_MUNICIPALITIES_API_URL)
-      .then((response) => response.json())
+      .then(response=>{
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then((data) => {
      
         const transformedData = data.municipalities.map((item) => {
@@ -22,7 +27,11 @@ const SearchBox = ({ onLocationSelected }) => {
         });
        
         setOptions(transformedData);
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error.message);
       });
+      ;
   }, []); 
 
   return (
