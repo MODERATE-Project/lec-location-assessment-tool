@@ -3,7 +3,7 @@ from flask_cors import CORS
 from municipalities_data_management import get_municipalities_data
 
 app = Flask(__name__)
-CORS(app, origins=["http://127.0.0.1"])
+CORS(app)
 
 municipalities = get_municipalities_data()
 
