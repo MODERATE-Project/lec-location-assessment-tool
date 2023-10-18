@@ -2,6 +2,10 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from municipalities_data_management import get_municipalities_data
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 app = Flask(__name__)
 CORS(app)
 
