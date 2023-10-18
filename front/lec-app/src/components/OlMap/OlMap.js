@@ -13,10 +13,57 @@ import { Style, Stroke } from "ol/style";
 import Select from "ol/interaction/Select";
 
 import { Fill } from "ol/style";
+import { bbox } from "ol/loadingstrategy";
+
+import VectorImageLayer from "ol/layer/VectorImage";
+import { simplify } from "ol/geom/Geometry";
+
 
 const OlMap = (props) => {
   const mapRef = useRef();
   const [map, setMap] = React.useState(null);
+
+  const municipalityLayer = new VectorLayer({
+    source: new VectorSource({
+      format: new GeoJSON(),
+      url: function (extent) {
+        return "http://localhost:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=moderate_municipios:simplified&outputFormat=application/json&srsname=EPSG:4326";
+        // return 'http://localhost:8080/geoserver/ows?service=WFS&' +
+        //   'version=1.0.0&request=GetFeature&typename=moderate_municipios:Municipios_IGN&' +
+        //   'outputFormat=application/json&srsname=EPSG:4326&' +
+        //   'bbox=' + extent.join(',') + ',EPSG:3857';
+      },
+      strategy: bbox,
+    }),
+    style: new Style({
+      stroke: new Stroke({
+        color: "red",
+        width: 0.1,
+      }),
+      fill: new Fill({
+        color: "rgba(255,255,255,0.1)", // Relleno transparente
+      }),
+    }),
+  });
+
+  const detailedMunicipalityLayer = new VectorLayer({
+    source: new VectorSource({
+      format: new GeoJSON(),
+      url: function (extent) {
+        return "http://localhost:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=moderate_municipios:detailed&outputFormat=application/json&srsname=EPSG:4326";
+      },
+      strategy: bbox,
+    }),
+    style: new Style({
+      stroke: new Stroke({
+        color: "red",
+        width: 0.1,
+      }),
+      fill: new Fill({
+        color: "rgba(255,255,255,0.1)", // Relleno transparente
+      }),
+    }),
+  });
 
   useEffect(() => {
     const initialMap = new Map({
@@ -27,56 +74,74 @@ const OlMap = (props) => {
         }),
       ],
       view: new View({
-        center: [0, 0],
-        zoom: 2,
+        center: fromLonLat([-3.703790, 40.416775]),
+        zoom: 7.7,
       }),
       controls: [],
     });
 
-    // Creación de la capa de municipios
-    const municipalityLayer = new VectorLayer({
-      source: new VectorSource({
-        format: new GeoJSON(),
-        url: "/Municipios_IGN.geojson",
-      }),
-      style: new Style({
-        stroke: new Stroke({
-          color: "red",
-          width: 2,
-        }),
-        fill: new Fill({ 
-          color: 'rgba(255,255,255,0.1)'  // Relleno transparente
-        }),
-      }),
-    });
+    // Creación dAe la capa de municipios
 
     initialMap.addLayer(municipalityLayer);
 
+    initialMap.getView().on("change:resolution", () => {
+      const currentZoom = initialMap.getView().getZoom();
+
+      if (currentZoom >= 10) {
+        if (
+          !initialMap.getLayers().getArray().includes(detailedMunicipalityLayer)
+        ) {
+          initialMap.removeLayer(municipalityLayer);
+          initialMap.addLayer(detailedMunicipalityLayer);
+        }
+      } else {
+        if (currentZoom >= 7 && currentZoom < 10) {
+         
+          if (!initialMap.getLayers().getArray().includes(municipalityLayer)) {
+            initialMap.removeLayer(detailedMunicipalityLayer);
+            initialMap.addLayer(municipalityLayer);
+          }
+        } else {
+         
+          initialMap.removeLayer(municipalityLayer);
+        }
+      } 
+    });
+
     // Estilo de selección
     const selectStyle = new Style({
-      stroke: new Stroke({
-        color: "red",
-        width: 2,
-      }),
       fill: new Fill({
-        color: "rgba(255, 0, 0, 0.1)", 
+        color: "rgba(255, 0, 0, 0.1)",
       }),
     });
 
     const select = new Select({
       condition: (event) => {
         let selected = false;
-        initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
-          if (layer === municipalityLayer) {
-            selected = true;
+        initialMap.forEachFeatureAtPixel(
+          event.pixel,
+          (feature, layer) => {
+            // Se verifica si la capa es municipalityLayer o detailedLayer
+            if (
+              layer === municipalityLayer ||
+              layer === detailedMunicipalityLayer
+            ) {
+              selected = true;
+              return true; // Termina la iteración una vez que encontramos la característica deseada.
+            }
+          },
+          {
+            layerFilter: (layerCandidate) =>
+              layerCandidate === municipalityLayer ||
+              layerCandidate === detailedMunicipalityLayer,
+            // Esto asegura que solo se revise la capa municipalityLayer o detailedLayer.
           }
-        });
+        );
         return selected;
       },
-      layers: [municipalityLayer],
+      layers: [municipalityLayer, detailedMunicipalityLayer], // Incluir ambas capas
       style: selectStyle,
     });
-    
 
     initialMap.addInteraction(select);
 
@@ -123,7 +188,7 @@ const OlMap = (props) => {
   }, [props.location, map, panToLocation]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "600px" }}>
+    <div style={{ position: "relative", width: "100%", height: "700px" }}>
       <div ref={mapRef} style={{ width: "100%", height: "100%" }}></div>
       {props.children}
     </div>
