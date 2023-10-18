@@ -37,11 +37,11 @@ const OlMap = (props) => {
     }),
     style: new Style({
       stroke: new Stroke({
-        color: "red",
-        width: 0.1,
+        color: "#F9C80E",
+        width: 1,
       }),
       fill: new Fill({
-        color: "rgba(255,255,255,0.1)", // Relleno transparente
+        color: "rgba(255,255,255,0.5)", // Relleno transparente
       }),
     }),
   });
@@ -56,11 +56,11 @@ const OlMap = (props) => {
     }),
     style: new Style({
       stroke: new Stroke({
-        color: "red",
-        width: 0.1,
+        color: "#F9C80E",
+        width: 1,
       }),
       fill: new Fill({
-        color: "rgba(255,255,255,0.1)", // Relleno transparente
+        color: "rgba(255,255,255,0.5)", // Relleno transparente
       }),
     }),
   });
@@ -111,7 +111,7 @@ const OlMap = (props) => {
     // Estilo de selección
     const selectStyle = new Style({
       fill: new Fill({
-        color: "rgba(255, 0, 0, 0.1)",
+        color: "rgba(249, 200, 14, 0.8)",
       }),
     });
 
