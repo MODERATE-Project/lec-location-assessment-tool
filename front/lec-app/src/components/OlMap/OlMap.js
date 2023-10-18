@@ -15,13 +15,20 @@ import Select from "ol/interaction/Select";
 import { Fill } from "ol/style";
 import { bbox } from "ol/loadingstrategy";
 
-import VectorImageLayer from "ol/layer/VectorImage";
-import { simplify } from "ol/geom/Geometry";
+import { pointerMove, click } from 'ol/events/condition';
 
 
 const OlMap = (props) => {
   const mapRef = useRef();
   const [map, setMap] = React.useState(null);
+
+  const [selectedMunicipality, setSelectedMunicipality] = React.useState(null);
+
+  useEffect(() => {
+    if (selectedMunicipality) {
+      alert(`Has seleccionado el municipio: ${selectedMunicipality}`);
+    }
+  }, [selectedMunicipality]);
 
   const municipalityLayer = new VectorLayer({
     source: new VectorSource({
@@ -74,7 +81,7 @@ const OlMap = (props) => {
         }),
       ],
       view: new View({
-        center: fromLonLat([-3.703790, 40.416775]),
+        center: fromLonLat([-3.70379, 40.416775]),
         zoom: 7.7,
       }),
       controls: [],
@@ -95,17 +102,15 @@ const OlMap = (props) => {
           initialMap.addLayer(detailedMunicipalityLayer);
         }
       } else {
-        if (currentZoom >= 7 && currentZoom < 10) {
-         
+        if (currentZoom >= 7.6 && currentZoom < 10) {
           if (!initialMap.getLayers().getArray().includes(municipalityLayer)) {
             initialMap.removeLayer(detailedMunicipalityLayer);
             initialMap.addLayer(municipalityLayer);
           }
         } else {
-         
           initialMap.removeLayer(municipalityLayer);
         }
-      } 
+      }
     });
 
     // Estilo de selección
@@ -115,42 +120,39 @@ const OlMap = (props) => {
       }),
     });
 
-    const select = new Select({
-      condition: (event) => {
-        let selected = false;
-        initialMap.forEachFeatureAtPixel(
-          event.pixel,
-          (feature, layer) => {
-            // Se verifica si la capa es municipalityLayer o detailedLayer
-            if (
-              layer === municipalityLayer ||
-              layer === detailedMunicipalityLayer
-            ) {
-              selected = true;
-              return true; // Termina la iteración una vez que encontramos la característica deseada.
-            }
-          },
-          {
-            layerFilter: (layerCandidate) =>
-              layerCandidate === municipalityLayer ||
-              layerCandidate === detailedMunicipalityLayer,
-            // Esto asegura que solo se revise la capa municipalityLayer o detailedLayer.
-          }
-        );
-        return selected;
-      },
-      layers: [municipalityLayer, detailedMunicipalityLayer], // Incluir ambas capas
-      style: selectStyle,
+    const hoverInteraction = new Select({
+      condition: pointerMove, // Se activará con el movimiento del puntero
+      layers: [municipalityLayer, detailedMunicipalityLayer],
+      style: selectStyle
     });
-
-    initialMap.addInteraction(select);
-
+    
+    initialMap.addInteraction(hoverInteraction);
+    
+    const selectInteraction = new Select({
+      condition: click, // Se activará con el clic
+      layers: [municipalityLayer, detailedMunicipalityLayer],
+      style: selectStyle
+    });
+    
+    selectInteraction.on('select', function(event) {
+      if (event.selected.length > 0) {
+        const feature = event.selected[0];
+        console.log("feature", feature);
+        const municipalityName = feature.get("nombre");
+        console.log("Nombre del municipio seleccionado:", municipalityName);
+      }
+    });
+    
+    initialMap.addInteraction(selectInteraction);
+    
     setMap(initialMap);
 
     // Limpieza: remueve la interacción y la capa al desmontar el componente
     return () => {
-      initialMap.removeInteraction(select);
+      initialMap.removeInteraction(selectInteraction);
+      initialMap.removeInteraction(hoverInteraction);
       initialMap.removeLayer(municipalityLayer);
+      initialMap.removeLayer(detailedMunicipalityLayer);
     };
   }, []);
 
