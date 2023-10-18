@@ -45,7 +45,7 @@ const OlMap = (props) => {
     style: new Style({
       stroke: new Stroke({
         color: "#F9C80E",
-        width: 1,
+        width: 0.5,
       }),
       fill: new Fill({
         color: "rgba(255,255,255,0.5)", // Relleno transparente
@@ -87,7 +87,7 @@ const OlMap = (props) => {
       controls: [],
     });
 
-    // Creación dAe la capa de municipios
+    // Creación de la capa de municipios
 
     initialMap.addLayer(municipalityLayer);
 

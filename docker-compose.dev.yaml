@@ -31,4 +31,16 @@ services:
     environment:
       - DEBUG=True
       - PYTHONPATH=/municipalities_svc/src
+  buildings_service:
+    build:
+      context: back/buildings_svc
+      dockerfile: Dockerfile.dev
+    volumes:
+      - './back/buildings_svc/src:/buildings_svc/src'
+      - './back/buildings_svc/data:/buildings_svc/data'
+    ports:
+      - "6000:5000"
+    environment:
+      - DEBUG=True
+      - PYTHONPATH=/buildings_svc/src
     
