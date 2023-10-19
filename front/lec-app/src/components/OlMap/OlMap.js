@@ -138,8 +138,9 @@ const OlMap = (props) => {
       if (event.selected.length > 0) {
         const feature = event.selected[0];
         console.log("feature", feature);
-        const municipalityName = feature.get("nombre");
+        const municipalityName = feature.get("NAMEUNIT");
         console.log("Nombre del municipio seleccionado:", municipalityName);
+        props.onMunicipioSelected(municipalityName);
       }
     });
     
