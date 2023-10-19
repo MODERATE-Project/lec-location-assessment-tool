@@ -26,25 +26,8 @@ const customStyles = {
 
 const DTable = ({ data }) => {
 
+  console.log(data);
 
-  /*
-    "AREA": 286.25,
-            "MEAN": 1487.64656476,
-            "MWh_aprove": 425.838829163,
-            "MWh_prod_e": 76.6509892493,
-            "Municipios": "Crevillent",
-            "Porcentaje_Hogares_unipersonales": "25,9",
-            "Porcentaje_mayor_65": "22,6",
-            "Porcentaje_menor_18": "16",
-            "Porcentaje_poblacion": "68,9",
-            "Renta_media": 21.927,
-            "Secciones": 305905002,
-            "Tamaño_medio_hogar": "2,74",
-            "Total_edad_media": "44,9",
-            "Total_poblacion": 8700,
-            "area_m2"
-    */
-  // Columnas para nuestra tabla
   const columns = [
     {
       name: "Potential",

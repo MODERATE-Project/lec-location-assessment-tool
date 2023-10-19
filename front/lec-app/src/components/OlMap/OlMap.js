@@ -15,12 +15,12 @@ import Select from "ol/interaction/Select";
 import { Fill } from "ol/style";
 import { bbox } from "ol/loadingstrategy";
 
-import { pointerMove, click } from 'ol/events/condition';
-
+import { pointerMove, click } from "ol/events/condition";
 
 const OlMap = (props) => {
   const mapRef = useRef();
   const [map, setMap] = React.useState(null);
+  const availableMunicipios = ["Crevillent"];
 
   const [selectedMunicipality, setSelectedMunicipality] = React.useState(null);
 
@@ -29,6 +29,32 @@ const OlMap = (props) => {
       alert(`Has seleccionado el municipio: ${selectedMunicipality}`);
     }
   }, [selectedMunicipality]);
+
+  function styleFunction(feature) {
+    const municipalityName = feature.get("NAMEUNIT");
+
+    if (availableMunicipios.includes(municipalityName)) {
+      return new Style({
+        stroke: new Stroke({
+          color: "#F9C80E",
+          width: 0.5,
+        }),
+        fill: new Fill({
+          color: "rgba(0, 255, 0, 0.5)", // Relleno verde para los municipios con datos
+        }),
+      });
+    } else {
+      return new Style({
+        stroke: new Stroke({
+          color: "#F9C80E",
+          width: 0.5,
+        }),
+        fill: new Fill({
+          color: "rgba(255,255,255,0.5)", // Relleno transparente para otros municipios
+        }),
+      });
+    }
+  }
 
   const municipalityLayer = new VectorLayer({
     source: new VectorSource({
@@ -42,15 +68,7 @@ const OlMap = (props) => {
       },
       strategy: bbox,
     }),
-    style: new Style({
-      stroke: new Stroke({
-        color: "#F9C80E",
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: "rgba(255,255,255,0.5)", // Relleno transparente
-      }),
-    }),
+    style: styleFunction
   });
 
   const detailedMunicipalityLayer = new VectorLayer({
@@ -61,15 +79,7 @@ const OlMap = (props) => {
       },
       strategy: bbox,
     }),
-    style: new Style({
-      stroke: new Stroke({
-        color: "#F9C80E",
-        width: 1,
-      }),
-      fill: new Fill({
-        color: "rgba(255,255,255,0.5)", // Relleno transparente
-      }),
-    }),
+    style: styleFunction
   });
 
   useEffect(() => {
@@ -123,29 +133,27 @@ const OlMap = (props) => {
     const hoverInteraction = new Select({
       condition: pointerMove, // Se activará con el movimiento del puntero
       layers: [municipalityLayer, detailedMunicipalityLayer],
-      style: selectStyle
+      style: selectStyle,
     });
-    
+
     initialMap.addInteraction(hoverInteraction);
-    
+
     const selectInteraction = new Select({
       condition: click, // Se activará con el clic
       layers: [municipalityLayer, detailedMunicipalityLayer],
-      style: selectStyle
+      style: selectStyle,
     });
-    
-    selectInteraction.on('select', function(event) {
+
+    selectInteraction.on("select", function (event) {
       if (event.selected.length > 0) {
         const feature = event.selected[0];
-        console.log("feature", feature);
         const municipalityName = feature.get("NAMEUNIT");
-        console.log("Nombre del municipio seleccionado:", municipalityName);
         props.onMunicipioSelected(municipalityName);
       }
     });
-    
+
     initialMap.addInteraction(selectInteraction);
-    
+
     setMap(initialMap);
 
     // Limpieza: remueve la interacción y la capa al desmontar el componente
