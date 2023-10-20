@@ -2,9 +2,13 @@ import logo from "./logo.svg";
 import "./App.css";
 import OlMap from "./components/OlMap/OlMap";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
-import React, { useState } from "react";
-
+import React, { useState,useCallback } from "react";
 import DTable from "./components/UI/DataTable/DTable";
+
+
+
+
+const availables = ['Siero','Crevillent'];
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -14,7 +18,7 @@ function App() {
     setSelectedLocation(location);
   };
 
-  const handleMunicipioSelected = (municipio) => {
+  const handleMunicipioSelected = useCallback((municipio) => {
     
     const url = `${process.env.REACT_APP_BUILDINGS_API_URL}?municipio=${encodeURIComponent(municipio)}`;
     console.log(municipio)
@@ -27,13 +31,15 @@ function App() {
       .catch((error) => {
         console.error("Hubo un error al obtener los datos:", error);
       });
-  };
+  }, []);  
+
 
   return (
     <div className="App">
       <OlMap
         location={selectedLocation}
         onMunicipioSelected={handleMunicipioSelected}
+        availableMunicipios={availables}
       >
         <SearchBox onLocationSelected={handleLocationSelected} />
       </OlMap>

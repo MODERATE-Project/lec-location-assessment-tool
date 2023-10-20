@@ -1,169 +1,138 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import "ol/ol.css";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
 import { fromLonLat } from "ol/proj";
-
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
-import { Style, Stroke } from "ol/style";
-
+import { Style, Stroke, Fill } from "ol/style";
 import Select from "ol/interaction/Select";
-
-import { Fill } from "ol/style";
 import { bbox } from "ol/loadingstrategy";
-
 import { pointerMove, click } from "ol/events/condition";
 
-const OlMap = (props) => {
+const OlMap = ({ location, onMunicipioSelected, availableMunicipios, children }) => {
   const mapRef = useRef();
-  const [map, setMap] = React.useState(null);
-  const availableMunicipios = ["Crevillent"];
+  const [map, setMap] = useState(null);
+  const selectInteractionsRef = useRef({});
+  const [activeLayer, setActiveLayer] = useState("simplified");
 
-  const [selectedMunicipality, setSelectedMunicipality] = React.useState(null);
-
-  useEffect(() => {
-    if (selectedMunicipality) {
-      alert(`Has seleccionado el municipio: ${selectedMunicipality}`);
-    }
-  }, [selectedMunicipality]);
-
-  function styleFunction(feature) {
-    const municipalityName = feature.get("NAMEUNIT");
-
-    if (availableMunicipios.includes(municipalityName)) {
-      return new Style({
-        stroke: new Stroke({
-          color: "#F9C80E",
-          width: 0.5,
-        }),
-        fill: new Fill({
-          color: "rgba(0, 255, 0, 0.5)", // Relleno verde para los municipios con datos
-        }),
-      });
-    } else {
-      return new Style({
-        stroke: new Stroke({
-          color: "#F9C80E",
-          width: 0.5,
-        }),
-        fill: new Fill({
-          color: "rgba(255,255,255,0.5)", // Relleno transparente para otros municipios
-        }),
-      });
-    }
-  }
-
-  const municipalityLayer = new VectorLayer({
-    source: new VectorSource({
-      format: new GeoJSON(),
-      url: function (extent) {
-        return "http://localhost:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=moderate_municipios:simplified&outputFormat=application/json&srsname=EPSG:4326";
-        // return 'http://localhost:8080/geoserver/ows?service=WFS&' +
-        //   'version=1.0.0&request=GetFeature&typename=moderate_municipios:Municipios_IGN&' +
-        //   'outputFormat=application/json&srsname=EPSG:4326&' +
-        //   'bbox=' + extent.join(',') + ',EPSG:3857';
-      },
-      strategy: bbox,
-    }),
-    style: styleFunction
-  });
-
-  const detailedMunicipalityLayer = new VectorLayer({
-    source: new VectorSource({
-      format: new GeoJSON(),
-      url: function (extent) {
-        return "http://localhost:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=moderate_municipios:detailed&outputFormat=application/json&srsname=EPSG:4326";
-      },
-      strategy: bbox,
-    }),
-    style: styleFunction
-  });
+  // Declare the variables outside the useEffect
+  const municipalityLayerRef = useRef(null);
+  const detailedMunicipalityLayerRef = useRef(null);
 
   useEffect(() => {
-    const initialMap = new Map({
-      target: mapRef.current,
-      layers: [
-        new TileLayer({
-          source: new OSM(),
+    if (!map) {
+      const initialMap = new Map({
+        target: mapRef.current,
+        layers: [
+          new TileLayer({
+            source: new OSM(),
+          }),
+        ],
+        view: new View({
+          center: fromLonLat([-3.70379, 40.416775]),
+          zoom: 7.7,
         }),
-      ],
-      view: new View({
-        center: fromLonLat([-3.70379, 40.416775]),
-        zoom: 7.7,
-      }),
-      controls: [],
-    });
+        controls: [],
+      });
 
-    // Creación de la capa de municipios
-
-    initialMap.addLayer(municipalityLayer);
-
-    initialMap.getView().on("change:resolution", () => {
-      const currentZoom = initialMap.getView().getZoom();
-
-      if (currentZoom >= 10) {
-        if (
-          !initialMap.getLayers().getArray().includes(detailedMunicipalityLayer)
-        ) {
-          initialMap.removeLayer(municipalityLayer);
-          initialMap.addLayer(detailedMunicipalityLayer);
-        }
-      } else {
-        if (currentZoom >= 7.6 && currentZoom < 10) {
-          if (!initialMap.getLayers().getArray().includes(municipalityLayer)) {
-            initialMap.removeLayer(detailedMunicipalityLayer);
-            initialMap.addLayer(municipalityLayer);
-          }
-        } else {
-          initialMap.removeLayer(municipalityLayer);
-        }
-      }
-    });
-
-    // Estilo de selección
-    const selectStyle = new Style({
-      fill: new Fill({
-        color: "rgba(249, 200, 14, 0.8)",
-      }),
-    });
-
-    const hoverInteraction = new Select({
-      condition: pointerMove, // Se activará con el movimiento del puntero
-      layers: [municipalityLayer, detailedMunicipalityLayer],
-      style: selectStyle,
-    });
-
-    initialMap.addInteraction(hoverInteraction);
-
-    const selectInteraction = new Select({
-      condition: click, // Se activará con el clic
-      layers: [municipalityLayer, detailedMunicipalityLayer],
-      style: selectStyle,
-    });
-
-    selectInteraction.on("select", function (event) {
-      if (event.selected.length > 0) {
-        const feature = event.selected[0];
+      const styleFunction = (feature, resolution, currentZoom) => {
         const municipalityName = feature.get("NAMEUNIT");
-        props.onMunicipioSelected(municipalityName);
-      }
-    });
+        const availables = availableMunicipios || [];
 
-    initialMap.addInteraction(selectInteraction);
+        const defaultStyle = new Style({
+          stroke: new Stroke({
+            color: "#003b49",
+            width: 0.5,
+          }),
+          fill: new Fill({
+            color: availables.includes(municipalityName)
+              ? "rgba(0, 255, 0, 0.5)"
+              : "rgba(255,255,255,0.5)",
+          }),
+        });
 
-    setMap(initialMap);
+        if (currentZoom >= 10) {
+          defaultStyle.getStroke().setWidth(1);
+        }
 
-    // Limpieza: remueve la interacción y la capa al desmontar el componente
-    return () => {
-      initialMap.removeInteraction(selectInteraction);
-      initialMap.removeInteraction(hoverInteraction);
-      initialMap.removeLayer(municipalityLayer);
-      initialMap.removeLayer(detailedMunicipalityLayer);
-    };
-  }, []);
+        return defaultStyle;
+      };
+
+      const createVectorLayer = (typename) => {
+        return new VectorLayer({
+          source: new VectorSource({
+            format: new GeoJSON(),
+            url: function (extent) {
+              return `http://localhost:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=${typename}&outputFormat=application/json&srsname=EPSG:4326`;
+            },
+            strategy: bbox,
+          }),
+          style: (feature, resolution) => {
+            const currentZoom = initialMap.getView().getZoom();
+            return styleFunction(feature, resolution, currentZoom);
+          },
+        });
+      };
+
+      const municipalityLayer = createVectorLayer(
+        "moderate_municipios:simplified"
+      );
+      const detailedMunicipalityLayer = createVectorLayer(
+        "moderate_municipios:detailed"
+      );
+
+      municipalityLayerRef.current = municipalityLayer;
+      detailedMunicipalityLayerRef.current = detailedMunicipalityLayer;
+
+      initialMap.addLayer(municipalityLayer);
+
+      initialMap.getView().on("change:resolution", () => {
+        const currentZoom = initialMap.getView().getZoom();
+        if (currentZoom >= 10) {
+          setActiveLayer("detailed");
+        } else {
+          setActiveLayer("simplified");
+        }
+      });
+
+      const selectStyle = new Style({
+        fill: new Fill({
+          color: "rgba(249, 200, 14, 0.8)",
+        }),
+      });
+
+      const hoverInteraction = new Select({
+        condition: pointerMove,
+        layers: [municipalityLayer, detailedMunicipalityLayer],
+        style: selectStyle,
+      });
+
+      initialMap.addInteraction(hoverInteraction);
+      selectInteractionsRef.current.hover = hoverInteraction;
+
+      const selectInteraction = new Select({
+        condition: click,
+        layers: [municipalityLayer, detailedMunicipalityLayer],
+        style: selectStyle,
+      });
+
+      selectInteraction.on("select", (event) => {
+        if (event.selected.length > 0) {
+          const municipalityName = event.selected[0].get("NAMEUNIT");
+          onMunicipioSelected(municipalityName);
+        }
+      });
+
+      initialMap.addInteraction(selectInteraction);
+      selectInteractionsRef.current.click = selectInteraction;
+
+      setMap(initialMap);
+    }
+  }, [map, onMunicipioSelected, availableMunicipios]);
 
   const panToLocation = useCallback(
     async (locName) => {
@@ -173,10 +142,10 @@ const OlMap = (props) => {
         );
         const json = await response.json();
         if (json && json.length > 0) {
-          const location = json[0];
+          const loc = json[0];
           const coordinates = fromLonLat([
-            parseFloat(location.lon),
-            parseFloat(location.lat),
+            parseFloat(loc.lon),
+            parseFloat(loc.lat),
           ]);
           map.getView().animate({
             center: coordinates,
@@ -193,15 +162,32 @@ const OlMap = (props) => {
   );
 
   useEffect(() => {
-    if (props.location && map) {
-      panToLocation(props.location);
+    if (location && map) {
+      panToLocation(location);
     }
-  }, [props.location, map, panToLocation]);
+  }, [location, map, panToLocation]);
+
+  useEffect(() => {
+    return () => {
+      if (map) {
+        map.getView().un("change:resolution");
+        if (selectInteractionsRef.current.hover) {
+          map.removeInteraction(selectInteractionsRef.current.hover);
+        }
+        if (selectInteractionsRef.current.click) {
+          map.removeInteraction(selectInteractionsRef.current.click);
+        }
+
+        map.setTarget(null);
+        setMap(null);
+      }
+    };
+  }, [map]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "700px" }}>
       <div ref={mapRef} style={{ width: "100%", height: "100%" }}></div>
-      {props.children}
+      {children}
     </div>
   );
 };
