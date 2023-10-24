@@ -13,15 +13,48 @@ import Select from "ol/interaction/Select";
 import { bbox } from "ol/loadingstrategy";
 import { pointerMove, click } from "ol/events/condition";
 
-const OlMap = ({ location, onMunicipioSelected, availableMunicipios, children }) => {
+const OlMap = ({
+  location,
+  onMunicipioSelected,
+  availableMunicipios,
+  children,
+}) => {
   const mapRef = useRef();
   const [map, setMap] = useState(null);
   const selectInteractionsRef = useRef({});
-  const [activeLayer, setActiveLayer] = useState("simplified");
+  const [activeLayer, setActiveLayerState] = useState("simplified");
 
-  // Declare the variables outside the useEffect
   const municipalityLayerRef = useRef(null);
   const detailedMunicipalityLayerRef = useRef(null);
+  const availableMunicipiosRef = useRef(availableMunicipios);
+
+  const setActiveLayer = (layerType) => {
+    if (!map) {
+      return;
+    }
+
+    if (layerType === "detailed" && activeLayer !== "detailed") {
+      if (municipalityLayerRef.current) {
+        map.removeLayer(municipalityLayerRef.current);
+      }
+      if (detailedMunicipalityLayerRef.current) {
+        map.addLayer(detailedMunicipalityLayerRef.current);
+      }
+      setActiveLayerState("detailed");
+    } else if (layerType === "simplified" && activeLayer !== "simplified") {
+      if (detailedMunicipalityLayerRef.current) {
+        map.removeLayer(detailedMunicipalityLayerRef.current);
+      }
+      if (municipalityLayerRef.current) {
+        map.addLayer(municipalityLayerRef.current);
+      }
+      setActiveLayerState("simplified");
+    }
+  };
+
+  useEffect(() => {
+    availableMunicipiosRef.current = availableMunicipios;
+  }, [availableMunicipios]);
 
   useEffect(() => {
     if (!map) {
@@ -41,7 +74,15 @@ const OlMap = ({ location, onMunicipioSelected, availableMunicipios, children })
 
       const styleFunction = (feature, resolution, currentZoom) => {
         const municipalityName = feature.get("NAMEUNIT");
-        const availables = availableMunicipios || [];
+
+        // Usa el ref en lugar de la variable de estado
+        const availables = availableMunicipiosRef.current || [];
+
+
+        //Ocultar las features a partir de un nivel de zoom
+        if (currentZoom < 7) {
+          return null;
+        }
 
         const defaultStyle = new Style({
           stroke: new Stroke({
@@ -130,6 +171,14 @@ const OlMap = ({ location, onMunicipioSelected, availableMunicipios, children })
       initialMap.addInteraction(selectInteraction);
       selectInteractionsRef.current.click = selectInteraction;
 
+      if (municipalityLayerRef.current) {
+        municipalityLayerRef.current.getSource().refresh();
+      }
+
+      if (detailedMunicipalityLayerRef.current) {
+        detailedMunicipalityLayerRef.current.getSource().refresh();
+      }
+
       setMap(initialMap);
     }
   }, [map, onMunicipioSelected, availableMunicipios]);
@@ -147,15 +196,12 @@ const OlMap = ({ location, onMunicipioSelected, availableMunicipios, children })
             parseFloat(loc.lon),
             parseFloat(loc.lat),
           ]);
-          map.getView().animate({
-            center: coordinates,
-            zoom: 11,
-          });
+          map.getView().animate({ center: coordinates, zoom: 11 });
         } else {
           alert("Ubicación no encontrada");
         }
-      } catch (error) {
-        console.error("Error en la búsqueda:", error);
+      } catch (err) {
+        alert("Error al encontrar la ubicación");
       }
     },
     [map]

@@ -1,25 +1,18 @@
-import logo from "./logo.svg";
-import "./App.css";
+import React, { useState, useEffect, useCallback } from "react";
 import OlMap from "./components/OlMap/OlMap";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
-import React, { useState,useCallback } from "react";
 import DTable from "./components/UI/DataTable/DTable";
-
-
-
-
-const availables = ['Siero','Crevillent'];
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [tableData, setTableData] = useState([]); 
+  const [tableData, setTableData] = useState([]);
+  const [availables, setAvailables] = useState([]); // Declaración de availables
 
   const handleLocationSelected = (location) => {
     setSelectedLocation(location);
   };
 
   const handleMunicipioSelected = useCallback((municipio) => {
-    
     const url = `${process.env.REACT_APP_BUILDINGS_API_URL}?municipio=${encodeURIComponent(municipio)}`;
     console.log(municipio)
     fetch(url)
@@ -31,15 +24,33 @@ function App() {
       .catch((error) => {
         console.error("Hubo un error al obtener los datos:", error);
       });
-  }, []);  
+  }, []);
 
+  useEffect(() => {
+    // Realiza la llamada GET a la API del backend para obtener los datos de availables
+    //MUST BE ASYNCHRONOUS FOR LOADING DATA WHEN ARRIVES
+    const url = `${process.env.REACT_APP_MUNICIPALITIES_WITH_DATA}?withData=true`;
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("DATA", data);
+        // Extrae los datos necesarios de la respuesta
+        const availaMuni = data.municipalities.map((item) => item.name);
+        console.log("DATA", data);
+        // Actualiza el estado de availables con los datos obtenidos
+        setAvailables(availaMuni);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los datos:", error);
+      });
+  }, []); // El array vacío [] asegura que este efecto se ejecute solo una vez al montar el componente
 
   return (
     <div className="App">
       <OlMap
         location={selectedLocation}
         onMunicipioSelected={handleMunicipioSelected}
-        availableMunicipios={availables}
+        availableMunicipios={availables} // Pasa availables como prop a OlMap
       >
         <SearchBox onLocationSelected={handleLocationSelected} />
       </OlMap>
