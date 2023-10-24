@@ -8,17 +8,22 @@ function App() {
   const [tableData, setTableData] = useState([]);
   const [availables, setAvailables] = useState([]); // Declaración de availables
 
+  const handleRowClick = (row) => {
+    console.log("Click en fila", row);
+  };
+
   const handleLocationSelected = (location) => {
     setSelectedLocation(location);
   };
 
   const handleMunicipioSelected = useCallback((municipio) => {
-    const url = `${process.env.REACT_APP_BUILDINGS_API_URL}?municipio=${encodeURIComponent(municipio)}`;
-    console.log(municipio)
+    const url = `${
+      process.env.REACT_APP_BUILDINGS_API_URL
+    }?municipio=${encodeURIComponent(municipio)}`;
+
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setTableData(data); // Guarda los datos en el estado local
       })
       .catch((error) => {
@@ -33,10 +38,8 @@ function App() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log("DATA", data);
         // Extrae los datos necesarios de la respuesta
         const availaMuni = data.municipalities.map((item) => item.name);
-        console.log("DATA", data);
         // Actualiza el estado de availables con los datos obtenidos
         setAvailables(availaMuni);
       })
@@ -54,7 +57,7 @@ function App() {
       >
         <SearchBox onLocationSelected={handleLocationSelected} />
       </OlMap>
-      <DTable data={tableData.buildings} />
+      <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
     </div>
   );
 }

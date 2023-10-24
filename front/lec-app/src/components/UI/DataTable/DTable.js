@@ -24,7 +24,7 @@ const customStyles = {
   },
 };
 
-const DTable = ({ data }) => {
+const DTable = ({ data, onRowClicked }) => {
 
   console.log(data);
 
@@ -102,6 +102,7 @@ const DTable = ({ data }) => {
       customStyles={customStyles}
       resizableColumns 
       showGridlines
+      onRowClicked={onRowClicked}
     />
   );
 };

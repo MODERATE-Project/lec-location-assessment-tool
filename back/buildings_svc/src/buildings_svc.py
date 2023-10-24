@@ -13,9 +13,7 @@ def get_buildings():
     municipio = request.args.get('municipio', None)  # Obtiene el parámetro municipio; si no está presente, retorna None
     # coords = request.json.get('coordinates', [])
 
-    print(municipio)
     filtered_buildings = [building for building in buildings if building['Municipios'] == municipio]
-    print(filtered_buildings)
     return jsonify({"buildings": filtered_buildings})
 
 

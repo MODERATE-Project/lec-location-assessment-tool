@@ -28,30 +28,6 @@ const OlMap = ({
   const detailedMunicipalityLayerRef = useRef(null);
   const availableMunicipiosRef = useRef(availableMunicipios);
 
-  const setActiveLayer = (layerType) => {
-    if (!map) {
-      return;
-    }
-
-    if (layerType === "detailed" && activeLayer !== "detailed") {
-      if (municipalityLayerRef.current) {
-        map.removeLayer(municipalityLayerRef.current);
-      }
-      if (detailedMunicipalityLayerRef.current) {
-        map.addLayer(detailedMunicipalityLayerRef.current);
-      }
-      setActiveLayerState("detailed");
-    } else if (layerType === "simplified" && activeLayer !== "simplified") {
-      if (detailedMunicipalityLayerRef.current) {
-        map.removeLayer(detailedMunicipalityLayerRef.current);
-      }
-      if (municipalityLayerRef.current) {
-        map.addLayer(municipalityLayerRef.current);
-      }
-      setActiveLayerState("simplified");
-    }
-  };
-
   useEffect(() => {
     availableMunicipiosRef.current = availableMunicipios;
   }, [availableMunicipios]);
@@ -77,7 +53,6 @@ const OlMap = ({
 
         // Usa el ref en lugar de la variable de estado
         const availables = availableMunicipiosRef.current || [];
-
 
         //Ocultar las features a partir de un nivel de zoom
         if (currentZoom < 7) {
@@ -180,8 +155,32 @@ const OlMap = ({
       }
 
       setMap(initialMap);
+
+      const setActiveLayer = (layerType) => {
+        if (!map) {
+          return;
+        }
+
+        if (layerType === "detailed" && activeLayer !== "detailed") {
+          if (municipalityLayerRef.current) {
+            map.removeLayer(municipalityLayerRef.current);
+          }
+          if (detailedMunicipalityLayerRef.current) {
+            map.addLayer(detailedMunicipalityLayerRef.current);
+          }
+          setActiveLayerState("detailed");
+        } else if (layerType === "simplified" && activeLayer !== "simplified") {
+          if (detailedMunicipalityLayerRef.current) {
+            map.removeLayer(detailedMunicipalityLayerRef.current);
+          }
+          if (municipalityLayerRef.current) {
+            map.addLayer(municipalityLayerRef.current);
+          }
+          setActiveLayerState("simplified");
+        }
+      };
     }
-  }, [map, onMunicipioSelected, availableMunicipios]);
+  }, [map, onMunicipioSelected, availableMunicipios, activeLayer]);
 
   const panToLocation = useCallback(
     async (locName) => {
@@ -214,14 +213,19 @@ const OlMap = ({
   }, [location, map, panToLocation]);
 
   useEffect(() => {
+    const currentHover = selectInteractionsRef.current.hover;
+    const currentClick = selectInteractionsRef.current.click;
+
     return () => {
       if (map) {
         map.getView().un("change:resolution");
-        if (selectInteractionsRef.current.hover) {
-          map.removeInteraction(selectInteractionsRef.current.hover);
+
+        // Usa las constantes locales en lugar de la ref directamente.
+        if (currentHover) {
+          map.removeInteraction(currentHover);
         }
-        if (selectInteractionsRef.current.click) {
-          map.removeInteraction(selectInteractionsRef.current.click);
+        if (currentClick) {
+          map.removeInteraction(currentClick);
         }
 
         map.setTarget(null);

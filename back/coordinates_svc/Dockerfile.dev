@@ -1,0 +1,9 @@
+FROM python:3.9-slim
+WORKDIR /coordinates_svc/src
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+COPY src /coordinates_svc/src
+COPY data /coordinates_svc/data
+ENV FLASK_APP=coordinates_svc:app
+ENV FLASK_ENV=development
+CMD ["flask", "run", "--host=0.0.0.0"]
