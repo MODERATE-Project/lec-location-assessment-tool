@@ -45,16 +45,3 @@ services:
     environment:
       - DEBUG=True
       - PYTHONPATH=/buildings_svc/src
-
-  coordinates_service:
-    build:
-      context: back/coordinates_svc
-      dockerfile: Dockerfile.dev
-    volumes:
-      - './back/coordinates_svc/src:/coordinates_svc/src'
-      - './back/coordinates_svc/data:/coordinates_svc/data'
-    ports:
-      - "3003:5000"
-    environment:
-      - DEBUG=True
-      - PYTHONPATH=/coordinates_svc/src

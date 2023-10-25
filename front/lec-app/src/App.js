@@ -10,41 +10,7 @@ function App() {
 
   const handleRowClick = (row) => {
     console.log("Click en fila", row);
-    
-    // Asumamos que las coordenadas que deseas convertir están en las propiedades `row.lat` y `row.lng`
-    const coordinatesToConvert = {
-      lat: row.lat,
-      lng: row.lng,
-    };
-
-    // URL de tu servicio del backend que convierte coordenadas
-    const apiUrl = `${process.env.REACT_APP_COORDINATES_API_URL}/25830/to/4326`;
-
-    fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(coordinatesToConvert), // Convertimos las coordenadas a un string JSON para enviarlas en el cuerpo de la solicitud
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json(); // Devuelve las nuevas coordenadas como JSON
-      })
-      .then((data) => {
-        // Aquí puedes manejar las coordenadas convertidas. Por ejemplo:
-        //const newLat = data.newLat;
-        //const newLng = data.newLng;
-        console.log(data);
-
-        // Aquí puedes hacer lo que necesites con las coordenadas convertidas, por ejemplo:
-        // setSelectedLocation({ lat: newLat, lng: newLng });
-      })
-      .catch((error) => {
-        console.error("Hubo un error al convertir las coordenadas:", error);
-      });
+        
   };
 
   const handleLocationSelected = (location) => {
