@@ -32,6 +32,7 @@ services:
     environment:
       - DEBUG=True
       - PYTHONPATH=/municipalities_svc/src
+
   buildings_service:
     build:
       context: back/buildings_svc
@@ -44,6 +45,7 @@ services:
     environment:
       - DEBUG=True
       - PYTHONPATH=/buildings_svc/src
+
   coordinates_service:
     build:
       context: back/coordinates_svc
@@ -56,4 +58,3 @@ services:
     environment:
       - DEBUG=True
       - PYTHONPATH=/coordinates_svc/src
-    
