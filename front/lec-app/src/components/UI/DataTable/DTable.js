@@ -33,61 +33,61 @@ const DTable = ({ data, onRowClicked }) => {
       name: "Potential",
       selector: (row) => row.MEAN,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "Area",
       selector: (row) => row.AREA,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "Average Income",
       selector: (row) => row.Renta_media,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "Total Population",
       selector: (row) => row.Total_poblacion,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "% Population",
       selector: (row) => row.Porcentaje_poblacion,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "% Single-Person Households",
       selector: (row) => row.Porcentaje_Hogares_unipersonales,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "% Greater than 65",
       selector: (row) => row.Porcentaje_mayor_65,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "% Greater than 18",
       selector: (row) => row.Porcentaje_menor_18,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "Average Household Size",
       selector: (row) => row.Tamaño_medio_hogar,
       sortable: true,
-      width: "auto"
+      
     },
     {
       name: "Average age",
       selector: (row) => row.Total_edad_media,
       sortable: true,
-      width: "auto"
+      
     },
 
     

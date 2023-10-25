@@ -33,7 +33,6 @@ function App() {
 
   useEffect(() => {
     // Realiza la llamada GET a la API del backend para obtener los datos de availables
-    //MUST BE ASYNCHRONOUS FOR LOADING DATA WHEN ARRIVES
     const url = `${process.env.REACT_APP_MUNICIPALITIES_WITH_DATA}?withData=true`;
     fetch(url)
       .then((res) => res.json())
