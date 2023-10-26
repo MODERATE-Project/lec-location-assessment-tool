@@ -7,9 +7,11 @@ function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [availables, setAvailables] = useState([]);
+  const [selectedBuilding, setSelectedBuilding] = useState([]);
 
-  const handleRowClick = (row) => {
-    console.log("Click en fila", row);
+  const handleRowClick = (building) => {
+    console.log("Click en fila", building);
+    setSelectedBuilding(building);
         
   };
 
@@ -54,6 +56,7 @@ function App() {
         location={selectedLocation}
         onMunicipioSelected={handleMunicipioSelected}
         availableMunicipios={availables} // Pasa availables como prop a OlMap
+        selectedBuilding={selectedBuilding}
       >
         <SearchBox onLocationSelected={handleLocationSelected} />
       </OlMap>

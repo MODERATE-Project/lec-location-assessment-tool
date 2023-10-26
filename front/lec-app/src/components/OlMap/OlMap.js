@@ -8,16 +8,19 @@ import { fromLonLat } from "ol/proj";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
-import { Style, Stroke, Fill } from "ol/style";
+import { Circle as CircleStyle, Style, Stroke, Fill } from "ol/style";
 import Select from "ol/interaction/Select";
 import { bbox } from "ol/loadingstrategy";
 import { pointerMove, click } from "ol/events/condition";
+import { Point } from "ol/geom";
+import { Feature } from "ol";
 
 const OlMap = ({
   location,
   onMunicipioSelected,
   availableMunicipios,
   children,
+  selectedBuilding,
 }) => {
   const mapRef = useRef();
   const [map, setMap] = useState(null);
@@ -27,6 +30,60 @@ const OlMap = ({
   const municipalityLayerRef = useRef(null);
   const detailedMunicipalityLayerRef = useRef(null);
   const availableMunicipiosRef = useRef(availableMunicipios);
+
+  // Creamos una nueva referencia para la capa del edificio seleccionado.
+  const buildingLayerRef = useRef(null);
+
+  // Este efecto se encargará de actualizar el mapa con la ubicación del edificio seleccionado.
+  useEffect(() => {
+    if (map && selectedBuilding) {
+      try {
+        // Extraemos las coordenadas del edificio seleccionado.
+        const coordinates = fromLonLat([
+          selectedBuilding.longitude,
+          selectedBuilding.latitude,
+        ]);
+
+        // Creamos un nuevo feature para el edificio con las coordenadas.
+        const buildingFeature = new Feature(new Point(coordinates));
+
+        // Creamos y/o actualizamos la capa del edificio.
+        if (!buildingLayerRef.current) {
+          const vectorSource = new VectorSource({
+            features: [buildingFeature],
+          });
+
+          const buildingLayer = new VectorLayer({
+            source: vectorSource,
+            style: new Style({
+              image: new CircleStyle({
+                radius: 7,
+                fill: new Fill({ color: "#003b49" }),
+                stroke: new Stroke({ color: "white", width: 2 }),
+              }),
+            }),
+          });
+
+          buildingLayerRef.current = buildingLayer;
+          map.addLayer(buildingLayer);
+        } else {
+          buildingLayerRef.current.getSource().clear();
+          buildingLayerRef.current.getSource().addFeature(buildingFeature);
+        }
+
+        // Centramos el mapa en la ubicación del edificio.
+        map.getView().animate({ center: coordinates, zoom: 18 });
+
+        // Deseleccionar todas las características de selectInteraction
+        if (selectInteractionsRef.current && selectedBuilding) {
+          selectInteractionsRef.current.click.getFeatures().clear();
+          selectInteractionsRef.current.hover.getFeatures().clear();
+        }
+      } catch (error) {
+        console.error("Error animating map:", error);
+      }
+    }
+  }, [selectedBuilding]);
 
   useEffect(() => {
     availableMunicipiosRef.current = availableMunicipios;
@@ -55,7 +112,7 @@ const OlMap = ({
         const availables = availableMunicipiosRef.current || [];
 
         //Ocultar las features a partir de un nivel de zoom
-        if (currentZoom < 7) {
+        if (currentZoom < 7 ) {
           return null;
         }
 
@@ -65,7 +122,7 @@ const OlMap = ({
             width: 0.5,
           }),
           fill: new Fill({
-            color: availables.includes(municipalityName)
+            color: availables.includes(municipalityName) && currentZoom <= 12
               ? "rgba(0, 255, 0, 0.5)"
               : "rgba(255,255,255,0.5)",
           }),
@@ -106,15 +163,6 @@ const OlMap = ({
 
       initialMap.addLayer(municipalityLayer);
 
-      initialMap.getView().on("change:resolution", () => {
-        const currentZoom = initialMap.getView().getZoom();
-        if (currentZoom >= 10) {
-          setActiveLayer("detailed");
-        } else {
-          setActiveLayer("simplified");
-        }
-      });
-
       const selectStyle = new Style({
         fill: new Fill({
           color: "rgba(249, 200, 14, 0.8)",
@@ -127,6 +175,9 @@ const OlMap = ({
         style: selectStyle,
       });
 
+      const currentZoom = initialMap.getView().getZoom();
+      hoverInteraction.setActive(currentZoom <= 14); // Establece el estado inicial de la interacción según el nivel de zoom
+
       initialMap.addInteraction(hoverInteraction);
       selectInteractionsRef.current.hover = hoverInteraction;
 
@@ -136,10 +187,33 @@ const OlMap = ({
         style: selectStyle,
       });
 
+      selectInteraction.setActive(currentZoom <= 14); // Si deseas activarlo a partir del zoom 10, por ejemplo.
+
       selectInteraction.on("select", (event) => {
         if (event.selected.length > 0) {
           const municipalityName = event.selected[0].get("NAMEUNIT");
           onMunicipioSelected(municipalityName);
+        }
+      });
+
+      initialMap.getView().on("change:resolution", function () {
+        const currentZoom = initialMap.getView().getZoom();
+
+        if (currentZoom <= 14) {
+          selectInteraction.setActive(true);
+          hoverInteraction.setActive(true);
+        } else {
+          selectInteraction.setActive(false);
+          hoverInteraction.setActive(false);
+
+          // Des-selecciona las features cuando el zoom no es el adecuado
+          selectInteraction.getFeatures().clear();
+          hoverInteraction.getFeatures().clear();
+        }
+        if (currentZoom >= 10) {
+          setActiveLayer("detailed");
+        } else {
+          setActiveLayer("simplified");
         }
       });
 
@@ -218,8 +292,6 @@ const OlMap = ({
 
     return () => {
       if (map) {
-        map.getView().un("change:resolution");
-
         // Usa las constantes locales en lugar de la ref directamente.
         if (currentHover) {
           map.removeInteraction(currentHover);
