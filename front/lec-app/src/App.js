@@ -10,7 +10,6 @@ function App() {
   const [selectedBuilding, setSelectedBuilding] = useState([]);
 
   const handleRowClick = (building) => {
-    console.log("Click en fila", building);
     setSelectedBuilding(building);
         
   };
@@ -35,7 +34,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Realiza la llamada GET a la API del backend para obtener los datos de availables
+    // Realiza la llamada GET a la API del backend para obtener los datos municipios con datos
     const url = `${process.env.REACT_APP_MUNICIPALITIES_API_URL}?withData=true`;
     fetch(url)
       .then((res) => res.json())
@@ -55,7 +54,7 @@ function App() {
       <OlMap
         location={selectedLocation}
         onMunicipioSelected={handleMunicipioSelected}
-        availableMunicipios={availables} // Pasa availables como prop a OlMap
+        availableMunicipios={availables} 
         selectedBuilding={selectedBuilding}
       >
         <SearchBox onLocationSelected={handleLocationSelected} />

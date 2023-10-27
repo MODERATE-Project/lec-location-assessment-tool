@@ -26,8 +26,6 @@ const customStyles = {
 
 const DTable = ({ data, onRowClicked }) => {
 
-  console.log(data);
-
   const columns = [
     {
       name: "Potential",
