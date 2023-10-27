@@ -1,7 +1,7 @@
 # lec-location-assessment-tool
 
 ## Requisites
-Geoserver must be installed on port 8080 and configured with the shapefiles from /data/geoserver/municipalities. Also it must be enabled CORS on web.xml.
+Geoserver must be installed on port 8080 and configured with the shapefiles from /data/geoserver/municipalities. Also it must be enabled CORS on web.xml (it not will be needed in production because of nginx reverse proxy".
 ## Create dev environment
 1. Clone the repository
 `git clone https://github.com/MODERATE-Project/lec-location-assessment-tool.git`
