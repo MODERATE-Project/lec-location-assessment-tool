@@ -28,6 +28,12 @@ const DTable = ({ data, onRowClicked }) => {
 
   const columns = [
     {
+      name: "Current use",
+      selector: (row) => row.currentUse,
+      sortable: true,
+      
+    },
+    {
       name: "Potential",
       selector: (row) => row.MEAN,
       sortable: true,
