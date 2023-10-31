@@ -7,7 +7,7 @@ function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [availables, setAvailables] = useState([]);
-  const [selectedBuilding, setSelectedBuilding] = useState([]);
+  const [selectedBuilding, setSelectedBuilding] = useState();
 
   const handleRowClick = (building) => {
     setSelectedBuilding(building);

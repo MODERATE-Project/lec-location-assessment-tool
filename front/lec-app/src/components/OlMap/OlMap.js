@@ -22,8 +22,8 @@ const OlMap = ({
   children,
   selectedBuilding,
 }) => {
-  const mapRef = useRef();
-  const [map, setMap] = useState(null);
+  const mapRef = useRef(null);
+  
   const selectInteractionsRef = useRef({});
   const [activeLayer, setActiveLayerState] = useState(null);
 
@@ -34,68 +34,36 @@ const OlMap = ({
   // Creamos una nueva referencia para la capa del edificio seleccionado.
   const buildingLayerRef = useRef(null);
 
-  // Este efecto se encargará de actualizar el mapa con la ubicación del edificio seleccionado.
-  useEffect(() => {
-    if (map && selectedBuilding) {
-      try {
-        const coordinates = getBuildingCoordinates(selectedBuilding);
-        createOrUpdateBuildingLayer(coordinates);
-        centerMapOnBuilding(coordinates);
-        deselectAllFeatures();
-      } catch (error) {
-        console.error("Error animating map:", error);
-      }
-    }
-  }, [selectedBuilding]);
-
-  const getBuildingCoordinates = (building) => {
-    return fromLonLat([building.longitude, building.latitude]);
-  };
-
-  const createOrUpdateBuildingLayer = (coordinates) => {
-    const buildingFeature = new Feature(new Point(coordinates));
-
-    if (!buildingLayerRef.current) {
-      const vectorSource = new VectorSource({ features: [buildingFeature] });
-      const buildingLayer = new VectorLayer({
-        source: vectorSource,
-        style: new Style({
-          image: new CircleStyle({
-            radius: 7,
-            fill: new Fill({ color: "red" }),
-            stroke: new Stroke({ color: "white", width: 2 }),
-          }),
-        }),
-      });
-
-      buildingLayerRef.current = buildingLayer;
-      map.addLayer(buildingLayer);
-    } else {
-      buildingLayerRef.current.getSource().clear();
-      buildingLayerRef.current.getSource().addFeature(buildingFeature);
-    }
-  };
-
-  const centerMapOnBuilding = (coordinates) => {
-    map.getView().animate({ center: coordinates, zoom: 18 });
-  };
-
-  const deselectAllFeatures = () => {
-    if (selectInteractionsRef.current) {
-      selectInteractionsRef.current.click.getFeatures().clear();
-      selectInteractionsRef.current.hover.getFeatures().clear();
-    }
-  };
-
+  
   useEffect(() => {
     availableMunicipiosRef.current = availableMunicipios;
   }, [availableMunicipios]);
 
-  useEffect(() => {
-    if (!map) {
-      initializeMap();
+
+  const setActiveLayer = useCallback((layerType) => {
+    if (!mapRef.current) {
+      return;
     }
-  }, [map, onMunicipioSelected, availableMunicipios, activeLayer]);
+
+    if (layerType === "detailed" && activeLayer !== "detailed") {
+      if (simplifiedMunicipalityLayerRef.current && layerIsOnMap(mapRef.current, simplifiedMunicipalityLayerRef.current)) {
+        mapRef.current.removeLayer(simplifiedMunicipalityLayerRef.current);
+      }
+      if (detailedMunicipalityLayerRef.current && !layerIsOnMap(mapRef.current, detailedMunicipalityLayerRef.current)) {
+        mapRef.current.addLayer(detailedMunicipalityLayerRef.current);
+      }
+      setActiveLayerState("detailed");
+    } else if (layerType === "simplified" && activeLayer !== "simplified") {
+      if (detailedMunicipalityLayerRef.current && layerIsOnMap(mapRef.current, detailedMunicipalityLayerRef.current)) {
+        mapRef.current.removeLayer(detailedMunicipalityLayerRef.current);
+      }
+      if (simplifiedMunicipalityLayerRef.current && !layerIsOnMap(mapRef.current, simplifiedMunicipalityLayerRef.current)) {
+        mapRef.current.addLayer(simplifiedMunicipalityLayerRef.current);
+      }
+      setActiveLayerState("simplified");
+    }
+  }, [activeLayer]);
+
 
   const getStyleFunction = useCallback((feature, resolution, currentZoom) => {
     const municipalityName = feature.get("NAMEUNIT");
@@ -145,6 +113,67 @@ const OlMap = ({
   }, [getStyleFunction]);
 
   const initializeMap = useCallback(() => {
+
+    const initializeSelectInteractions = (initialMap, layers) => {
+      const selectStyle = new Style({
+        fill: new Fill({
+          color: "rgba(249, 200, 14, 0.8)",
+        }),
+      });
+  
+      const currentZoom = initialMap.getView().getZoom();
+  
+      const hoverInteraction = new Select({
+        condition: pointerMove,
+        layers: layers,
+        style: selectStyle,
+      });
+  
+      hoverInteraction.setActive(currentZoom <= 14);
+      initialMap.addInteraction(hoverInteraction);
+      selectInteractionsRef.current.hover = hoverInteraction;
+  
+      const selectInteraction = new Select({
+        condition: click,
+        layers: layers,
+        style: selectStyle,
+      });
+  
+      selectInteraction.setActive(currentZoom <= 14);
+  
+      selectInteraction.on("select", (event) => {
+        if (event.selected.length > 0) {
+          const municipalityName = event.selected[0].get("NAMEUNIT");
+          onMunicipioSelected(municipalityName);
+        }
+      });
+  
+      initialMap.addInteraction(selectInteraction);
+      selectInteractionsRef.current.click = selectInteraction;
+    };
+  
+    const initializeZoomHandler = (initialMap) => {
+      initialMap.getView().on("change:resolution", function () {
+        const currentZoom = initialMap.getView().getZoom();
+  
+        const hoverInteraction = selectInteractionsRef.current.hover;
+        const selectInteraction = selectInteractionsRef.current.click;
+  
+        if (currentZoom <= 14) {
+          setActiveLayer("simplified");
+          selectInteraction.setActive(true);
+          hoverInteraction.setActive(true);
+        } else {
+          setActiveLayer("detailed");
+          selectInteraction.setActive(false);
+          hoverInteraction.setActive(false);
+          // Des-selecciona las features cuando el zoom no es el adecuado
+          selectInteraction.getFeatures().clear();
+          hoverInteraction.getFeatures().clear();
+        }
+      });
+    };
+      
     const initialMap = new Map({
       target: mapRef.current,
       layers: [new TileLayer({ source: new OSM() })],
@@ -156,7 +185,7 @@ const OlMap = ({
     });
 
     mapRef.current = initialMap;
-   
+    
     const simplifiedMunicpalityLayer = createVectorLayer(
       "moderate_municipios:simplified", initialMap
     );
@@ -182,101 +211,82 @@ const OlMap = ({
     if (detailedMunicipalityLayerRef.current) {
       detailedMunicipalityLayerRef.current.getSource().refresh();
     }
-
-    setMap(initialMap);
    
-  },[createVectorLayer, onMunicipioSelected, availableMunicipios]);;
+  },[createVectorLayer, setActiveLayer, onMunicipioSelected]);
+
+  const isMapInitialized = useRef(false); // se añade al principio del componente
+
+  useEffect(() => {
+    if (!isMapInitialized.current) {
+      initializeMap();
+      isMapInitialized.current = true;      
+    }
+  }, [onMunicipioSelected, availableMunicipios, activeLayer, initializeMap]);
+
+  const createOrUpdateBuildingLayer = useCallback((coordinates) => {
+    const buildingFeature = new Feature(new Point(coordinates));
+
+    if (!buildingLayerRef.current) {
+      const vectorSource = new VectorSource({ features: [buildingFeature] });
+      const buildingLayer = new VectorLayer({
+        source: vectorSource,
+        style: new Style({
+          image: new CircleStyle({
+            radius: 7,
+            fill: new Fill({ color: "red" }),
+            stroke: new Stroke({ color: "white", width: 2 }),
+          }),
+        }),
+      });
+
+      buildingLayerRef.current = buildingLayer;
+      mapRef.current.addLayer(buildingLayer);
+    } else {
+      buildingLayerRef.current.getSource().clear();
+      buildingLayerRef.current.getSource().addFeature(buildingFeature);
+    }
+
+  }, []);
+
+    
+  const centerMapOnBuilding = useCallback((coordinates) => {
+    mapRef.current.getView().animate({ center: coordinates, zoom: 18 });    
+  }, []);
 
 
-  const initializeSelectInteractions = (initialMap, layers) => {
-    const selectStyle = new Style({
-      fill: new Fill({
-        color: "rgba(249, 200, 14, 0.8)",
-      }),
-    });
-
-    const currentZoom = initialMap.getView().getZoom();
-
-    const hoverInteraction = new Select({
-      condition: pointerMove,
-      layers: layers,
-      style: selectStyle,
-    });
-
-    hoverInteraction.setActive(currentZoom <= 14);
-    initialMap.addInteraction(hoverInteraction);
-    selectInteractionsRef.current.hover = hoverInteraction;
-
-    const selectInteraction = new Select({
-      condition: click,
-      layers: layers,
-      style: selectStyle,
-    });
-
-    selectInteraction.setActive(currentZoom <= 14);
-
-    selectInteraction.on("select", (event) => {
-      if (event.selected.length > 0) {
-        const municipalityName = event.selected[0].get("NAMEUNIT");
-        onMunicipioSelected(municipalityName);
-      }
-    });
-
-    initialMap.addInteraction(selectInteraction);
-    selectInteractionsRef.current.click = selectInteraction;
+  const getBuildingCoordinates = (building) => {
+    return fromLonLat([building.longitude, building.latitude]);
   };
 
-  const initializeZoomHandler = (initialMap) => {
-    initialMap.getView().on("change:resolution", function () {
-      const currentZoom = initialMap.getView().getZoom();
-
-      const hoverInteraction = selectInteractionsRef.current.hover;
-      const selectInteraction = selectInteractionsRef.current.click;
-
-      if (currentZoom <= 14) {
-        setActiveLayer("simplified");
-        selectInteraction.setActive(true);
-        hoverInteraction.setActive(true);
-      } else {
-        setActiveLayer("detailed");
-        selectInteraction.setActive(false);
-        hoverInteraction.setActive(false);
-        // Des-selecciona las features cuando el zoom no es el adecuado
-        selectInteraction.getFeatures().clear();
-        hoverInteraction.getFeatures().clear();
-      }
-    });
+  
+  const deselectAllFeatures = () => {
+    if (selectInteractionsRef.current) {
+      selectInteractionsRef.current.click.getFeatures().clear();
+      selectInteractionsRef.current.hover.getFeatures().clear();
+    }
   };
 
+  // Este efecto se encarga de actualizar el mapa con la ubicación del edificio seleccionado.
+  useEffect(() => {
+
+    if (mapRef.current && selectedBuilding) {
+      try {
+        const coordinates = getBuildingCoordinates(selectedBuilding);
+        createOrUpdateBuildingLayer(coordinates);
+        centerMapOnBuilding(coordinates);
+        deselectAllFeatures ();
+        
+      } catch (error) {
+        console.error("Error animating map:", error);
+      }
+    }
+  }, [selectedBuilding, centerMapOnBuilding, createOrUpdateBuildingLayer]);
+ 
 
   const layerIsOnMap = (map, layer) => {
     const layers = map.getLayers().getArray();
     return layers.includes(layer);
   };
-
-  const setActiveLayer = useCallback((layerType) => {
-    if (!mapRef.current) {
-      return;
-    }
-
-    if (layerType === "detailed" && activeLayer !== "detailed") {
-      if (simplifiedMunicipalityLayerRef.current && layerIsOnMap(mapRef.current, simplifiedMunicipalityLayerRef.current)) {
-        mapRef.current.removeLayer(simplifiedMunicipalityLayerRef.current);
-      }
-      if (detailedMunicipalityLayerRef.current && !layerIsOnMap(mapRef.current, detailedMunicipalityLayerRef.current)) {
-        mapRef.current.addLayer(detailedMunicipalityLayerRef.current);
-      }
-      setActiveLayerState("detailed");
-    } else if (layerType === "simplified" && activeLayer !== "simplified") {
-      if (detailedMunicipalityLayerRef.current && layerIsOnMap(mapRef.current, detailedMunicipalityLayerRef.current)) {
-        mapRef.current.removeLayer(detailedMunicipalityLayerRef.current);
-      }
-      if (simplifiedMunicipalityLayerRef.current && !layerIsOnMap(mapRef.current, simplifiedMunicipalityLayerRef.current)) {
-        mapRef.current.addLayer(simplifiedMunicipalityLayerRef.current);
-      }
-      setActiveLayerState("simplified");
-    }
-  }, [activeLayer]);
 
  
   const panToLocation = useCallback(
@@ -292,7 +302,8 @@ const OlMap = ({
             parseFloat(loc.lon),
             parseFloat(loc.lat),
           ]);
-          map.getView().animate({ center: coordinates, zoom: 11 });
+          
+          mapRef.current.getView().animate({ center: coordinates, zoom: 11 });
         } else {
           alert("Ubicación no encontrada");
         }
@@ -300,14 +311,14 @@ const OlMap = ({
         alert("Error al encontrar la ubicación");
       }
     },
-    [map]
+    []
   );
 
   useEffect(() => {
-    if (location && map) {
+    if (location && mapRef.current) {
       panToLocation(location);
     }
-  }, [location, map, panToLocation]);
+  }, [location, panToLocation]);
 
   useEffect(() => {
     
@@ -315,20 +326,20 @@ const OlMap = ({
     const currentClick = selectInteractionsRef.current.click;
 
     return () => {
-      if (map) {
+      if (mapRef.current) {
         // Usa las constantes locales en lugar de la ref directamente.
         if (currentHover) {
-          map.removeInteraction(currentHover);
+          mapRef.current.removeInteraction(currentHover);
         }
         if (currentClick) {
-          map.removeInteraction(currentClick);
+          mapRef.current.removeInteraction(currentClick);
         }
 
-        map.setTarget(null);
-        setMap(null);
+        mapRef.current.setTarget(null);
+        //setMap(null);
       }
     };
-  }, [map]);
+  }, []);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "700px" }}>
