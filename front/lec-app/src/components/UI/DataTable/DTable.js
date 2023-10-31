@@ -76,7 +76,7 @@ const DTable = ({ data, onRowClicked }) => {
       
     },
     {
-      name: "% Greater than 18",
+      name: "% less than 18",
       selector: (row) => row.Porcentaje_menor_18,
       sortable: true,
       

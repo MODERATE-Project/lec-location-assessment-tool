@@ -26,7 +26,6 @@ function App() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        console.log("DATA TO PASS TO DTable: ", data);
         setTableData(data); // Guarda los datos en el estado local
       })
       .catch((error) => {
