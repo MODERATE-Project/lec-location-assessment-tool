@@ -33,6 +33,7 @@ const OlMap = ({
 
   // Creamos una nueva referencia para la capa del edificio seleccionado.
   const buildingLayerRef = useRef(null);
+  const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
 
   useEffect(() => {
     availableMunicipiosRef.current = availableMunicipios;
@@ -244,11 +245,6 @@ const OlMap = ({
   const createOrUpdateBuildingLayer = useCallback((coordinates) => {
     const buildingFeature = new Feature(new Point(coordinates));
 
-    console.log(
-      "inside createOrUpdateBuildingLayer, buildingFeature is:",
-      buildingFeature
-    );
-
     if (!buildingLayerRef.current) {
       const vectorSource = new VectorSource({ features: [buildingFeature] });
       const buildingLayer = new VectorLayer({
@@ -264,12 +260,11 @@ const OlMap = ({
 
       buildingLayerRef.current = buildingLayer;
       mapRef.current.addLayer(buildingLayer);
-
-      console.log("BUILDING layer inside createOr...", buildingFeature);
     } else {
       buildingLayerRef.current.getSource().clear();
       buildingLayerRef.current.getSource().addFeature(buildingFeature);
     }
+    setBuildingLayerReady(true);
   }, []);
 
   const centerMapOnBuilding = useCallback((coordinates) => {
@@ -289,12 +284,9 @@ const OlMap = ({
 
   // Este efecto se encarga de actualizar el mapa con la ubicación del edificio seleccionado.
   useEffect(() => {
-    console.log("Selected buiding in useEfect 1", selectedBuilding);
-
     if (mapRef.current && selectedBuilding) {
       try {
         const coordinates = getBuildingCoordinates(selectedBuilding);
-        console.log("Selected building inside useEffect 2", selectedBuilding);
         createOrUpdateBuildingLayer(coordinates);
         centerMapOnBuilding(coordinates);
         deselectAllFeatures();
@@ -304,20 +296,19 @@ const OlMap = ({
     }
   }, [selectedBuilding, centerMapOnBuilding, createOrUpdateBuildingLayer]);
 
+  // Efecto para gestionar la apertura de la URL al catastro cuando se clicka en un edificio (Punto)
   useEffect(() => {
     if (!mapRef.current) return;
 
     // Función para manejar el click sobre el mapa
     const handleMapClick = (event) => {
-      // Obtener las características en el punto de click
-
       mapRef.current.forEachFeatureAtPixel(
         event.pixel,
         (feature, layer) => {
           if (layer === buildingLayerRef.current) {
+            // Aquí se asume que selectedBuilding es un objeto con la propiedad 'informatio'
             feature.set("url", selectedBuilding.informatio);
             const url = feature.get("url");
-
             if (url) {
               // Abrir URL en una nueva pestaña que apunta a info del catastro
               window.open(url, "_blank");
@@ -326,10 +317,8 @@ const OlMap = ({
           }
         },
         {
-          // Aplicar el filtro de capa aquí
-          layerFilter: (layerCandidate) => {
-            return layerCandidate === buildingLayerRef.current;
-          },
+          layerFilter: (layerCandidate) =>
+            layerCandidate === buildingLayerRef.current,
         }
       );
     };
@@ -343,7 +332,38 @@ const OlMap = ({
         mapRef.current.un("singleclick", handleMapClick);
       }
     };
-  }, [buildingLayerRef, selectedBuilding]);
+    // Agrega selectedBuilding aquí si su cambio debería reconfigurar el evento
+  }, [selectedBuilding]);
+
+  useEffect(() => {
+    if (buildingLayerRef.current) {
+      setBuildingLayerReady(true);
+    }
+    // No hay necesidad de tener este useEffect si solo estableces el estado
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current || !isBuildingLayerReady) return;
+
+    const handlePointerMove = (event) => {
+      const pixel = mapRef.current.getEventPixel(event.originalEvent);
+      const hit = mapRef.current.forEachFeatureAtPixel(
+        pixel,
+        (feature, layer) => layer === buildingLayerRef.current
+      );
+
+      mapRef.current.getTargetElement().style.cursor = hit ? "pointer" : "";
+    };
+
+    mapRef.current.on("pointermove", handlePointerMove);
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.un("pointermove", handlePointerMove);
+      }
+    };
+    // isBuildingLayerReady debe estar en la lista de dependencias para reconfigurar el evento si cambia
+  }, [isBuildingLayerReady]);
 
   const layerIsOnMap = (map, layer) => {
     const layers = map.getLayers().getArray();
