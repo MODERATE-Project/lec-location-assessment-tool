@@ -1,0 +1,26 @@
+<dataStore>
+  <id>DataStoreInfoImpl-4201c90e:18b41aa272c:-7ffc</id>
+  <name>simplified_municipalities</name>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--4a3407e6:18b3d1bfcb3:-8000</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">ISO-8859-1</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Madrid</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">http://geoserver.org/moderate</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="skipScan">true</entry>
+    <entry key="url">file:data/municipalities/municipalities_simplified/Municipios_IGN.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+  <dateCreated>2023-10-18 07:27:14.868 UTC</dateCreated>
+  <dateModified>2023-10-18 10:23:38.818 UTC</dateModified>
+  <disableOnConnFailure>false</disableOnConnFailure>
+</dataStore>

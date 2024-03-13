@@ -1,0 +1,17 @@
+<layer>
+  <name>detailed</name>
+  <id>LayerInfoImpl-4201c90e:18b41aa272c:-7ffd</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--570ae188:124761b8d78:-7fe0</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-4201c90e:18b41aa272c:-7ffe</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2023-10-18 07:26:39.683 UTC</dateCreated>
+  <dateModified>2023-10-18 10:38:30.31 UTC</dateModified>
+</layer>

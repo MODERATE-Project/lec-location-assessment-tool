@@ -11,7 +11,7 @@ services:
     ports:
       - 80:80
     env_file:
-      - .env.development
+      - .env.production
 
   municipalities_service:
     build:
@@ -23,3 +23,24 @@ services:
     environment:
       - PYTHONPATH=/municipalities_svc/src
 
+  buildings_service:
+    build:
+      context: back/buildings_svc
+      dockerfile: Dockerfile.prod
+    ports:
+      - 5001:5000
+    restart: always
+    environment:
+      - PYTHONPATH=/buildings_svc/src
+
+  geoserver:
+    container_name: geoserver-instance
+    build:
+      context: ./geoserver_data
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8080:8080"
+    restart: always
+    volumes:
+      - ./geoserver_data/data/municipalities:/opt/geoserver/data_dir/data/municipalities
+      - ./geoserver_data/workspaces/moderate_municipios:/opt/geoserver/data_dir/workspaces/moderate_municipios

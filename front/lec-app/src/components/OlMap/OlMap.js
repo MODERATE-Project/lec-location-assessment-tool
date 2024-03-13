@@ -118,7 +118,7 @@ const OlMap = ({
         source: new VectorSource({
           format: new GeoJSON(),
           url: function (extent) {
-            return `http://localhost:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typename=${typename}&outputFormat=application/json&srsname=EPSG:4326`;
+            return `${process.env.REACT_APP_GEOSERVER_API_URL}/ows?service=WFS&version=1.0.0&request=GetFeature&typename=${typename}&outputFormat=application/json&srsname=EPSG:4326`;
           },
           strategy: bbox,
         }),
