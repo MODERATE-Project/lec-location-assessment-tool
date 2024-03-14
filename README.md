@@ -24,7 +24,7 @@ docker compose -f docker-compose.prod.yaml up
 ## Running the tool
 Open the browser with the following link: http://localhost
 
-## Contenedores desplegados
+## Deployed containers
 There will be four containers deployed in the system, as can be seen in the docker compose file of this repository. These are:
 - Microservice to offer building data through an API. Example: 
   - To get the data of all buildings in the municipality of Crevillent, you can make a GET request to the endpoint http://127.0.0.1:5001/buildings?municipio=Crevillent
@@ -36,13 +36,13 @@ There will be four containers deployed in the system, as can be seen in the dock
 
 ## Screenshots
 ### Selecting a municipality
-![Municipality selection](./images/lec_crevillent_search_box.jpg)
+![Municipality selection](./docs/images/lec_crevillent_search_box.jpg)
 
 ### Selecting a building
-![Building selection](./images/lec_crevillent_selected_building.jpg)
+![Building selection](./docs/images/lec_crevillent_selected_building.jpg)
 
 ### Cadaster data for the building
-![Cadaster data for a building](./images/electronic_cadaster_info.jpg)
+![Cadaster data for a building](./docs/images/electronic_cadaster_info.jpg)
 
 
 ## Stopping the tool
