@@ -1,4 +1,4 @@
-name: Build and push the buildings microservice image
+name: Build and push the LEC tool frontend image
 
 on:
   push:
@@ -12,8 +12,12 @@ jobs:
       project_id: ${{ vars.DEFAULT_GAR_PROJECT_ID }}
       gar_location: ${{ vars.DEFAULT_GAR_LOCATION }}
       gar_repo: ${{ vars.DEFAULT_GAR_REPOSITORY }}
-      image_name: tool-lec-buildings-svc
-      working_dir: back/buildings_svc
+      image_name: tool-lec-frontend
+      working_dir: front/lec-app
+      build_args: |
+        REACT_APP_MUNICIPALITIES_API_URL=/municipalities
+        REACT_APP_BUILDINGS_API_URL=/buildings
+        REACT_APP_GEOSERVER_API_URL=/geoserver
     secrets:
       wif_provider: ${{ secrets.WIF_PROVIDER }}
       wif_service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
