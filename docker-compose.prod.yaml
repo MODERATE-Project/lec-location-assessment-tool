@@ -3,7 +3,6 @@ services:
     container_name: lec-app-frontend
     build:
       context: front/lec-app
-      dockerfile: Dockerfile.prod
       args:
         REACT_APP_MUNICIPALITIES_API_URL: /municipalities
         REACT_APP_BUILDINGS_API_URL: /buildings
@@ -21,7 +20,6 @@ services:
     container_name: municipalities-svc
     build:
       context: back/municipalities_svc
-      dockerfile: Dockerfile.prod
     ports:
       - 5000:5000
     restart: always
@@ -30,7 +28,6 @@ services:
     container_name: buildings-svc
     build:
       context: back/buildings_svc
-      dockerfile: Dockerfile.prod
     ports:
       - 5001:5000
     restart: always
