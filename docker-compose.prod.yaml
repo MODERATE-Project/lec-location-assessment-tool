@@ -1,45 +1,45 @@
 services:
   app:
-    container_name: front-lec-prod-c
+    container_name: lec-app-frontend
     build:
       context: front/lec-app
       dockerfile: Dockerfile.prod
+      args:
+        REACT_APP_MUNICIPALITIES_API_URL: /municipalities
+        REACT_APP_BUILDINGS_API_URL: /buildings
+        REACT_APP_GEOSERVER_API_URL: /geoserver
     environment:
-      - NODE_ENV=production
       - WDS_SOCKET_PORT=3000
+      - MODERATE_GEOSERVER_PROXY_PASS_URL=http://geoserver:8080
+      - MODERATE_MUNICIPALITIES_SVC_PROXY_PASS_URL=http://municipalities_service:5000
+      - MODERATE_BUILDINGS_SVC_PROXY_PASS_URL=http://buildings_service:5000
     restart: always
     ports:
       - 80:80
-    env_file:
-      - .env.production
 
   municipalities_service:
+    container_name: municipalities-svc
     build:
       context: back/municipalities_svc
       dockerfile: Dockerfile.prod
     ports:
       - 5000:5000
     restart: always
-    environment:
-      - PYTHONPATH=/municipalities_svc/src
 
   buildings_service:
+    container_name: buildings-svc
     build:
       context: back/buildings_svc
       dockerfile: Dockerfile.prod
     ports:
       - 5001:5000
     restart: always
-    environment:
-      - PYTHONPATH=/buildings_svc/src
 
   geoserver:
     container_name: geoserver-instance
-    build:
-      context: ./geoserver_data
-      dockerfile: Dockerfile.prod
+    image: kartoza/geoserver:2.24.2
     ports:
-      - "8080:8080"
+      - 8080:8080
     restart: always
     volumes:
       - ./geoserver_data/data/municipalities:/opt/geoserver/data_dir/data/municipalities

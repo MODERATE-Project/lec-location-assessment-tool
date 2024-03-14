@@ -11,12 +11,26 @@ function App() {
 
   const handleRowClick = (building) => {
     setSelectedBuilding(building);
-        
   };
 
   const handleLocationSelected = (location) => {
     setSelectedLocation(location);
   };
+
+  useEffect(() => {
+    console.debug(
+      "REACT_APP_MUNICIPALITIES_API_URL",
+      process.env.REACT_APP_MUNICIPALITIES_API_URL
+    );
+    console.debug(
+      "REACT_APP_BUILDINGS_API_URL",
+      process.env.REACT_APP_BUILDINGS_API_URL
+    );
+    console.debug(
+      "REACT_APP_GEOSERVER_API_URL",
+      process.env.REACT_APP_GEOSERVER_API_URL
+    );
+  }, []);
 
   const handleMunicipioSelected = useCallback((municipio) => {
     const url = `${
@@ -54,7 +68,7 @@ function App() {
       <OlMap
         location={selectedLocation}
         onMunicipioSelected={handleMunicipioSelected}
-        availableMunicipios={availables} 
+        availableMunicipios={availables}
         selectedBuilding={selectedBuilding}
       >
         <SearchBox onLocationSelected={handleLocationSelected} />
