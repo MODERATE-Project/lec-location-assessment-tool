@@ -1,4 +1,4 @@
-# lec-location-assessment-tool
+# Local Energy Communities (LEC) Location Assessment Tool
 
 ## Requirements
 To deploy the tool, it is necessary to install Docker engine and Docker compose: https://docs.docker.com/engine/install/
