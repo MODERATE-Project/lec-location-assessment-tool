@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
-import OlMap from "./components/OlMap/OlMap";
-import SearchBox from "./components/UI/SearchBox/SearchBox";
 import DTable from "./components/UI/DataTable/DTable";
+import SearchBox from "./components/UI/SearchBox/SearchBox";
+import { REACT_APP_MUNICIPALITIES_API_URL, REACT_APP_BUILDINGS_API_URL, REACT_APP_GEOSERVER_API_URL } from "./constants"
+import './App.css'
+// import OlMapBasic from "./components/OlMap/OlMapBasic";
+// import DeclarativeMapDef from "./components/OlMap/DelcarativeMapDef";
+import OlMap from "./components/OlMap/OlMap";
+import SortingCriteriaSelector from "./components/UI/SortingCriteriaSelector/SortingCriteriaSelector";
+import DrawingToggleButton from "./components/UI/DrawingToggleButton/DrawingToggleButton";
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [availables, setAvailables] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState();
+  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false)
 
   const handleRowClick = (building) => {
     setSelectedBuilding(building);
@@ -15,27 +22,31 @@ function App() {
 
   const handleLocationSelected = (location) => {
     setSelectedLocation(location);
+    console.log('new location', location)
   };
 
   useEffect(() => {
     console.debug(
       "REACT_APP_MUNICIPALITIES_API_URL",
-      process.env.REACT_APP_MUNICIPALITIES_API_URL
+      REACT_APP_MUNICIPALITIES_API_URL
     );
     console.debug(
       "REACT_APP_BUILDINGS_API_URL",
-      process.env.REACT_APP_BUILDINGS_API_URL
+      REACT_APP_BUILDINGS_API_URL
     );
     console.debug(
       "REACT_APP_GEOSERVER_API_URL",
-      process.env.REACT_APP_GEOSERVER_API_URL
+      REACT_APP_GEOSERVER_API_URL
     );
   }, []);
 
+  const handleSortingCriteria = (sortingCriteria) => {
+    console.log('sortingCriteria', sortingCriteria)
+  }
+
   const handleMunicipioSelected = useCallback((municipio) => {
-    const url = `${
-      process.env.REACT_APP_BUILDINGS_API_URL
-    }?municipio=${encodeURIComponent(municipio)}`;
+    const url = `${REACT_APP_BUILDINGS_API_URL
+      }?municipio=${encodeURIComponent(municipio)}`;
 
     fetch(url)
       .then((res) => res.json())
@@ -44,12 +55,16 @@ function App() {
       })
       .catch((error) => {
         console.error("Hubo un error al obtener los datos:", error);
+      })
+      .finally(() => {
+        console.log("Se ha terminado de obtener los datos del municipio " + municipio);
+        setSelectedLocation(location);
       });
   }, []);
 
   useEffect(() => {
     // Realiza la llamada GET a la API del backend para obtener los datos municipios con datos
-    const url = `${process.env.REACT_APP_MUNICIPALITIES_API_URL}?withData=true`;
+    const url = `${REACT_APP_MUNICIPALITIES_API_URL}?withData=true`;
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -61,8 +76,13 @@ function App() {
       .catch((error) => {
         console.error("Hubo un error al obtener los datos:", error);
       });
-  }, []); // El array vacío [] asegura que este efecto se ejecute solo una vez al montar el componente
+  }, []);
 
+  const handleDrawingToggleButtonChange = () => {
+    console.log('isDrawingEnabled', isDrawingEnabled)
+    setIsDrawingEnabled(prevState => !prevState);
+
+  }
   return (
     <div className="App">
       <OlMap
@@ -70,8 +90,11 @@ function App() {
         onMunicipioSelected={handleMunicipioSelected}
         availableMunicipios={availables}
         selectedBuilding={selectedBuilding}
+        isDrawingEnabled={isDrawingEnabled} 
       >
         <SearchBox onLocationSelected={handleLocationSelected} />
+        {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria}/>}
+        <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
       </OlMap>
       <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
     </div>

@@ -1,0 +1,16 @@
+version: "3"
+
+# Para cargar variables de entono (env-vars)
+dotenv: [.env.development]
+
+tasks:
+
+  start-dev:
+      - docker compose -f ${PWD}/docker-compose.dev.yaml up -d --build --remove-orphans
+
+
+  logs:
+    - docker compose -f ${PWD}/docker-compose.dev.yaml logs -f
+
+  stop-dev:
+    - docker compose -f ${PWD}/docker-compose.dev.yaml down

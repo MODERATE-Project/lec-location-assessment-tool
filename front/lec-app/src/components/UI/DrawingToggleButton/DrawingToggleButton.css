@@ -1,0 +1,25 @@
+.left-button {
+    position: absolute;
+    left: 0;
+    margin-left: 10px;
+    top: 50%;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    
+}
+
+.left-button-enabled {
+    background-color: lightgray;
+    padding: 15px;
+    animation: bounce .3s forwards;
+}
+
+.left-button-disabled {
+    animation: bounce .3s backwards;
+}
+
+@keyframes bounce {
+    to { transform: scale(.8); }
+  }
+  

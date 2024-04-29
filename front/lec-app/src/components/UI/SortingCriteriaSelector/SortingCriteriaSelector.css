@@ -1,0 +1,67 @@
+.sorting-criteria-container {
+  position: absolute;
+  top: 50px;
+  right: 25px;
+  width: fit-content;
+
+  padding: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  z-index: 1000;
+  text-align: left;
+  display: flex;
+  max-width: 100%;
+  flex-direction: column;
+  margin: 0;
+}
+
+.sorting-criteria-container p, .sorting-criteria-container h2 {
+  /* font-weight: bold; */
+  flex-wrap: wrap;
+  max-width: 350px;
+}
+
+.sorting-criteria-container p {
+  margin-top: 0;
+  /* border-bottom: 1px solid #ccc; */
+  font-style: italic;
+
+}
+
+.sorting-criteria-container h2 {
+  margin: 0;
+}
+
+.variable-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.variable-row label {
+  flex: 1;
+  padding-right: 1.5rem;
+}
+
+
+.variable-row input[type="number"] {
+  width: 60px;
+  font-size: 18px;
+  /* Adjust font size as needed */
+
+}
+
+.sort-button {
+  margin-top: 20px;
+  background-color: #003b49;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sort-button:hover {
+  background-color: #f2c75c;
+  color: #003b49;
+}
