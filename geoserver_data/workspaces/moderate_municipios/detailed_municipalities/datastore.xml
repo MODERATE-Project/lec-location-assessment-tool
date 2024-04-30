@@ -7,7 +7,7 @@
     <id>WorkspaceInfoImpl--4a3407e6:18b3d1bfcb3:-8000</id>
   </workspace>
   <connectionParameters>
-    <entry key="charset">ISO-8859-1</entry>
+    <entry key="charset">UTF-8</entry>
     <entry key="filetype">shapefile</entry>
     <entry key="create spatial index">true</entry>
     <entry key="memory mapped buffer">false</entry>
@@ -21,6 +21,6 @@
   </connectionParameters>
   <__default>false</__default>
   <dateCreated>2023-10-18 07:24:11.853 UTC</dateCreated>
-  <dateModified>2023-10-18 10:41:21.734 UTC</dateModified>
+  <dateModified>2024-04-30 12:45:28.596 UTC</dateModified>
   <disableOnConnFailure>false</disableOnConnFailure>
 </dataStore>
