@@ -8,6 +8,8 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
 import { bbox } from "ol/loadingstrategy";
 import { REACT_APP_GEOSERVER_API_URL } from "../constants";
+import { Style, Stroke, Fill } from "ol/style";
+
 
 const osmLayer = new TileLayer({
     preload: Infinity,
@@ -22,59 +24,70 @@ const municipalitySource = (type) => {
     })
 }
 
-const simplifiedMunicipalityLayer = (vectorZoomThreshold) => {
+
+
+const simplifiedMunicipalityLayer = (vectorZoomThreshold, availables) => {
     return new VectorLayer({
+        name: 'simplified',
         source: municipalitySource('simplified'),
-        maxZoom: vectorZoomThreshold
+        maxZoom: vectorZoomThreshold,
+        minZoom: 7,
     })
 }
 
-const detailedMunicipalityLayer = (vectorZoomThreshold) => {
+const detailedMunicipalityLayer = (vectorZoomThreshold, availables) => {
     return new VectorLayer({
+        name: 'detailed',
         source: municipalitySource('detailed'),
-        minZoom: vectorZoomThreshold
+        minZoom: vectorZoomThreshold,
     })
 }
 
 
 export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoomLevel, availableMunicipios }) => {
+        
+    const simplifiedLayer = simplifiedMunicipalityLayer(vectorZoomThreshold, availableMunicipios);
+    const detailedLayer = detailedMunicipalityLayer(vectorZoomThreshold, availableMunicipios);
+
+
     const initialMap = new Map({
         target: targetElemet,
         layers: [
             osmLayer,
-            simplifiedMunicipalityLayer(vectorZoomThreshold),
-            detailedMunicipalityLayer(vectorZoomThreshold)
+            simplifiedLayer,
+            detailedLayer
         ],
         view: new View({
             center: fromLonLat([-3.70379, 40.416775]),
             zoom: initialZoomLevel
         }),
+        controls: []
     });
 
-    // EVENT change:resolution
-    initialMap.getView().on("change:resolution", function () {
-        const currentZoom = initialMap.getView().getZoom();
-        console.log("Cambio de zoom: ", currentZoom)
+    // EVENT change:resolution // XXX para Debug: para verificar valores de zoom y capas
+    // initialMap.getView().on("change:resolution", function () {
+    //     const currentZoom = initialMap.getView().getZoom();
+    //     console.log("Cambio de zoom: ", currentZoom)
 
-        const layers = initialMap.getLayers().getArray();
-        console.log("Capas: ", layers.map(layer => ({ 'name': layer.constructor.name, 'visible': layer.isVisible() })))
-    });
+    //     const layers = initialMap.getLayers().getArray();
+    //     console.log("Capas: ", layers.map(layer => ({ 'name': layer.constructor.name, 'visible': layer.isVisible() })))
+    // });
 
 
-    // EVENT click
-    initialMap.on("click", (event) => {
-        const feature = initialMap.forEachFeatureAtPixel(
-            event.pixel,
-            (feature) => feature,
-            {
-                layerFilter: (layer) => layer === buildingLayerRef.current,
-            }
-        );
-        if (feature) {
-            const building = feature.getProperties();
-            onBuildingSelected(building);
-        }
-    });
+    // EVENT click // TODO: implementar correctamente.
+    // initialMap.on("click", (event) => {
+    //     const feature = initialMap.forEachFeatureAtPixel(
+    //         event.pixel,
+    //         (feature) => feature,
+    //         {
+    //             layerFilter: (layer) => layer === buildingLayerRef.current,
+    //         }
+    //     );
+    //     if (feature) {
+    //         const building = feature.getProperties();
+    //         onBuildingSelected(building);
+    //     }
+    // });
 
-    return { initialMap };
+    return { initialMap, simplifiedLayer, detailedLayer };
 }        

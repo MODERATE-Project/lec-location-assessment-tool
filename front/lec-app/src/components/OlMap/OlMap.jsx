@@ -19,12 +19,15 @@ const OlMap = ({
 }) => {
 
   const selectInteractionsRef = useRef({});
-  const availableMunicipiosRef = useRef(availableMunicipios);
-  
+  // const availableMunicipios = useState(availableMunicipios);
+
+  const mapElementRef = useRef();
+
   const { mapRef } = useMap({
+    mapElementRef,
     location,
     onMunicipioSelected,
-    availableMunicipiosRef,
+    availableMunicipios,
     selectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef
@@ -34,11 +37,7 @@ const OlMap = ({
 
   // Creamos una nueva referencia para la capa del edificio seleccionado.
   const buildingLayerRef = useRef(null);
-  const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
-
-  useEffect(() => {
-    availableMunicipiosRef.current = availableMunicipios;
-  }, [availableMunicipios]);
+  const [isBuildingLayerReady, setIsBuildingLayerReady] = useState(false);
 
   const createOrUpdateBuildingLayer = useCallback((coordinates) => {
     const buildingFeature = new Feature(new Point(coordinates));
@@ -165,11 +164,9 @@ const OlMap = ({
 
 
 
-  
-
   return (
     <div className="map-wrapper">
-      <div ref={mapRef} className="map"></div>
+      <div ref={mapElementRef} className="map"></div>
       {children}
     </div>
   );

@@ -41,7 +41,7 @@ const SearchBox = ({ onLocationSelected }) => {
   return (
     <div className={classes.selectContainer}>
       <Select
-        filterOption={createFilter({ ignoreAccents: false })}
+        filterOption={createFilter({ ignoreAccents: true })}
         options={options}
         placeholder="Select a municipality"
         onChange={(selectedOption) =>

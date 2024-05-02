@@ -26,10 +26,10 @@ const addBoxInteraction = (map, drawingVectorLayer) => {
 
 // typeSelect.onchange = function () {  // TODO: efecto de disable de UI
 const removeBoxInteraction = (map) => {
-    if (draw)
+    if (draw && modify) {
         map.removeInteraction(draw);
         map.removeInteraction(modify);
-
+    }
 }
 
 

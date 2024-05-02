@@ -20,10 +20,10 @@ function App() {
     setSelectedBuilding(building);
   };
 
-  const handleLocationSelected = (location) => {
-    setSelectedLocation(location);
-    console.log('new location', location)
-  };
+  // const handleLocationSelected = (location) => {
+  //   setSelectedLocation(location);
+  //   console.log('new location', location)
+  // };
 
   useEffect(() => {
     console.debug(
@@ -58,7 +58,7 @@ function App() {
       })
       .finally(() => {
         console.log("Se ha terminado de obtener los datos del municipio " + municipio);
-        setSelectedLocation(location);
+        setSelectedLocation(municipio);
       });
   }, []);
 
@@ -92,9 +92,9 @@ function App() {
         selectedBuilding={selectedBuilding}
         isDrawingEnabled={isDrawingEnabled} 
       >
-        <SearchBox onLocationSelected={handleLocationSelected} />
-        {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria}/>}
-        <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
+        <SearchBox onLocationSelected={handleMunicipioSelected} />
+        {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} />}
+        {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
       </OlMap>
       <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
     </div>
