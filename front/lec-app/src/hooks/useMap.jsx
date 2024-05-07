@@ -12,6 +12,7 @@ import { Style, Stroke, Fill } from "ol/style";
 import Select from "ol/interaction/Select";
 import { bbox } from "ol/loadingstrategy";
 import { pointerMove, click } from "ol/events/condition";
+import { getCenter } from 'ol/extent'
 import { REACT_APP_GEOSERVER_API_URL } from "../constants.js"
 // import './OlMapBasic.css'
 import { addBoxInteraction, removeBoxInteraction } from "../services/mapDrawingModule.js";
@@ -34,6 +35,22 @@ export function useMap({
     // const [activeLayer, setActiveLayerState] = useState(null);
 
     const panToLocation = useCallback(async (locName) => {
+
+        const features = simplifiedMunicipalityLayerRef.current.getSource().getFeatures().filter(feature => (
+            feature.get("NAMEUNIT") === locName || feature.get("NAMEUNIT") === location
+        ))
+
+        const feature = features.length > 0 ? features[0] : null
+
+        if (feature) { // si encuentra la feature, la usamos para centrar el mapa
+
+            const geometry = feature.getGeometry()
+            const centerCoordinates = geometry.getExtent();
+            const center = getCenter(centerCoordinates);
+
+            // mapRef.current.getView().animate({ center: center, zoom: 11 });
+            mapRef.current.getView().fit(geometry, { duration: 2000, padding: [70, 70, 70, 70] });
+        } else { // si no la encuentra se recurre a nominatim para sacar el centro (original)
         try {
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${locName}`
@@ -52,6 +69,7 @@ export function useMap({
             }
         } catch (err) {
             alert("Error al encontrar la ubicación");
+            }
         }
     }, []);
 
@@ -258,7 +276,11 @@ const initializeMap = useCallback((availableMunicipios) => {
 
         selectInteraction.on("select", (event) => {
             if (event.selected.length > 0) {
-                const municipalityName = event.selected[0].get("NAMEUNIT");
+
+                    const municipalityFeature = event.selected[0]
+                    const municipalityName = municipalityFeature.get("NAMEUNIT");
+
+                    // setCurrentLocationFeature({feature: municipalityFeature, locName: municipalityName});
                 onMunicipioSelected(municipalityName);
             }
         });
