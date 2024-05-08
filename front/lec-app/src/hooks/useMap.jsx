@@ -177,7 +177,7 @@ export function useMap({
             let color;
             if (currentZoom > 14 && location) {
 
-                if (location === municipalityName)
+                if (location === municipalityName && availables?.includes(municipalityName))
                     color = colors['unavailable'];
                 else color = colors['inspectionOutbound'];
 
