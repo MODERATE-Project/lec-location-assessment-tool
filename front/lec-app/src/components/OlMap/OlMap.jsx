@@ -37,7 +37,7 @@ const OlMap = ({
 
   // Creamos una nueva referencia para la capa del edificio seleccionado.
   const buildingLayerRef = useRef(null);
-  const [isBuildingLayerReady, setIsBuildingLayerReady] = useState(false);
+  const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
 
   const createOrUpdateBuildingLayer = useCallback((coordinates) => {
     const buildingFeature = new Feature(new Point(coordinates));
