@@ -45,17 +45,21 @@ const detailedMunicipalityLayer = (vectorZoomThreshold, availables) => {
 
 
 export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoomLevel, availableMunicipios }) => {
-        
+
     const simplifiedLayer = simplifiedMunicipalityLayer(vectorZoomThreshold, availableMunicipios);
     const detailedLayer = detailedMunicipalityLayer(vectorZoomThreshold, availableMunicipios);
-
+    const drawingVectorLayer = new VectorLayer({
+        name: "drawing",
+        source: new VectorSource({ wrapX: false }),
+    })
 
     const initialMap = new Map({
         target: targetElemet,
         layers: [
             osmLayer,
             simplifiedLayer,
-            detailedLayer
+            detailedLayer,
+            drawingVectorLayer
         ],
         view: new View({
             center: fromLonLat([-3.70379, 40.416775]),
@@ -89,5 +93,5 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
     //     }
     // });
 
-    return { initialMap, simplifiedLayer, detailedLayer };
+    return { initialMap, simplifiedLayer, detailedLayer, drawingVectorLayer };
 }        

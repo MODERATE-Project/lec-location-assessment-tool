@@ -23,8 +23,12 @@ export function useMap({
     selectInteractionsRef,
 }) {
     const mapRef = useRef(null);
-    const simplifiedMunicipalityLayerRef = useRef(null);
-    const detailedMunicipalityLayerRef = useRef(null);
+
+    const simplifiedMunicipalityLayerRef = useRef();
+    const detailedMunicipalityLayerRef = useRef();
+    const drawingVectorLayerRef = useRef();
+
+
     const isMapInitialized = useRef(false); // se añade al principio del componente
     // const [activeLayer, setActiveLayerState] = useState(null);
 
@@ -39,8 +43,8 @@ export function useMap({
         if (feature) { // si encuentra la feature, la usamos para centrar el mapa
 
             const geometry = feature.getGeometry()
-            const centerCoordinates = geometry.getExtent();
-            const center = getCenter(centerCoordinates);
+            // const centerCoordinates = geometry.getExtent();
+            // const center = getCenter(centerCoordinates);
 
             // mapRef.current.getView().animate({ center: center, zoom: 11 });
             mapRef.current.getView().fit(geometry, { duration: 2000, padding: [70, 70, 70, 70] });
@@ -235,11 +239,6 @@ export function useMap({
 
     }, [styleFunction])
 
-    const drawingVectorLayer = useRef(new VectorLayer({
-        name: "drawing",
-        source: new VectorSource({ wrapX: false }),
-    }));
-
 
     const initializeMap = useCallback((availableMunicipios) => {
         console.log("inicializando mapa", availableMunicipios);
@@ -309,7 +308,7 @@ export function useMap({
 
         // console.log(availableMunicipios.current)
 
-        const { initialMap, simplifiedLayer: simplifiedMunicipalityLayer, detailedLayer: detailedMunicipalityLayer } = initializeOlMap({
+        const { initialMap, simplifiedLayer: simplifiedMunicipalityLayer, detailedLayer: detailedMunicipalityLayer, drawingVectorLayer } = initializeOlMap({
             targetElemet: mapElementRef.current,
             vectorZoomThreshold: 9,
             initialZoomLevel: 7.7,
@@ -340,6 +339,7 @@ export function useMap({
 
         simplifiedMunicipalityLayerRef.current = simplifiedMunicipalityLayer;
         detailedMunicipalityLayerRef.current = detailedMunicipalityLayer;
+        drawingVectorLayerRef.current = drawingVectorLayer;
 
         // initialMap.addLayer(simplifiedMunicpalityLayer);
 
@@ -359,7 +359,6 @@ export function useMap({
 
     }, []);
 
-    // FIXME [Lo comento porque] parece no hacer nada
     useEffect(() => {
         const currentHover = selectInteractionsRef.current.hover;
         const currentClick = selectInteractionsRef.current.click;
@@ -405,7 +404,7 @@ export function useMap({
 
             if (isDrawingEnabled) {
 
-                addBoxInteraction(mapRef.current, drawingVectorLayer.current);
+                addBoxInteraction(mapRef.current, drawingVectorLayerRef.current);
                 mapRef.current.removeInteraction(selectInteractionsRef.current.hover)
                 mapRef.current.removeInteraction(selectInteractionsRef.current.click)
 
