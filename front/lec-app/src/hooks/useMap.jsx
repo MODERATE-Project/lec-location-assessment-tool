@@ -245,6 +245,9 @@ export function useMap({
         const initializeSelectInteractions = (initialMap, layers) => {
             const selectStyle = new Style({
                 fill: new Fill({
+                    stroke: new Stroke({
+                        color: "#003b49",
+                    }),    
                     color: "rgba(249, 200, 14, 0.8)",
                 }),
             });
