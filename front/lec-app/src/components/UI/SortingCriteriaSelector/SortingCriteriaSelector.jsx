@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './SortingCriteriaSelector.css';
+import Loader from '../Loader';
 
-const SortingCriteriaComponent = ({ onSort }) => {
+const SortingCriteriaComponent = ({ onSort, isLoading }) => {
+
   const [variableImportance, setVariableImportance] = useState({
     Rent: 0,
     Age: 0,
@@ -49,7 +51,10 @@ const SortingCriteriaComponent = ({ onSort }) => {
           </div>
         ))}
       </div>
-      <button className="sort-button dark" onClick={handleSort}>Sort Table</button>
+      <button className="sort-button dark" onClick={handleSort}>
+        { isLoading && <Loader /> }
+        Sort Table
+        </button>
     </div>
   );
 };

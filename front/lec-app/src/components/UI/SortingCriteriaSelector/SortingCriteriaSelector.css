@@ -56,6 +56,10 @@
   margin-top: 20px;
   border-radius: 5px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 100%;
 }
 
 .sort-button:hover {
