@@ -42,6 +42,27 @@ function App() {
 
   const handleSortingCriteria = (sortingCriteria) => {
     console.log('sortingCriteria', sortingCriteria)
+
+    const weights_mapped = mapWeightsToApi(sortingCriteria)
+
+    // Realiza la llamada GET a la API del backend para obtener los datos
+    const url = `${REACT_APP_BUILDINGS_API_URL
+      }/weighted-sort?municipio=${encodeURIComponent(selectedLocation)}&weights=${encodeURIComponent(JSON.stringify(weights_mapped))}`;
+    fetch(url)
+      .then((res) => (
+        console.log('res', res),
+        res.json())
+      )
+      .then((data) => {
+        if (data.buildings) {
+          console.log('Fetching sorted: data:', data)
+          setTableData(data); // Guarda los datos en el estado local
+        }
+        else console.error("Fetching sorted data: No response from server: ", data);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener los datos:", error);
+      });
   }
 
   const handleMunicipioSelected = useCallback((municipio) => {
