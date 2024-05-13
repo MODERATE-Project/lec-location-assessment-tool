@@ -8,6 +8,7 @@ import './App.css'
 import OlMap from "./components/OlMap/OlMap";
 import SortingCriteriaSelector from "./components/UI/SortingCriteriaSelector/SortingCriteriaSelector";
 import DrawingToggleButton from "./components/UI/DrawingToggleButton/DrawingToggleButton";
+import mapWeightsToApi from "./services/sortAdapter"
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
