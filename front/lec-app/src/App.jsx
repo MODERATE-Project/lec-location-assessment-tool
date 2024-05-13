@@ -113,7 +113,11 @@ function App() {
         selectedBuilding={selectedBuilding}
         isDrawingEnabled={isDrawingEnabled} 
       >
-        <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation}/>
+        <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />
+        {tableData.buildings?.length > 0 && !selectedBuilding &&
+          <div className="buildings-alert">
+            <p>Click on table rows or zoom in to see and interact with the buildings</p>
+          </div>}
         {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} />}
         {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
       </OlMap>

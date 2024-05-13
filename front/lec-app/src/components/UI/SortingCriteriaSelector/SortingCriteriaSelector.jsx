@@ -49,7 +49,7 @@ const SortingCriteriaComponent = ({ onSort }) => {
           </div>
         ))}
       </div>
-      <button className="sort-button" onClick={handleSort}>Sort Table</button>
+      <button className="sort-button dark" onClick={handleSort}>Sort Table</button>
     </div>
   );
 };
