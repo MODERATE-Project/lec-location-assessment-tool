@@ -134,6 +134,7 @@ function App() {
         location={selectedLocation}
         onMunicipioSelected={handleMunicipioSelected}
         availableMunicipios={availables}
+        availableBuildings={tableData.buildings}
         selectedBuilding={selectedBuilding}
         isDrawingEnabled={isDrawingEnabled}
       >

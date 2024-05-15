@@ -11,13 +11,15 @@ import { REACT_APP_GEOSERVER_API_URL } from "../constants.js"
 // import './OlMapBasic.css'
 import { addBoxInteraction, removeBoxInteraction } from "../services/mapDrawingModule.js";
 import { initializeOlMap } from '../services/OlMap'
-
+import Feature from 'ol/Feature';
+import WKT from 'ol/format/WKT';
 
 export function useMap({
     mapElementRef,
     location,
     onMunicipioSelected,
     availableMunicipios,
+    availableBuildings,
     selectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef,
@@ -27,7 +29,7 @@ export function useMap({
     const simplifiedMunicipalityLayerRef = useRef();
     const detailedMunicipalityLayerRef = useRef();
     const drawingVectorLayerRef = useRef();
-
+    const buildingsLayerRef = useRef(null);
 
     const isMapInitialized = useRef(false); // se añade al principio del componente
     // const [activeLayer, setActiveLayerState] = useState(null);
@@ -247,7 +249,7 @@ export function useMap({
                 fill: new Fill({
                     stroke: new Stroke({
                         color: "#003b49",
-                    }),    
+                    }),
                     color: "rgba(249, 200, 14, 0.8)",
                 }),
             });
@@ -311,11 +313,10 @@ export function useMap({
 
         // console.log(availableMunicipios.current)
 
-        const { initialMap, simplifiedLayer: simplifiedMunicipalityLayer, detailedLayer: detailedMunicipalityLayer, drawingVectorLayer } = initializeOlMap({
+        const { initialMap, simplifiedLayer: simplifiedMunicipalityLayer, detailedLayer: detailedMunicipalityLayer, drawingVectorLayer, buildingsLayer } = initializeOlMap({
             targetElemet: mapElementRef.current,
             vectorZoomThreshold: 9,
             initialZoomLevel: 7.7,
-            availableMunicipios,
         });
         /*new Map({
         target: mapRef.current,
@@ -343,6 +344,7 @@ export function useMap({
         simplifiedMunicipalityLayerRef.current = simplifiedMunicipalityLayer;
         detailedMunicipalityLayerRef.current = detailedMunicipalityLayer;
         drawingVectorLayerRef.current = drawingVectorLayer;
+        buildingsLayerRef.current = buildingsLayer;
 
         // initialMap.addLayer(simplifiedMunicpalityLayer);
 
@@ -390,13 +392,36 @@ export function useMap({
         }
     }, [])
 
+    useEffect(() => {
+        if (buildingsLayerRef.current && availableBuildings && availableBuildings.length > 0) {
+            buildingsLayerRef.current.getSource().clear();
 
-    const layerIsOnMap = (map, layer) => {
-        const layers = map.getLayers().getArray();
-        console.log(`checking layer ${layer.get('name')} in layers: \n${layers.map(layer => layer.get('name') + ' ' || 'unamed')}`);
+            availableBuildings.forEach(building => {
+                const geometryString = building.geometry
 
-        return layers.includes(layer);
-    };
+                const format = new WKT();
+                const geometry = format.readGeometry(geometryString, {
+                    dataProjection: 'EPSG:4326',
+                    featureProjection: 'EPSG:4326'
+                });
+
+
+                const feature = new Feature({
+                    geometry: geometry
+                });
+                buildingsLayerRef.current.getSource().addFeature(feature);
+            });
+        }
+    }, [availableBuildings])
+
+
+
+    // const layerIsOnMap = (map, layer) => {
+    //     const layers = map.getLayers().getArray();
+    //     console.log(`checking layer ${layer.get('name')} in layers: \n${layers.map(layer => layer.get('name') + ' ' || 'unamed')}`);
+
+    //     return layers.includes(layer);
+    // };
 
 
 

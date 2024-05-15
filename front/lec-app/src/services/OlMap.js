@@ -10,7 +10,6 @@ import { bbox } from "ol/loadingstrategy";
 import { REACT_APP_GEOSERVER_API_URL } from "../constants";
 import { Style, Stroke, Fill } from "ol/style";
 
-
 const osmLayer = new TileLayer({
     preload: Infinity,
     source: new OSM(),
@@ -26,7 +25,7 @@ const municipalitySource = (type) => {
 
 
 
-const simplifiedMunicipalityLayer = (vectorZoomThreshold, availables) => {
+const simplifiedMunicipalityLayer = (vectorZoomThreshold) => {
     return new VectorLayer({
         name: 'simplified',
         source: municipalitySource('simplified'),
@@ -35,7 +34,7 @@ const simplifiedMunicipalityLayer = (vectorZoomThreshold, availables) => {
     })
 }
 
-const detailedMunicipalityLayer = (vectorZoomThreshold, availables) => {
+const detailedMunicipalityLayer = (vectorZoomThreshold) => {
     return new VectorLayer({
         name: 'detailed',
         source: municipalitySource('detailed'),
@@ -44,14 +43,32 @@ const detailedMunicipalityLayer = (vectorZoomThreshold, availables) => {
 }
 
 
-export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoomLevel, availableMunicipios }) => {
+export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoomLevel }) => {
 
-    const simplifiedLayer = simplifiedMunicipalityLayer(vectorZoomThreshold, availableMunicipios);
-    const detailedLayer = detailedMunicipalityLayer(vectorZoomThreshold, availableMunicipios);
+    const simplifiedLayer = simplifiedMunicipalityLayer(vectorZoomThreshold);
+    const detailedLayer = detailedMunicipalityLayer(vectorZoomThreshold);
     const drawingVectorLayer = new VectorLayer({
         name: "drawing",
-        source: new VectorSource({ wrapX: false }),
+        source: new VectorSource(
+            // { wrapX: false }
+        ),
     })
+    const buildingsLayer = new VectorLayer({
+        name: "buildings",
+        source: new VectorSource(
+            // { wrapX: false }
+        ),
+        style: new Style({
+            stroke: new Stroke({
+                color: 'red', // color del contorno
+                width: 2, // ancho del contorno
+            }),
+            fill: new Fill({
+                color: 'red', // color de relleno sólido
+            }),
+        }),
+    })
+
 
     const initialMap = new Map({
         target: targetElemet,
@@ -59,6 +76,7 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
             osmLayer,
             simplifiedLayer,
             detailedLayer,
+            buildingsLayer,
             drawingVectorLayer
         ],
         view: new View({
@@ -93,5 +111,5 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
     //     }
     // });
 
-    return { initialMap, simplifiedLayer, detailedLayer, drawingVectorLayer };
+    return { initialMap, simplifiedLayer, detailedLayer, drawingVectorLayer, buildingsLayer };
 }        

@@ -13,9 +13,10 @@ const OlMap = ({
   location,
   onMunicipioSelected,
   availableMunicipios,
-  children,
+  availableBuildings,
   selectedBuilding,
-  isDrawingEnabled
+  isDrawingEnabled,
+  children
 }) => {
 
   const selectInteractionsRef = useRef({});
@@ -28,6 +29,7 @@ const OlMap = ({
     location,
     onMunicipioSelected,
     availableMunicipios,
+    availableBuildings,
     selectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef

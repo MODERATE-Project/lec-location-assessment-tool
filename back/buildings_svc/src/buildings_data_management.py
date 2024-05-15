@@ -18,7 +18,7 @@ def get_buildings_data():
 def get_buildings_dataframe():
     current_directory = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(
-        current_directory, '../data/buildings_sections.csv')
+        current_directory, '../data/buildings_epsg4326.csv')
 
     buildings_df = pd.read_csv(file_path, header=0)
     buildings_df['id'] = buildings_df.index
@@ -31,7 +31,7 @@ def get_buildings_sorted_by_weights(buildings_df, weights: dict):
         raise RuntimeError('No weights provided')
 
     weighted_score = sum(
-        buildings_df[col] * weights[col]/10 for col in weights.keys()) # /10 --> pesos ∈ [0,1]
+        buildings_df[col] * weights[col]/10 for col in weights.keys())  # /10 --> pesos ∈ [0,1]
     buildings_df['Weighted_Score'] = weighted_score
 
     # Sort DataFrame by weighted score in descending order
