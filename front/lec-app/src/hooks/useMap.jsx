@@ -21,6 +21,7 @@ export function useMap({
     availableMunicipios,
     availableBuildings,
     selectedBuilding,
+    setSelectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef,
 }) {
@@ -244,7 +245,7 @@ export function useMap({
 
     const initializeMap = useCallback((availableMunicipios) => {
         console.log("inicializando mapa", availableMunicipios);
-        const initializeSelectInteractions = (initialMap, layers) => {
+        const initializeSelectInteractions = (initialMap, layers, buildingsLayer) => {
             const selectStyle = new Style({
                 fill: new Fill({
                     stroke: new Stroke({
@@ -277,16 +278,55 @@ export function useMap({
             selectInteraction.on("select", (event) => {
                 if (event.selected.length > 0) {
 
-                    const municipalityFeature = event.selected[0]
-                    const municipalityName = municipalityFeature.get("NAMEUNIT");
+                    const feature = event.selected[0]
+                    // const layerName = selectInteraction.getLayer(feature).get('name');
+
+                    // if (layerName === 'buildings') {
+
+                    // const building = feature.get("building");
+                    // setSelectedBuilding(building);
+                    // }
+                    // else {
+                    const municipalityName = feature.get("NAMEUNIT");
 
                     // setCurrentLocationFeature({feature: municipalityFeature, locName: municipalityName});
                     onMunicipioSelected(municipalityName);
+                    // }
                 }
             });
 
             initialMap.addInteraction(selectInteraction);
             selectInteractionsRef.current.click = selectInteraction;
+
+
+            // ----
+
+            // const buildingHover = new Select({
+            //     condition: pointerMove,
+            //     layers: "buildings",
+            //     // style: selectStyle,
+            // });
+
+            // initialMap.addInteraction(buildingHover);
+
+            const buildingClickInteraction = new Select({
+                condition: click,
+                layers: [buildingsLayer],
+                // style: selectStyle,
+            });
+
+            buildingClickInteraction.on("select", (event) => {
+                if (event.selected.length > 0) {
+
+                    const feature = event.selected[0]
+
+                    const building = feature.get("building");
+                    setSelectedBuilding(building);
+                }
+            });
+
+            initialMap.addInteraction(buildingClickInteraction);
+            selectInteractionsRef.current.buildingsClick = buildingClickInteraction;
         };
 
         const initializeZoomHandler = (initialMap) => {
@@ -328,7 +368,6 @@ export function useMap({
         controls: [],
     });*/
 
-        mapRef.current = initialMap;
 
         // const simplifiedMunicpalityLayer = createVectorLayer(
         //     "moderate_municipios:simplified",
@@ -351,7 +390,9 @@ export function useMap({
         initializeSelectInteractions(initialMap, [
             simplifiedMunicipalityLayer,
             detailedMunicipalityLayer,
-        ]);
+        ],
+            buildingsLayer
+        );
         initializeZoomHandler(initialMap);
 
         if (simplifiedMunicipalityLayerRef.current) {
@@ -361,6 +402,8 @@ export function useMap({
         if (detailedMunicipalityLayerRef.current) {
             detailedMunicipalityLayerRef.current.getSource().refresh();
         }
+
+        mapRef.current = initialMap;
 
     }, []);
 
@@ -407,7 +450,8 @@ export function useMap({
 
 
                 const feature = new Feature({
-                    geometry: geometry
+                    geometry: geometry,
+                    building: building
                 });
                 buildingsLayerRef.current.getSource().addFeature(feature);
             });
@@ -445,6 +489,45 @@ export function useMap({
         }
     }, [isDrawingEnabled]);
 
+
+    useEffect(() => {
+        if (isDrawingEnabled) {
+            const drawEndListener = drawingVectorLayerRef.current.getSource().on('addfeature', async (event) => {
+                const drawnFeature = event.feature;
+                const drawnGeometry = drawnFeature.getGeometry();
+    
+                buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
+                    const buildingGeometry = buildingFeature.getGeometry();
+                    const buildingCoordinates = buildingGeometry.getCoordinates();
+                    let isBuildingInside = false;
+    
+                    // Verificar si al menos uno de los vértices del edificio está dentro del polígono dibujado
+                    for (let i = 0; i < buildingCoordinates[0].length; i++) {
+                        if (drawnGeometry.intersectsCoordinate(buildingCoordinates[0][0][i])) {
+                            isBuildingInside = true;
+                            break;
+                        }
+                    }
+    
+                    if (isBuildingInside) {
+                        buildingFeature.setStyle(null); // Mostrar edificio
+                    } else {
+                        buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
+                    }
+                });
+            });
+    
+            return () => {
+                drawingVectorLayerRef.current.getSource().un('addfeature', drawEndListener);
+            };
+        } else {
+            // Si el dibujo está deshabilitado, mostrar todos los edificios nuevamente
+            buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
+                buildingFeature.setStyle(null); // Mostrar edificio
+            });
+        }
+    }, [isDrawingEnabled]);
+    
     return { mapRef };
 }
 

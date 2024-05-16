@@ -136,6 +136,7 @@ function App() {
         availableMunicipios={availables}
         availableBuildings={tableData.buildings}
         selectedBuilding={selectedBuilding}
+        setSelectedBuilding={setSelectedBuilding}
         isDrawingEnabled={isDrawingEnabled}
       >
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />

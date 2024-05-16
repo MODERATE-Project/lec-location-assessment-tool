@@ -15,6 +15,7 @@ const OlMap = ({
   availableMunicipios,
   availableBuildings,
   selectedBuilding,
+  setSelectedBuilding,
   isDrawingEnabled,
   children
 }) => {
@@ -31,6 +32,7 @@ const OlMap = ({
     availableMunicipios,
     availableBuildings,
     selectedBuilding,
+    setSelectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef
   })

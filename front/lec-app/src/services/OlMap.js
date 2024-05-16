@@ -9,6 +9,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import { bbox } from "ol/loadingstrategy";
 import { REACT_APP_GEOSERVER_API_URL } from "../constants";
 import { Style, Stroke, Fill } from "ol/style";
+import { ScaleLine } from 'ol/control';
 
 const osmLayer = new TileLayer({
     preload: Infinity,
@@ -83,8 +84,12 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
             center: fromLonLat([-3.70379, 40.416775]),
             zoom: initialZoomLevel
         }),
-        controls: []
+        controls: [
+            new ScaleLine(),
+            // new ZoomSlider(),
+        ]
     });
+
 
     // EVENT change:resolution // XXX para Debug: para verificar valores de zoom y capas
     // initialMap.getView().on("change:resolution", function () {
