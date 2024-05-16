@@ -353,7 +353,12 @@ export function useMap({
 
         // console.log(availableMunicipios.current)
 
-        const { initialMap, simplifiedLayer: simplifiedMunicipalityLayer, detailedLayer: detailedMunicipalityLayer, drawingVectorLayer, buildingsLayer } = initializeOlMap({
+        const {
+            initialMap,
+            simplifiedLayer: simplifiedMunicipalityLayer,
+            detailedLayer: detailedMunicipalityLayer,
+            drawingVectorLayer, buildingsLayer
+        } = initializeOlMap({
             targetElemet: mapElementRef.current,
             vectorZoomThreshold: 9,
             initialZoomLevel: 7.7,
@@ -453,6 +458,7 @@ export function useMap({
                     geometry: geometry,
                     building: building
                 });
+
                 buildingsLayerRef.current.getSource().addFeature(feature);
             });
         }
@@ -495,28 +501,32 @@ export function useMap({
             const drawEndListener = drawingVectorLayerRef.current.getSource().on('addfeature', async (event) => {
                 const drawnFeature = event.feature;
                 const drawnGeometry = drawnFeature.getGeometry();
-    
+
                 buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
                     const buildingGeometry = buildingFeature.getGeometry();
-                    const buildingCoordinates = buildingGeometry.getCoordinates();
-                    let isBuildingInside = false;
-    
-                    // Verificar si al menos uno de los vértices del edificio está dentro del polígono dibujado
-                    for (let i = 0; i < buildingCoordinates[0].length; i++) {
-                        if (drawnGeometry.intersectsCoordinate(buildingCoordinates[0][0][i])) {
-                            isBuildingInside = true;
-                            break;
-                        }
-                    }
-    
+                    const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
+
                     if (isBuildingInside) {
-                        buildingFeature.setStyle(null); // Mostrar edificio
+                        // buildingFeature.setStyle(null); // Mostrar edificio
+                        buildingFeature.setStyle(new Style({
+                            stroke: new Stroke({
+                                color: 'green',
+                                width: 2,
+                            }),
+                            fill: new Fill({
+                                color: 'rgba(0, 255, 0, 0.1)',
+                            }),
+                        }));
                     } else {
-                        buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
+                        // buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
+                        buildingFeature.setStyle(new Style({
+                            display: 'none',
+                        }));
                     }
+                    //   });
                 });
             });
-    
+
             return () => {
                 drawingVectorLayerRef.current.getSource().un('addfeature', drawEndListener);
             };
@@ -527,7 +537,7 @@ export function useMap({
             });
         }
     }, [isDrawingEnabled]);
-    
+
     return { mapRef };
 }
 

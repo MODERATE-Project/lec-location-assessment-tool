@@ -61,12 +61,12 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
         ),
         style: new Style({
             stroke: new Stroke({
-                color: 'red', // color del contorno
-                width: 2, // ancho del contorno
+                color: 'red',
+                width: 2,
             }),
             fill: new Fill({
-                color: 'red', // color de relleno sólido
-            }),
+                color: 'rgba(255, 0, 0, 0.3)',
+            })
         }),
     })
 
