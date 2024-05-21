@@ -21,12 +21,11 @@ const OlMap = ({
   onClearPolygon,
   setClearPolygon,
   setIsPolygonDrawn,
+  isPolygonDrawn,
   children
 }) => {
 
   const selectInteractionsRef = useRef({});
-  // const availableMunicipios = useState(availableMunicipios);
-
   const mapElementRef = useRef();
 
   const { mapRef, buildingsLayerRef: buildingLayerRef, removePolygonDrawn } = useMap({
@@ -40,39 +39,51 @@ const OlMap = ({
     setSelectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef,
-    setIsPolygonDrawn
+    isPolygonDrawn,
+    setIsPolygonDrawn,
   })
 
-
-
-  // Creamos una nueva referencia para la capa del edificio seleccionado.
   const buildingCentroidRef = useRef(null);
   const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
 
-  const createOrUpdateBuildingLayer = useCallback((coordinates) => {
-    const buildingFeature = new Feature(new Point(coordinates));
+  const createOrUpdateBuildingLayer = useCallback((buildings) => {
+    const features = buildings.map(building => {
+      const coordinates = fromLonLat([building.longitude, building.latitude]);
+      return new Feature({
+        geometry: new Point(coordinates),
+        building: building
+      });
+    });
 
     if (!buildingCentroidRef.current) {
-      const vectorSource = new VectorSource({ features: [buildingFeature] });
+      const vectorSource = new VectorSource({ features });
       const buildingLayer = new VectorLayer({
         source: vectorSource,
-        style: new Style({
-          image: new CircleStyle({
-            radius: 7,
-            fill: new Fill({ color: "red" }),
-            stroke: new Stroke({ color: "white", width: 2 }),
-          }),
-        }),
+        style: (feature) => {
+          let fillColor = 'red'; // Por defecto, rojo
+          if (isPolygonDrawn) {
+            fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
+          } else if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
+            fillColor = 'blue'; // Si se ha seleccionado el edificio, azul
+          }
+          return new Style({
+            image: new CircleStyle({
+              radius: 7,
+              fill: new Fill({ color: fillColor }),
+              stroke: new Stroke({ color: "white", width: 2 }),
+            }),
+          });
+        }
       });
 
       buildingCentroidRef.current = buildingLayer;
       mapRef.current.addLayer(buildingLayer);
     } else {
       buildingCentroidRef.current.getSource().clear();
-      buildingCentroidRef.current.getSource().addFeature(buildingFeature);
+      buildingCentroidRef.current.getSource().addFeatures(features);
     }
     setBuildingLayerReady(true);
-  }, [mapRef]);
+  }, [mapRef, isPolygonDrawn, selectedBuilding]);
 
   const centerMapOnBuilding = useCallback((coordinates) => {
     mapRef.current.getView().animate({ center: coordinates, zoom: 18 });
@@ -103,25 +114,25 @@ const OlMap = ({
     }
   }, [selectedBuilding, centerMapOnBuilding, mapRef]);
 
-  // Efecto para gestionar la apertura de la URL al catastro cuando se clicka en un edificio (Punto)
+  useEffect(() => {
+    if (mapRef.current && availableBuildings) {
+      createOrUpdateBuildingLayer(availableBuildings);
+    }
+  }, [availableBuildings, createOrUpdateBuildingLayer, mapRef]);
+
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Función para manejar el click sobre el mapa
     const handleMapClick = (event) => {
       mapRef.current.forEachFeatureAtPixel(
         event.pixel,
         (feature, layer) => {
           if (layer === buildingLayerRef.current) {
-            // Aquí se asume que selectedBuilding es un objeto con la propiedad 'informatio'
-            if(feature.get("building").informatio != selectedBuilding.informatio) return
-            feature.set("url", selectedBuilding.informatio);
-            const url = feature.get("url");
-            if (url) {
-              // Abrir URL en una nueva pestaña que apunta a info del catastro
-              window.open(url, "_blank");
+            const building = feature.get("building");
+            if (building && selectedBuilding && building.id === selectedBuilding.id) {
+              window.open(building.informatio, "_blank");
             }
-            return true; // Detendrá la iteración a través de más features en el mismo pixel.
+            return true;
           }
         },
         {
@@ -131,23 +142,19 @@ const OlMap = ({
       );
     };
 
-    // Registrar el controlador de eventos de click
     mapRef.current.on("singleclick", handleMapClick);
 
-    // Limpiar el evento al desmontar el componente
     return () => {
       if (mapRef.current) {
         mapRef.current.un("singleclick", handleMapClick);
       }
     };
-    // Agrega selectedBuilding aquí si su cambio debería reconfigurar el evento
-  }, [selectedBuilding, mapRef]);
+  }, [selectedBuilding, mapRef, buildingLayerRef]);
 
   useEffect(() => {
     if (buildingLayerRef.current) {
       setBuildingLayerReady(true);
     }
-    // No hay necesidad de tener este useEffect si solo estableces el estado
   }, []);
 
   useEffect(() => {
@@ -170,19 +177,15 @@ const OlMap = ({
         mapRef.current.un("pointermove", handlePointerMove);
       }
     };
-    // isBuildingLayerReady debe estar en la lista de dependencias para reconfigurar el evento si cambia
   }, [isBuildingLayerReady]);
-
 
   useEffect(() => {
     if (onClearPolygon && isBuildingLayerReady) {
-      // buildingLayerRef.current.getSource().clear();
       buildingLayerRef.current.setStyle(null);
-      removePolygonDrawn()
-      setClearPolygon(false)
+      removePolygonDrawn();
+      setClearPolygon(false);
     }
-
-  }, [onClearPolygon, isBuildingLayerReady])
+  }, [onClearPolygon, isBuildingLayerReady]);
 
   return (
     <div className="map-wrapper">

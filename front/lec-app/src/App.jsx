@@ -154,6 +154,7 @@ function App() {
         isDrawingEnabled={isDrawingEnabled}
         onClearPolygon={onClearPolygon}
         setClearPolygon={setOnClearPolygon}
+        isPolygonDrawn={isPolygonDrawn}
         setIsPolygonDrawn={setIsPolygonDrawn}
       >
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />

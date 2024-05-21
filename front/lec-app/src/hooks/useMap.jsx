@@ -25,6 +25,7 @@ export function useMap({
     setSelectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef,
+    isPolygonDrawn,
     setIsPolygonDrawn
 }) {
     const mapRef = useRef(null);
@@ -294,7 +295,7 @@ export function useMap({
                     // setCurrentLocationFeature({feature: municipalityFeature, locName: municipalityName});
                     onMunicipioSelected(municipalityName);
                     // }
-                } 
+                }
             });
 
             initialMap.addInteraction(selectInteraction);
@@ -463,7 +464,7 @@ export function useMap({
                     building: building
                 });
 
-                if (drawingVectorLayerRef.current.getSource().getFeatures().length > 0) {
+                if (isPolygonDrawn) {
                     feature.setStyle(new Style({
                         stroke: new Stroke({
                             color: 'green',
@@ -497,7 +498,7 @@ export function useMap({
         if (availableBuildings?.length <= 0) return
 
         buildingsLayerRef.current.getSource().forEachFeature(feature => {
-            if (drawingVectorLayerRef.current.getSource().getFeatures().length > 0) {
+            if (isPolygonDrawn) {
                 feature.setStyle(new Style({
                     stroke: new Stroke({
                         color: 'green',
@@ -520,90 +521,90 @@ export function useMap({
                 }))
             }
         })
-    }, [drawingVectorLayerRef.current?.getSource().getFeatures().length]);
+    }, [isPolygonDrawn]);
 
 
-// const layerIsOnMap = (map, layer) => {
-//     const layers = map.getLayers().getArray();
-//     console.log(`checking layer ${layer.get('name')} in layers: \n${layers.map(layer => layer.get('name') + ' ' || 'unamed')}`);
+    // const layerIsOnMap = (map, layer) => {
+    //     const layers = map.getLayers().getArray();
+    //     console.log(`checking layer ${layer.get('name')} in layers: \n${layers.map(layer => layer.get('name') + ' ' || 'unamed')}`);
 
-//     return layers.includes(layer);
-// };
-
-
+    //     return layers.includes(layer);
+    // };
 
 
-useEffect(() => {
-    console.log('Map receive isDrawingEnabled event', isDrawingEnabled)
-    if (mapRef.current) {
 
-        if (isDrawingEnabled) {
 
-            addBoxInteraction(mapRef.current, drawingVectorLayerRef.current);
-            mapRef.current.removeInteraction(selectInteractionsRef.current.hover)
-            mapRef.current.removeInteraction(selectInteractionsRef.current.click)
+    useEffect(() => {
+        console.log('Map receive isDrawingEnabled event', isDrawingEnabled)
+        if (mapRef.current) {
 
-        } else {
-            removeBoxInteraction(mapRef.current);
-            mapRef.current.addInteraction(selectInteractionsRef.current.hover)
-            mapRef.current.addInteraction(selectInteractionsRef.current.click)
+            if (isDrawingEnabled) {
+
+                addBoxInteraction(mapRef.current, drawingVectorLayerRef.current);
+                mapRef.current.removeInteraction(selectInteractionsRef.current.hover)
+                mapRef.current.removeInteraction(selectInteractionsRef.current.click)
+
+            } else {
+                removeBoxInteraction(mapRef.current);
+                mapRef.current.addInteraction(selectInteractionsRef.current.hover)
+                mapRef.current.addInteraction(selectInteractionsRef.current.click)
+            }
+
         }
-
-    }
-}, [isDrawingEnabled]);
+    }, [isDrawingEnabled]);
 
 
-useEffect(() => {
-    if (isDrawingEnabled) {
-        const drawEndListener = drawingVectorLayerRef.current.getSource().on('addfeature', async (event) => {
-            const drawnFeature = event.feature;
-            const drawnGeometry = drawnFeature.getGeometry();
+    useEffect(() => {
+        if (isDrawingEnabled) {
+            const drawEndListener = drawingVectorLayerRef.current.getSource().on('addfeature', async (event) => {
+                const drawnFeature = event.feature;
+                const drawnGeometry = drawnFeature.getGeometry();
 
-            const newBuildingsList = [...availableBuildings];
-            buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
-                const buildingGeometry = buildingFeature.getGeometry();
-                const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
+                const newBuildingsList = [...availableBuildings];
+                buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
+                    const buildingGeometry = buildingFeature.getGeometry();
+                    const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
 
-                if (isBuildingInside) {
-                    buildingFeature.setStyle(null); // Mostrar edificio
-                } else {
-                    let index = Object.values(newBuildingsList).findIndex(item =>
-                        item.id === buildingFeature.get('building').id
-                    );
-                    if (index !== -1) {
-                        newBuildingsList.splice(index, 1);
+                    if (isBuildingInside) {
+                        buildingFeature.setStyle(null); // Mostrar edificio
+                    } else {
+                        let index = Object.values(newBuildingsList).findIndex(item =>
+                            item.id === buildingFeature.get('building').id
+                        );
+                        if (index !== -1) {
+                            newBuildingsList.splice(index, 1);
+                        }
+
+                        // buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
+                        buildingFeature.setStyle(new Style({
+                            display: 'none',
+                        }));
                     }
-
-                    // buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
-                    buildingFeature.setStyle(new Style({
-                        display: 'none',
-                    }));
-                }
-                //   });
+                    //   });
+                });
+                setIsPolygonDrawn(true);
+                setAvailableBuildings(newBuildingsList);
             });
-            setAvailableBuildings(newBuildingsList);
-            setIsPolygonDrawn(true);
-        });
 
-        return () => {
-            drawingVectorLayerRef.current.getSource().un('addfeature', drawEndListener);
-        };
-    } else {
-        // Si el dibujo está deshabilitado, mostrar todos los edificios nuevamente
-        buildingsLayerRef.current.setStyle(null);
-    }
-}, [isDrawingEnabled]);
+            return () => {
+                drawingVectorLayerRef.current.getSource().un('addfeature', drawEndListener);
+            };
+        } else {
+            // Si el dibujo está deshabilitado, mostrar todos los edificios nuevamente
+            buildingsLayerRef.current.setStyle(null);
+        }
+    }, [isDrawingEnabled]);
 
 
-const removePolygonDrawn = useCallback(() => {
-    if (mapRef.current) {
-        drawingVectorLayerRef.current.getSource().clear();
-        setIsPolygonDrawn(false);
-    }
-});
+    const removePolygonDrawn = useCallback(() => {
+        if (mapRef.current) {
+            drawingVectorLayerRef.current.getSource().clear();
+            setIsPolygonDrawn(false);
+        }
+    });
 
 
-return { mapRef, buildingsLayerRef, removePolygonDrawn };
+    return { mapRef, buildingsLayerRef, removePolygonDrawn };
 }
 
 
