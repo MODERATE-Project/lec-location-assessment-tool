@@ -114,6 +114,7 @@ const OlMap = ({
         (feature, layer) => {
           if (layer === buildingLayerRef.current) {
             // Aquí se asume que selectedBuilding es un objeto con la propiedad 'informatio'
+            if(feature.get("building").informatio != selectedBuilding.informatio) return
             feature.set("url", selectedBuilding.informatio);
             const url = feature.get("url");
             if (url) {

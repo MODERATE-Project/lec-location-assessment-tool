@@ -294,7 +294,7 @@ export function useMap({
                     // setCurrentLocationFeature({feature: municipalityFeature, locName: municipalityName});
                     onMunicipioSelected(municipalityName);
                     // }
-                }
+                } 
             });
 
             initialMap.addInteraction(selectInteraction);
@@ -324,6 +324,8 @@ export function useMap({
 
                     const building = feature.get("building");
                     setSelectedBuilding(building);
+                } else {
+                    setSelectedBuilding(null);
                 }
             });
 
