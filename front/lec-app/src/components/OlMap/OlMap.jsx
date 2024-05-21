@@ -14,9 +14,13 @@ const OlMap = ({
   onMunicipioSelected,
   availableMunicipios,
   availableBuildings,
+  setAvailableBuildings,
   selectedBuilding,
   setSelectedBuilding,
   isDrawingEnabled,
+  onClearPolygon,
+  setClearPolygon,
+  setIsPolygonDrawn,
   children
 }) => {
 
@@ -25,28 +29,30 @@ const OlMap = ({
 
   const mapElementRef = useRef();
 
-  const { mapRef } = useMap({
+  const { mapRef, buildingsLayerRef: buildingLayerRef, removePolygonDrawn } = useMap({
     mapElementRef,
     location,
     onMunicipioSelected,
     availableMunicipios,
     availableBuildings,
+    setAvailableBuildings,
     selectedBuilding,
     setSelectedBuilding,
     isDrawingEnabled,
-    selectInteractionsRef
+    selectInteractionsRef,
+    setIsPolygonDrawn
   })
 
 
 
   // Creamos una nueva referencia para la capa del edificio seleccionado.
-  const buildingLayerRef = useRef(null);
+  const buildingCentroidRef = useRef(null);
   const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
 
   const createOrUpdateBuildingLayer = useCallback((coordinates) => {
     const buildingFeature = new Feature(new Point(coordinates));
 
-    if (!buildingLayerRef.current) {
+    if (!buildingCentroidRef.current) {
       const vectorSource = new VectorSource({ features: [buildingFeature] });
       const buildingLayer = new VectorLayer({
         source: vectorSource,
@@ -59,11 +65,11 @@ const OlMap = ({
         }),
       });
 
-      buildingLayerRef.current = buildingLayer;
+      buildingCentroidRef.current = buildingLayer;
       mapRef.current.addLayer(buildingLayer);
     } else {
-      buildingLayerRef.current.getSource().clear();
-      buildingLayerRef.current.getSource().addFeature(buildingFeature);
+      buildingCentroidRef.current.getSource().clear();
+      buildingCentroidRef.current.getSource().addFeature(buildingFeature);
     }
     setBuildingLayerReady(true);
   }, [mapRef]);
@@ -95,7 +101,7 @@ const OlMap = ({
         console.error("Error animating map:", error);
       }
     }
-  }, [selectedBuilding, centerMapOnBuilding, createOrUpdateBuildingLayer, mapRef]);
+  }, [selectedBuilding, centerMapOnBuilding, mapRef]);
 
   // Efecto para gestionar la apertura de la URL al catastro cuando se clicka en un edificio (Punto)
   useEffect(() => {
@@ -144,7 +150,7 @@ const OlMap = ({
   }, []);
 
   useEffect(() => {
-    if (!mapRef.current || !isBuildingLayerReady) return;
+    if (!mapRef.current || !buildingLayerRef.current) return;
 
     const handlePointerMove = (event) => {
       const pixel = mapRef.current.getEventPixel(event.originalEvent);
@@ -167,6 +173,15 @@ const OlMap = ({
   }, [isBuildingLayerReady]);
 
 
+  useEffect(() => {
+    if (onClearPolygon && isBuildingLayerReady) {
+      // buildingLayerRef.current.getSource().clear();
+      buildingLayerRef.current.setStyle(null);
+      removePolygonDrawn()
+      setClearPolygon(false)
+    }
+
+  }, [onClearPolygon, isBuildingLayerReady])
 
   return (
     <div className="map-wrapper">

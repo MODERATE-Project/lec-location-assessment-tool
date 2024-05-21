@@ -1,0 +1,16 @@
+.cancelselection-button {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    opacity: 0.75;
+    z-index: 1000;
+    width: fit-content;
+}
+
+.cancelselection-button:hover {
+    opacity: 1;
+}

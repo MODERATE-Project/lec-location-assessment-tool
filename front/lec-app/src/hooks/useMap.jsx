@@ -20,10 +20,12 @@ export function useMap({
     onMunicipioSelected,
     availableMunicipios,
     availableBuildings,
+    setAvailableBuildings,
     selectedBuilding,
     setSelectedBuilding,
     isDrawingEnabled,
     selectInteractionsRef,
+    setIsPolygonDrawn
 }) {
     const mapRef = useRef(null);
 
@@ -459,86 +461,147 @@ export function useMap({
                     building: building
                 });
 
+                if (drawingVectorLayerRef.current.getSource().getFeatures().length > 0) {
+                    feature.setStyle(new Style({
+                        stroke: new Stroke({
+                            color: 'green',
+                            width: 2,
+                        }),
+                        fill: new Fill({
+                            color: 'rgba(0, 255, 0, 0.1)',
+                        }),
+                    }));
+                } else {
+
+                    feature.setStyle(new Style({
+                        stroke: new Stroke({
+                            color: 'red',
+                            width: 2,
+                        }),
+                        fill: new Fill({
+                            color: 'rgba(255, 0, 0, 0.1)',
+                        })
+                    }))
+                }
+
                 buildingsLayerRef.current.getSource().addFeature(feature);
+
             });
         }
     }, [availableBuildings])
 
 
-
-    // const layerIsOnMap = (map, layer) => {
-    //     const layers = map.getLayers().getArray();
-    //     console.log(`checking layer ${layer.get('name')} in layers: \n${layers.map(layer => layer.get('name') + ' ' || 'unamed')}`);
-
-    //     return layers.includes(layer);
-    // };
-
-
-
-
     useEffect(() => {
-        console.log('Map receive isDrawingEnabled event', isDrawingEnabled)
-        if (mapRef.current) {
+        if (availableBuildings?.length <= 0) return
 
-            if (isDrawingEnabled) {
-
-                addBoxInteraction(mapRef.current, drawingVectorLayerRef.current);
-                mapRef.current.removeInteraction(selectInteractionsRef.current.hover)
-                mapRef.current.removeInteraction(selectInteractionsRef.current.click)
-
+        buildingsLayerRef.current.getSource().forEachFeature(feature => {
+            if (drawingVectorLayerRef.current.getSource().getFeatures().length > 0) {
+                feature.setStyle(new Style({
+                    stroke: new Stroke({
+                        color: 'green',
+                        width: 2,
+                    }),
+                    fill: new Fill({
+                        color: 'rgba(0, 255, 0, 0.1)',
+                    }),
+                }));
             } else {
-                removeBoxInteraction(mapRef.current);
-                mapRef.current.addInteraction(selectInteractionsRef.current.hover)
-                mapRef.current.addInteraction(selectInteractionsRef.current.click)
+
+                feature.setStyle(new Style({
+                    stroke: new Stroke({
+                        color: 'red',
+                        width: 2,
+                    }),
+                    fill: new Fill({
+                        color: 'rgba(255, 0, 0, 0.1)',
+                    })
+                }))
             }
+        })
+    }, [drawingVectorLayerRef.current?.getSource().getFeatures().length]);
 
-        }
-    }, [isDrawingEnabled]);
+
+// const layerIsOnMap = (map, layer) => {
+//     const layers = map.getLayers().getArray();
+//     console.log(`checking layer ${layer.get('name')} in layers: \n${layers.map(layer => layer.get('name') + ' ' || 'unamed')}`);
+
+//     return layers.includes(layer);
+// };
 
 
-    useEffect(() => {
+
+
+useEffect(() => {
+    console.log('Map receive isDrawingEnabled event', isDrawingEnabled)
+    if (mapRef.current) {
+
         if (isDrawingEnabled) {
-            const drawEndListener = drawingVectorLayerRef.current.getSource().on('addfeature', async (event) => {
-                const drawnFeature = event.feature;
-                const drawnGeometry = drawnFeature.getGeometry();
 
-                buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
-                    const buildingGeometry = buildingFeature.getGeometry();
-                    const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
+            addBoxInteraction(mapRef.current, drawingVectorLayerRef.current);
+            mapRef.current.removeInteraction(selectInteractionsRef.current.hover)
+            mapRef.current.removeInteraction(selectInteractionsRef.current.click)
 
-                    if (isBuildingInside) {
-                        // buildingFeature.setStyle(null); // Mostrar edificio
-                        buildingFeature.setStyle(new Style({
-                            stroke: new Stroke({
-                                color: 'green',
-                                width: 2,
-                            }),
-                            fill: new Fill({
-                                color: 'rgba(0, 255, 0, 0.1)',
-                            }),
-                        }));
-                    } else {
-                        // buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
-                        buildingFeature.setStyle(new Style({
-                            display: 'none',
-                        }));
-                    }
-                    //   });
-                });
-            });
-
-            return () => {
-                drawingVectorLayerRef.current.getSource().un('addfeature', drawEndListener);
-            };
         } else {
-            // Si el dibujo está deshabilitado, mostrar todos los edificios nuevamente
-            buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
-                buildingFeature.setStyle(null); // Mostrar edificio
-            });
+            removeBoxInteraction(mapRef.current);
+            mapRef.current.addInteraction(selectInteractionsRef.current.hover)
+            mapRef.current.addInteraction(selectInteractionsRef.current.click)
         }
-    }, [isDrawingEnabled]);
 
-    return { mapRef };
+    }
+}, [isDrawingEnabled]);
+
+
+useEffect(() => {
+    if (isDrawingEnabled) {
+        const drawEndListener = drawingVectorLayerRef.current.getSource().on('addfeature', async (event) => {
+            const drawnFeature = event.feature;
+            const drawnGeometry = drawnFeature.getGeometry();
+
+            const newBuildingsList = [...availableBuildings];
+            buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
+                const buildingGeometry = buildingFeature.getGeometry();
+                const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
+
+                if (isBuildingInside) {
+                    buildingFeature.setStyle(null); // Mostrar edificio
+                } else {
+                    let index = Object.values(newBuildingsList).findIndex(item =>
+                        item.id === buildingFeature.get('building').id
+                    );
+                    if (index !== -1) {
+                        newBuildingsList.splice(index, 1);
+                    }
+
+                    // buildingFeature.setStyle(new Style({ opacity: 0 })); // Ocultar edificio
+                    buildingFeature.setStyle(new Style({
+                        display: 'none',
+                    }));
+                }
+                //   });
+            });
+            setAvailableBuildings(newBuildingsList);
+            setIsPolygonDrawn(true);
+        });
+
+        return () => {
+            drawingVectorLayerRef.current.getSource().un('addfeature', drawEndListener);
+        };
+    } else {
+        // Si el dibujo está deshabilitado, mostrar todos los edificios nuevamente
+        buildingsLayerRef.current.setStyle(null);
+    }
+}, [isDrawingEnabled]);
+
+
+const removePolygonDrawn = useCallback(() => {
+    if (mapRef.current) {
+        drawingVectorLayerRef.current.getSource().clear();
+        setIsPolygonDrawn(false);
+    }
+});
+
+
+return { mapRef, buildingsLayerRef, removePolygonDrawn };
 }
 
 

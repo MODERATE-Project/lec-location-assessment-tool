@@ -3,22 +3,24 @@ import DTable from "./components/UI/DataTable/DTable";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
 import { REACT_APP_MUNICIPALITIES_API_URL, REACT_APP_BUILDINGS_API_URL, REACT_APP_GEOSERVER_API_URL } from "./constants"
 import './App.css'
-// import OlMapBasic from "./components/OlMap/OlMapBasic";
-// import DeclarativeMapDef from "./components/OlMap/DelcarativeMapDef";
 import OlMap from "./components/OlMap/OlMap";
 import SortingCriteriaSelector from "./components/UI/SortingCriteriaSelector/SortingCriteriaSelector";
 import DrawingToggleButton from "./components/UI/DrawingToggleButton/DrawingToggleButton";
 import mapWeightsToApi from "./services/sortAdapter"
 import toast, { Toaster } from "react-hot-toast";
+import CancellSelectionButton from "./components/UI/CancellSelectionButton/CancellSelectionButton";
 
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [tableData, setTableData] = useState([]);
+  const [initialTableData, setInitialTableData] = useState([]);
   const [availables, setAvailables] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState();
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [onClearPolygon, setOnClearPolygon] = useState(false)
+  const [isPolygonDrawn, setIsPolygonDrawn] = useState(false)
 
   const handleRowClick = (building) => {
     setSelectedBuilding(building);
@@ -65,6 +67,7 @@ function App() {
           if (data.buildings) {
             console.log('Fetching sorted: data:', data)
             setTableData(data); // Guarda los datos en el estado local
+            setInitialTableData(data)
           }
           else console.error("Fetching sorted data: No response from server: ", data);
         })
@@ -95,6 +98,7 @@ function App() {
       .then((res) => res.json())
       .then((data) => {
         setTableData(data); // Guarda los datos en el estado local
+        setInitialTableData(data);
         setSelectedBuilding(null);
       })
       .catch((error) => {
@@ -124,10 +128,19 @@ function App() {
   }, []);
 
   const handleDrawingToggleButtonChange = () => {
-    console.log('isDrawingEnabled', isDrawingEnabled)
     setIsDrawingEnabled(prevState => !prevState);
-
+    console.log('isDrawingEnabled', isDrawingEnabled)
   }
+
+  const setAvailableBuildings = (buildings) => {
+    setTableData({ buildings: buildings })
+  }
+
+  const restoreBuildingsAndRemovePolygon = () => {
+    setTableData({ buildings: initialTableData.buildings })
+    setOnClearPolygon(true)
+  }
+
   return (
     <div className="App">
       <OlMap
@@ -135,23 +148,28 @@ function App() {
         onMunicipioSelected={handleMunicipioSelected}
         availableMunicipios={availables}
         availableBuildings={tableData.buildings}
+        setAvailableBuildings={setAvailableBuildings}
         selectedBuilding={selectedBuilding}
         setSelectedBuilding={setSelectedBuilding}
         isDrawingEnabled={isDrawingEnabled}
+        onClearPolygon={onClearPolygon}
+        setClearPolygon={setOnClearPolygon}
+        setIsPolygonDrawn={setIsPolygonDrawn}
       >
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />
-        {tableData.buildings?.length > 0 && !selectedBuilding &&
+        {tableData.buildings?.length > 0 && !selectedBuilding && 
           <div className="buildings-alert">
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />}
-        {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
+        {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />} 
+        {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>
       <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
       <Toaster
         toastOptions={{
           style: {
-            margin:'30px',
+            margin: '30px',
             padding: '10px 50px',
           }
         }}
