@@ -45,6 +45,23 @@ const OlMap = ({
 
   const buildingCentroidRef = useRef(null);
   const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
+  
+  const centroidStyle = (feature) => {
+    let fillColor = 'red'; // Por defecto, rojo
+    if (isPolygonDrawn) {
+      fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
+    } 
+    if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
+      fillColor = 'blue'; // Si se ha seleccionado el edificio, azul
+    }
+    return new Style({
+      image: new CircleStyle({
+        radius: 7,
+        fill: new Fill({ color: fillColor }),
+        stroke: new Stroke({ color: "white", width: 2 }),
+      }),
+    });
+  }
 
   const createOrUpdateBuildingLayer = useCallback((buildings) => {
     const features = buildings.map(building => {
@@ -54,39 +71,26 @@ const OlMap = ({
         building: building
       });
     });
-
+    
     if (!buildingCentroidRef.current) {
       const vectorSource = new VectorSource({ features });
       const buildingLayer = new VectorLayer({
         source: vectorSource,
-        style: (feature) => {
-          let fillColor = 'red'; // Por defecto, rojo
-          if (isPolygonDrawn) {
-            fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
-          } else if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
-            fillColor = 'blue'; // Si se ha seleccionado el edificio, azul
-          }
-          return new Style({
-            image: new CircleStyle({
-              radius: 7,
-              fill: new Fill({ color: fillColor }),
-              stroke: new Stroke({ color: "white", width: 2 }),
-            }),
-          });
-        }
+        style: centroidStyle,
       });
 
       buildingCentroidRef.current = buildingLayer;
       mapRef.current.addLayer(buildingLayer);
     } else {
       buildingCentroidRef.current.getSource().clear();
+      buildingCentroidRef.current.setStyle(centroidStyle)
       buildingCentroidRef.current.getSource().addFeatures(features);
     }
     setBuildingLayerReady(true);
   }, [mapRef, isPolygonDrawn, selectedBuilding]);
 
   const centerMapOnBuilding = useCallback((coordinates) => {
-    mapRef.current.getView().animate({ center: coordinates, zoom: 18 });
+    mapRef.current.getView().animate({ center: coordinates, zoom: 19 });
   }, [mapRef]);
 
   const getBuildingCoordinates = (building) => {

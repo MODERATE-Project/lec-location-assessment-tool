@@ -418,6 +418,25 @@ export function useMap({
     }, []);
 
     useEffect(() => {
+
+        // change feature fill color
+        if (selectedBuilding) {
+
+            const feature = buildingsLayerRef.current.getSource().getFeatures().filter(
+                f => f.get('building').id === selectedBuilding.id
+            )[0];
+
+            if (feature) {
+                // Limpiar la selección anterior
+                selectInteractionsRef.current.buildingsClick.getFeatures().clear();
+                // Añadir la nueva característica seleccionada
+                selectInteractionsRef.current.buildingsClick.getFeatures().push(feature);
+            }
+        }
+
+    }, [selectedBuilding]);
+
+    useEffect(() => {
         const currentHover = selectInteractionsRef.current.hover;
         const currentClick = selectInteractionsRef.current.click;
 
@@ -560,7 +579,9 @@ export function useMap({
                 const drawnFeature = event.feature;
                 const drawnGeometry = drawnFeature.getGeometry();
 
-                const newBuildingsList = [...availableBuildings];
+                // const newBuildingsList = [...availableBuildings];
+                const newBuildingsList = [...buildingsLayerRef.current.getSource().getFeatures().map(f => f.get('building'))]
+
                 buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
                     const buildingGeometry = buildingFeature.getGeometry();
                     const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
@@ -595,7 +616,7 @@ export function useMap({
         }
     }, [isDrawingEnabled]);
 
-
+    
     const removePolygonDrawn = useCallback(() => {
         if (mapRef.current) {
             drawingVectorLayerRef.current.getSource().clear();

@@ -49,7 +49,10 @@ function App() {
 
   const handleSortingCriteria = (sortingCriteria) => {
     console.log('sortingCriteria', sortingCriteria)
-
+    if (isPolygonDrawn) {
+      restoreBuildingsAndRemovePolygon()
+      console.log("Buildings restored and polygon removed", sortingCriteria)
+    }
     setIsLoading(true)
     const weights_mapped = mapWeightsToApi(sortingCriteria)
 
@@ -158,12 +161,12 @@ function App() {
         setIsPolygonDrawn={setIsPolygonDrawn}
       >
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />
-        {tableData.buildings?.length > 0 && !selectedBuilding && 
+        {tableData.buildings?.length > 0 && !selectedBuilding &&
           <div className="buildings-alert">
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />}
-        {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />} 
+        {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>
       <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
