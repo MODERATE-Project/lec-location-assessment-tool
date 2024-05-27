@@ -7,7 +7,7 @@ import { Style, Stroke, Fill } from "ol/style";
 import Select from "ol/interaction/Select";
 import { pointerMove, click } from "ol/events/condition";
 import { getCenter } from 'ol/extent'
-import { REACT_APP_GEOSERVER_API_URL } from "../constants.js"
+// import { REACT_APP_GEOSERVER_API_URL } from "../constants.js"
 // import './OlMapBasic.css'
 import { addBoxInteraction, removeBoxInteraction } from "../services/mapDrawingModule.js";
 import { initializeOlMap } from '../services/OlMap'

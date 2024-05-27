@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DTable from "./components/UI/DataTable/DTable";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
-import { REACT_APP_MUNICIPALITIES_API_URL, REACT_APP_BUILDINGS_API_URL, REACT_APP_GEOSERVER_API_URL } from "./constants"
+import { VITE_MUNICIPALITIES_API_URL, VITE_BUILDINGS_API_URL, VITE_GEOSERVER_API_URL } from "./constants"
 import './App.css'
 import OlMap from "./components/OlMap/OlMap";
 import SortingCriteriaSelector from "./components/UI/SortingCriteriaSelector/SortingCriteriaSelector";
@@ -33,16 +33,16 @@ function App() {
 
   useEffect(() => {
     console.debug(
-      "REACT_APP_MUNICIPALITIES_API_URL",
-      REACT_APP_MUNICIPALITIES_API_URL
+      "VITE_MUNICIPALITIES_API_URL",
+      VITE_MUNICIPALITIES_API_URL
     );
     console.debug(
-      "REACT_APP_BUILDINGS_API_URL",
-      REACT_APP_BUILDINGS_API_URL
+      "VITE_BUILDINGS_API_URL",
+      VITE_BUILDINGS_API_URL
     );
     console.debug(
-      "REACT_APP_GEOSERVER_API_URL",
-      REACT_APP_GEOSERVER_API_URL
+      "VITE_GEOSERVER_API_URL",
+      VITE_GEOSERVER_API_URL
     );
   }, []);
 
@@ -57,7 +57,7 @@ function App() {
     const weights_mapped = mapWeightsToApi(sortingCriteria)
 
     // Realiza la llamada GET a la API del backend para obtener los datos
-    const url = `${REACT_APP_BUILDINGS_API_URL
+    const url = `${VITE_BUILDINGS_API_URL
       }/weighted-sort?municipio=${encodeURIComponent(selectedLocation)}&weights=${encodeURIComponent(JSON.stringify(weights_mapped))}`;
 
     toast.promise(
@@ -94,7 +94,7 @@ function App() {
 
     console.log('Buscando Datos del municipio', municipio)
 
-    const url = `${REACT_APP_BUILDINGS_API_URL
+    const url = `${VITE_BUILDINGS_API_URL
       }?municipio=${encodeURIComponent(municipio)}`;
 
     fetch(url)
@@ -116,7 +116,7 @@ function App() {
 
   useEffect(() => {
     // Realiza la llamada GET a la API del backend para obtener los datos municipios con datos
-    const url = `${REACT_APP_MUNICIPALITIES_API_URL}?withData=true`;
+    const url = `${VITE_MUNICIPALITIES_API_URL}?withData=true`;
     fetch(url)
       .then((res) => res.json())
       .then((data) => {

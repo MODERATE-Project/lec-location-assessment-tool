@@ -7,7 +7,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
 import { bbox } from "ol/loadingstrategy";
-import { REACT_APP_GEOSERVER_API_URL } from "../constants";
+import { VITE_GEOSERVER_API_URL } from "../constants";
 import { Style, Stroke, Fill } from "ol/style";
 import { ScaleLine } from 'ol/control';
 
@@ -19,7 +19,7 @@ const osmLayer = new TileLayer({
 const municipalitySource = (type) => {
     return new VectorSource({
         format: new GeoJSON(),
-        url: `${REACT_APP_GEOSERVER_API_URL}/ows?service=WFS&version=1.0.0&request=GetFeature&typename=moderate_municipios:${type}&outputFormat=application/json&srsname=EPSG:4326`,
+        url: `${VITE_GEOSERVER_API_URL}/ows?service=WFS&version=1.0.0&request=GetFeature&typename=moderate_municipios:${type}&outputFormat=application/json&srsname=EPSG:4326`,
         strategy: bbox
     })
 }

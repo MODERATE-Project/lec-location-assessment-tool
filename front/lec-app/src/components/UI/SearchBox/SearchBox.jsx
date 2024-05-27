@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import Select, { createFilter } from "react-select";
 import classes from "./SearchBox.module.css";
 import CustomMenuList from "./CustomMenuList";
-import { REACT_APP_MUNICIPALITIES_API_URL } from '../../../constants.js'
+import { VITE_MUNICIPALITIES_API_URL } from '../../../constants.js'
 
 const SearchBox = ({ onLocationSelected, location }) => {
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState();
 
   useEffect(() => {
-    fetch(REACT_APP_MUNICIPALITIES_API_URL)
+    fetch(VITE_MUNICIPALITIES_API_URL)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

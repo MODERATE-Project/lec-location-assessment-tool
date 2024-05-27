@@ -4,9 +4,9 @@ services:
     build:
       context: front/lec-app
       args:
-        REACT_APP_MUNICIPALITIES_API_URL: /municipalities
-        REACT_APP_BUILDINGS_API_URL: /buildings
-        REACT_APP_GEOSERVER_API_URL: /geoserver
+        VITE_MUNICIPALITIES_API_URL: /municipalities
+        VITE_BUILDINGS_API_URL: /buildings
+        VITE_GEOSERVER_API_URL: /geoserver
     environment:
       - WDS_SOCKET_PORT=3000
       - MODERATE_GEOSERVER_PROXY_PASS_URL=http://geoserver:8080

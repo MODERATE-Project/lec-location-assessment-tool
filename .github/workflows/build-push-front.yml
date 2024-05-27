@@ -15,9 +15,9 @@ jobs:
       image_name: tool-lec-frontend
       working_dir: front/lec-app
       build_args: |
-        REACT_APP_MUNICIPALITIES_API_URL=/municipalities
-        REACT_APP_BUILDINGS_API_URL=/buildings
-        REACT_APP_GEOSERVER_API_URL=/geoserver
+        VITE_MUNICIPALITIES_API_URL=/municipalities
+        VITE_BUILDINGS_API_URL=/buildings
+        VITE_GEOSERVER_API_URL=/geoserver
     secrets:
       wif_provider: ${{ secrets.WIF_PROVIDER }}
       wif_service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
