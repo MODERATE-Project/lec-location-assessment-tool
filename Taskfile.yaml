@@ -6,10 +6,11 @@ dotenv: [.env.development]
 tasks:
 
   start-dev:
+    # - docker compose -f docker-compose.dev.yaml build --no-cache
       - docker compose -f ${PWD}/docker-compose.dev.yaml up -d --remove-orphans
 
   start-prod:
-    - docker compose -f docker-compose.prod.yaml build --no-cache
+    # - docker compose -f docker-compose.prod.yaml build --no-cache
     - docker compose -f ${PWD}/docker-compose.prod.yaml up -d --remove-orphans
 
     
