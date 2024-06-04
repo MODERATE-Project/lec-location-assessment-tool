@@ -1,6 +1,7 @@
 services:
   app:
     container_name: front-lec-dev-c
+    image: moderate-lec/lec-app-dev:$DOCKER_IMAGE_TAG
     build:
       context: front/lec-app
       dockerfile: Dockerfile.dev
@@ -23,6 +24,7 @@ services:
 
   municipalities_service:
     container_name: municipalities-svc
+    image: moderate-lec/municipalities-svc-dev:$DOCKER_IMAGE_TAG
     build:
       context: back/municipalities_svc
       dockerfile: Dockerfile.dev
@@ -37,6 +39,7 @@ services:
 
   buildings_service:
     container_name: buildings-svc
+    image: moderate-lec/buildings-svc-dev:$DOCKER_IMAGE_TAG
     build:
       context: back/buildings_svc
       dockerfile: Dockerfile.dev
