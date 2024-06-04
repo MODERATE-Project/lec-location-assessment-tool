@@ -59,15 +59,16 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
         source: new VectorSource(
             // { wrapX: false }
         ),
-        style: new Style({
-            stroke: new Stroke({
-                color: 'red',
-                width: 2,
-            }),
-            fill: new Fill({
-                color: 'rgba(255, 0, 0, 0.3)',
-            })
-        }),
+        // style: new Style({
+        //     stroke: new Stroke({
+        //         color: 'red',
+        //         width: 2,
+        //     }),
+        //     fill: new Fill({
+        //         color: 'rgba(255, 0, 0, 0.3)',
+        //         // color: gradientColor(), // TODO !!!!!
+        //     })
+        // }),
     })
 
 

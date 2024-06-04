@@ -13,6 +13,7 @@ import { addBoxInteraction, removeBoxInteraction } from "../services/mapDrawingM
 import { initializeOlMap } from '../services/OlMap'
 import Feature from 'ol/Feature';
 import WKT from 'ol/format/WKT';
+import { createGradientFunction } from "../services/gradient";
 
 export function useMap({
     mapElementRef,
@@ -468,6 +469,8 @@ export function useMap({
         if (buildingsLayerRef.current && availableBuildings && availableBuildings.length > 0) {
             buildingsLayerRef.current.getSource().clear();
 
+            const getColor = createGradientFunction(availableBuildings.map(building => building['MEAN']));
+
             availableBuildings.forEach(building => {
                 const geometryString = building.geometry
 
@@ -483,6 +486,8 @@ export function useMap({
                     building: building
                 });
 
+                const buildingColor = getColor(building['MEAN'])
+
                 if (isPolygonDrawn) {
                     feature.setStyle(new Style({
                         stroke: new Stroke({
@@ -490,18 +495,20 @@ export function useMap({
                             width: 2,
                         }),
                         fill: new Fill({
-                            color: 'rgba(0, 255, 0, 0.1)',
+                            // color: 'rgba(0, 255, 0, 0.1)',
+                            color: buildingColor, // TODO test this
                         }),
                     }));
                 } else {
 
                     feature.setStyle(new Style({
                         stroke: new Stroke({
-                            color: 'red',
+                            color: buildingColor,
                             width: 2,
                         }),
                         fill: new Fill({
-                            color: 'rgba(255, 0, 0, 0.1)',
+                            // color: 'rgba(255, 0, 0, 0.1)',
+                            color: buildingColor, // TODO test this
                         })
                     }))
                 }
