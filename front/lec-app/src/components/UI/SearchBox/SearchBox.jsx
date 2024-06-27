@@ -54,11 +54,11 @@ const SearchBox = ({ onLocationSelected, location }) => {
         onChange={(selectedOption) =>
           handleLocationSelected(selectedOption.value)
         }
-        onKeyDown={(e) => {
+        /*onKeyDown={(e) => {
           if (e.key === "Enter" && e.target.value !== "") {
             handleLocationSelected(e.target.value);
           }
-        }}
+        }}*/
         components={{
           MenuList: CustomMenuList,
         }}
