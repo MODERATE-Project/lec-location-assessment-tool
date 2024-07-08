@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from buildings_data_management import *
 import json
@@ -18,12 +18,15 @@ buildings_df = get_buildings_dataframe()
 #     return jsonify({"buildings": filtered_buildings})
 
 @app.route('/buildings', methods=['GET'])
-def get_buildings_new():
+def get_buildings():
     municipio = request.args.get('municipio', None)  # Obtiene el parámetro municipio; si no está presente, retorna None
 
     filtered_buildings = get_buildings_sorted_by_mean(buildings_df[ buildings_df['Municipios'] == municipio ])
     
-    return jsonify({"buildings": dataframe_to_json(filtered_buildings)})
+    res = make_response(jsonify({"buildings": dataframe_to_json(filtered_buildings)}))
+    res.headers['Content-Type'] = 'application/json; charset=utf-8'
+
+    return res
 
 
 @app.route('/buildings/weighted-sort', methods=['GET'])
