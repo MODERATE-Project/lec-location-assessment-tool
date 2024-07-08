@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import DTable from "./components/UI/DataTable/DTable";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
+import GradientColorBar from './components/UI/GradientColorBar/GradientColorBar';
 import { VITE_MUNICIPALITIES_API_URL, VITE_BUILDINGS_API_URL, VITE_GEOSERVER_API_URL } from "./constants"
 import './App.css'
 import OlMap from "./components/OlMap/OlMap";
@@ -100,6 +101,12 @@ function App() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
+        const values = data.buildings.map(building => building['MEAN'])
+        const maxValue = Math.min(...values)
+        const minValue = Math.max(...values)
+        data.maxValue = maxValue
+        data.minValue = minValue
+        
         setTableData(data); // Guarda los datos en el estado local
         setInitialTableData(data);
         setSelectedBuilding(null);
@@ -136,7 +143,10 @@ function App() {
   }
 
   const setAvailableBuildings = (buildings) => {
-    setTableData({ buildings: buildings })
+    values = buildings.map(building => building['MEAN'])
+    maxValue = Math.min(...values)
+    minValue = Math.max(...values)
+    setTableData({ buildings: buildings, maxValue: maxValue, minValue: minValue })
   }
 
   const restoreBuildingsAndRemovePolygon = () => {
@@ -166,6 +176,7 @@ function App() {
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />}
+        {tableData.buildings?.length > 0 && <GradientColorBar minValue={tableData.minValue} maxValue={tableData.maxValue}/>}
         {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>
