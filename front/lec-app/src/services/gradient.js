@@ -5,7 +5,7 @@ const createGradientFunction = (values) => {
     const min = Math.min(...values)
     const max = Math.max(...values)
 
-    return chroma.scale(['green', 'yellow', 'red' ]).domain([min,max]);
+    return chroma.scale(['green', 'yellow', 'red' ]).domain([max,min]);
     
     }
 

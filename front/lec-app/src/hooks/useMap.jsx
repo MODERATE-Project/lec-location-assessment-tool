@@ -68,7 +68,7 @@ export function useMap({
                         parseFloat(loc.lat),
                     ]);
 
-                    mapRef.current.getView().animate({ center: coordinates, zoom: 11 });
+                    mapRef.current.getView().animate({ center: coordinates, zoom: 12 });
                 } else {
                     alert("Ubicación no encontrada");
                 }

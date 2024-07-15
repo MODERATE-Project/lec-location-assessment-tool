@@ -56,6 +56,7 @@ export const initializeOlMap = ({ targetElemet, vectorZoomThreshold, initialZoom
     })
     const buildingsLayer = new VectorLayer({
         name: "buildings",
+        minZoom: 14,
         source: new VectorSource(
             // { wrapX: false }
         ),

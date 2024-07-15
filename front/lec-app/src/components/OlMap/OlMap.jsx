@@ -75,12 +75,13 @@ const OlMap = ({
     if (!buildingCentroidRef.current) {
       const vectorSource = new VectorSource({ features });
       const buildingLayer = new VectorLayer({
+        minZoom: 20,
         source: vectorSource,
         style: centroidStyle,
       });
 
       buildingCentroidRef.current = buildingLayer;
-      mapRef.current.addLayer(buildingLayer);
+      mapRef.current.addLayer(buildingLayer); 
     } else {
       buildingCentroidRef.current.getSource().clear();
       buildingCentroidRef.current.setStyle(centroidStyle)
