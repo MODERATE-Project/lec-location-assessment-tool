@@ -10,6 +10,7 @@ import DrawingToggleButton from "./components/UI/DrawingToggleButton/DrawingTogg
 import mapWeightsToApi from "./services/sortAdapter"
 import toast, { Toaster } from "react-hot-toast";
 import CancellSelectionButton from "./components/UI/CancellSelectionButton/CancellSelectionButton";
+import { createGradientFunction } from "./services/gradient";
 
 
 function App() {
@@ -22,6 +23,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [onClearPolygon, setOnClearPolygon] = useState(false)
   const [isPolygonDrawn, setIsPolygonDrawn] = useState(false)
+  const [colorData, setColorData] = useState({
+    getColor: () => null,
+    minValue: 0,
+    maxValue: 1
+  })
+
 
   const handleRowClick = (building) => {
     setSelectedBuilding(building);
@@ -106,7 +113,13 @@ function App() {
         const minValue = Math.max(...values)
         data.maxValue = maxValue
         data.minValue = minValue
-        
+
+        setColorData({
+          getColor: createGradientFunction(values, minValue, maxValue),
+          minValue: minValue,
+          maxValue: maxValue,
+        });
+
         setTableData(data); // Guarda los datos en el estado local
         setInitialTableData(data);
         setSelectedBuilding(null);
@@ -143,13 +156,38 @@ function App() {
   }
 
   const setAvailableBuildings = (buildings) => {
-    values = buildings.map(building => building['MEAN'])
-    maxValue = Math.min(...values)
-    minValue = Math.max(...values)
-    setTableData({ buildings: buildings, maxValue: maxValue, minValue: minValue })
+
+
+    /*
+    // NOTE: uncomment in case that gradient has to relative to selected buildings (drawing a polygon)
+    const values = buildings.map(building => building['MEAN'])
+    const maxValue = Math.min(...values)
+    const minValue = Math.max(...values)
+
+    setColorData({
+      getColor: createGradientFunction(values, minValue, maxValue),
+      minValue: minValue,
+      maxValue: maxValue,
+    });
+    */
+
+    setTableData({ buildings: buildings })
   }
 
   const restoreBuildingsAndRemovePolygon = () => {
+
+    /*
+    // NOTE: uncomment in case that gradient has to relative to selected buildings (drawing a polygon)
+    const values = initialTableData.buildings.map(building => building['MEAN'])
+    const maxValue = Math.min(...values)
+    const minValue = Math.max(...values)
+
+    setColorData({
+      getColor: createGradientFunction(values, minValue, maxValue),
+      minValue: minValue,
+      maxValue: maxValue,
+    });
+    */
     setTableData({ buildings: initialTableData.buildings })
     setOnClearPolygon(true)
   }
@@ -169,6 +207,7 @@ function App() {
         setClearPolygon={setOnClearPolygon}
         isPolygonDrawn={isPolygonDrawn}
         setIsPolygonDrawn={setIsPolygonDrawn}
+        getColor={colorData.getColor}
       >
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />
         {tableData.buildings?.length > 0 && !selectedBuilding &&
@@ -176,7 +215,7 @@ function App() {
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />}
-        {tableData.buildings?.length > 0 && <GradientColorBar minValue={tableData.minValue} maxValue={tableData.maxValue}/>}
+        {tableData.buildings?.length > 0 && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
         {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>

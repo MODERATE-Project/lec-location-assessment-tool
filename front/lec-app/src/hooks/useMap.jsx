@@ -13,7 +13,7 @@ import { addBoxInteraction, removeBoxInteraction } from "../services/mapDrawingM
 import { initializeOlMap } from '../services/OlMap'
 import Feature from 'ol/Feature';
 import WKT from 'ol/format/WKT';
-import { createGradientFunction } from "../services/gradient";
+import { darken } from "../services/gradient";
 
 export function useMap({
     mapElementRef,
@@ -27,7 +27,8 @@ export function useMap({
     isDrawingEnabled,
     selectInteractionsRef,
     isPolygonDrawn,
-    setIsPolygonDrawn
+    setIsPolygonDrawn,
+    getColor
 }) {
     const mapRef = useRef(null);
 
@@ -469,8 +470,6 @@ export function useMap({
         if (buildingsLayerRef.current && availableBuildings && availableBuildings.length > 0) {
             buildingsLayerRef.current.getSource().clear();
 
-            const getColor = createGradientFunction(availableBuildings.map(building => building['MEAN']));
-
             availableBuildings.forEach(building => {
                 const geometryString = building.geometry
 
@@ -488,30 +487,30 @@ export function useMap({
 
                 const buildingColor = getColor(building['MEAN'])
 
-                if (isPolygonDrawn) {
-                    feature.setStyle(new Style({
-                        stroke: new Stroke({
-                            color: 'green',
-                            width: 2,
-                        }),
-                        fill: new Fill({
-                            // color: 'rgba(0, 255, 0, 0.1)',
-                            color: buildingColor, // TODO test this
-                        }),
-                    }));
-                } else {
+                // if (isPolygonDrawn) {
+                //     feature.setStyle(new Style({
+                //         stroke: new Stroke({
+                //             color: buildingColor,
+                //             width: 2,
+                //         }),
+                //         fill: new Fill({
+                //             // color: 'rgba(0, 255, 0, 0.1)',
+                //             color: buildingColor, 
+                //         }),
+                //     }));
+                // } else {
 
                     feature.setStyle(new Style({
                         stroke: new Stroke({
-                            color: buildingColor,
-                            width: 2,
+                            color: darken(buildingColor),
+                            width: 1,
                         }),
                         fill: new Fill({
                             // color: 'rgba(255, 0, 0, 0.1)',
                             color: buildingColor, // TODO test this
                         })
                     }))
-                }
+                // }
 
                 buildingsLayerRef.current.getSource().addFeature(feature);
 
@@ -520,34 +519,34 @@ export function useMap({
     }, [availableBuildings])
 
 
-    useEffect(() => {
-        if (availableBuildings?.length <= 0) return
+    // useEffect(() => {
+    //     if (availableBuildings?.length <= 0) return
 
-        buildingsLayerRef.current.getSource().forEachFeature(feature => {
-            if (isPolygonDrawn) {
-                feature.setStyle(new Style({
-                    stroke: new Stroke({
-                        color: 'green',
-                        width: 2,
-                    }),
-                    fill: new Fill({
-                        color: 'rgba(0, 255, 0, 0.1)',
-                    }),
-                }));
-            } else {
+    //     buildingsLayerRef.current.getSource().forEachFeature(feature => {
+    //         if (isPolygonDrawn) {
+    //             feature.setStyle(new Style({
+    //                 stroke: new Stroke({
+    //                     color: 'green',
+    //                     width: 2,
+    //                 }),
+    //                 fill: new Fill({
+    //                     color: 'rgba(0, 255, 0, 0.1)',
+    //                 }),
+    //             }));
+    //         } else {
 
-                feature.setStyle(new Style({
-                    stroke: new Stroke({
-                        color: 'red',
-                        width: 2,
-                    }),
-                    fill: new Fill({
-                        color: 'rgba(255, 0, 0, 0.1)',
-                    })
-                }))
-            }
-        })
-    }, [isPolygonDrawn]);
+    //             feature.setStyle(new Style({
+    //                 stroke: new Stroke({
+    //                     color: 'red',
+    //                     width: 2,
+    //                 }),
+    //                 fill: new Fill({
+    //                     color: 'rgba(255, 0, 0, 0.1)',
+    //                 })
+    //             }))
+    //         }
+    //     })
+    // }, [isPolygonDrawn]);
 
 
     // const layerIsOnMap = (map, layer) => {
@@ -569,11 +568,13 @@ export function useMap({
                 addBoxInteraction(mapRef.current, drawingVectorLayerRef.current);
                 mapRef.current.removeInteraction(selectInteractionsRef.current.hover)
                 mapRef.current.removeInteraction(selectInteractionsRef.current.click)
+                mapRef.current.removeInteraction(selectInteractionsRef.current.buildingsClick)
 
             } else {
                 removeBoxInteraction(mapRef.current);
                 mapRef.current.addInteraction(selectInteractionsRef.current.hover)
                 mapRef.current.addInteraction(selectInteractionsRef.current.click)
+                mapRef.current.addInteraction(selectInteractionsRef.current.buildingsClick)
             }
 
         }

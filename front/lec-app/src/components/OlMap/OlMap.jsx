@@ -22,6 +22,7 @@ const OlMap = ({
   setClearPolygon,
   setIsPolygonDrawn,
   isPolygonDrawn,
+  getColor,
   children
 }) => {
 
@@ -41,6 +42,7 @@ const OlMap = ({
     selectInteractionsRef,
     isPolygonDrawn,
     setIsPolygonDrawn,
+    getColor
   })
 
   const buildingCentroidRef = useRef(null);
@@ -48,12 +50,12 @@ const OlMap = ({
   
   const centroidStyle = (feature) => {
     let fillColor = 'red'; // Por defecto, rojo
-    if (isPolygonDrawn) {
-      fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
-    } 
-    if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
-      fillColor = 'blue'; // Si se ha seleccionado el edificio, azul
-    }
+    // if (isPolygonDrawn) {
+      // fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
+    // } 
+    // if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
+      fillColor = 'DeepSkyBlue'; // Si se ha seleccionado el edificio, azul
+    // }
     return new Style({
       image: new CircleStyle({
         radius: 7,
