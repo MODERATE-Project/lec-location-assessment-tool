@@ -39,6 +39,8 @@
 
 .sorting-criteria-content {
   padding-top: 15px;
+  display: flex;
+  flex-direction: column;
 }
 .variable-row {
   display: flex;
@@ -60,14 +62,12 @@
 }
 
 .sort-button {
+  display: flex;
+  justify-content: center;
+  max-height: 100%;
   margin-top: 20px;
   border-radius: 5px;
   cursor: pointer;
-  display: inline-flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-  max-height: 100%;
 }
 
 .sort-button:hover {
