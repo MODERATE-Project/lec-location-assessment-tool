@@ -28,6 +28,7 @@ function App() {
     minValue: 0,
     maxValue: 1
   })
+  const [areMapBuildingsVisible, setMapBuildingsVisible] = useState(false)
 
 
   const handleRowClick = (building) => {
@@ -208,6 +209,7 @@ function App() {
         isPolygonDrawn={isPolygonDrawn}
         setIsPolygonDrawn={setIsPolygonDrawn}
         getColor={colorData.getColor}
+        setMapBuildingsVisible={setMapBuildingsVisible}
       >
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />
         {tableData.buildings?.length > 0 && !selectedBuilding &&
@@ -217,7 +219,7 @@ function App() {
         {tableData.buildings?.length > 0 && <>
           <ExportButton />
           <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />
-          <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />
+          { areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
           <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
         </>}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}

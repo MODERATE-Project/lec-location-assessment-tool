@@ -28,7 +28,8 @@ export function useMap({
     selectInteractionsRef,
     isPolygonDrawn,
     setIsPolygonDrawn,
-    getColor
+    getColor,
+    setMapBuildingsVisible
 }) {
     const mapRef = useRef(null);
 
@@ -342,11 +343,13 @@ export function useMap({
 
                 const hoverInteraction = selectInteractionsRef.current.hover;
                 const selectInteraction = selectInteractionsRef.current.click;
-
+                
                 if (currentZoom <= 14) {
                     // setActiveLayer("simplified");
                     selectInteraction.setActive(true);
                     hoverInteraction.setActive(true);
+                    
+                    setMapBuildingsVisible(false)
                 } else {
                     // setActiveLayer("detailed");
                     selectInteraction.setActive(false);
@@ -354,12 +357,14 @@ export function useMap({
                     // Des-selecciona las features cuando el zoom no es el adecuado
                     selectInteraction.getFeatures().clear();
                     hoverInteraction.getFeatures().clear();
+
+                    setMapBuildingsVisible(true)
                 }
             });
         };
 
         // console.log(availableMunicipios.current)
-
+        
         const {
             initialMap,
             simplifiedLayer: simplifiedMunicipalityLayer,

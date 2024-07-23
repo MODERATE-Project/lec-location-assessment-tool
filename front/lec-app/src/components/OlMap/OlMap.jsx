@@ -23,6 +23,7 @@ const OlMap = ({
   setIsPolygonDrawn,
   isPolygonDrawn,
   getColor,
+  setMapBuildingsVisible,
   children
 }) => {
 
@@ -42,7 +43,8 @@ const OlMap = ({
     selectInteractionsRef,
     isPolygonDrawn,
     setIsPolygonDrawn,
-    getColor
+    getColor,
+    setMapBuildingsVisible
   })
 
   const buildingCentroidRef = useRef(null);
