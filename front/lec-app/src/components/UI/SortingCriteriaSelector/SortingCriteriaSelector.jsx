@@ -12,25 +12,15 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   const [advanced, setAdvanced] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const [sortableList, setSortableList] = useState([
-    { id: 1, name: 'Rent', value: 1 },
-    { id: 2, name: 'Age', value: 1 },
-    { id: 3, name: 'Population', value: 1 },
-    { id: 4, name: 'Single-person households', value: 1 },
-    { id: 5, name: 'Elderly Percentage', value: 1 },
-    { id: 6, name: 'Youth Percentage', value: 1 },
-    { id: 7, name: 'Average Persons Per Household', value: 1 },
-    { id: 8, name: 'Potential Production', value: 1 },
+    { id: 1, value: 1, name: 'Rent' },
+    { id: 2, value: 1, name: 'Age' },
+    { id: 3, value: 1, name: 'Population' },
+    { id: 4, value: 1, name: 'Single-person households' },
+    { id: 5, value: 1, name: 'Elderly Percentage' },
+    { id: 6, value: 1, name: 'Youth Percentage' },
+    { id: 7, value: 1, name: 'Average Persons Per Household' },
+    { id: 8, value: 1, name: 'Potential Production' },
   ])
-  const [variableImportance, setVariableImportance] = useState({
-    Rent: 0,
-    Age: 0,
-    Population: 0,
-    "Single-person households": 0,
-    "Elderly Percentage": 0,
-    "Youth Percentage": 0,
-    "Average Persons Per Household": 0,
-    "Potential Production": 0,
-  });
 
   const upperLimit = 10;
 
