@@ -11,7 +11,8 @@ const GradientColorBar = ({
   width = 25,
   height = 200,
   minValue = 0,
-  maxValue = 1
+  maxValue = 1,
+  variableName = 'Potential'
 }) => {
   // Crear el gradiente usando chroma.js
   const gradientString = `linear-gradient(to top, ${gradient.join(', ')})`;
@@ -19,10 +20,12 @@ const GradientColorBar = ({
 
 
   return (
-    <div className="color-bar" style={{ width: `${width}px`, height: `${height}px` }}>
+    <div className="color-bar">
+      <div className='variable-name'><span>{variableName}</span></div>
       <div
         className="gradient"
         style={{
+          width: `${width}px`, height: `${height}px`,
           background: gradientString,
         }}
       />

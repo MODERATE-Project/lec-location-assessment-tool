@@ -1,28 +1,35 @@
 .color-bar {
-    position: absolute;
-    top: 70px;
-    left: 15px;  
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-  }
-  
-  .gradient {
-    width: 100%;
-    height: 100%;
-    /* display: inline-block; */
-    /* flex-grow: 100; */
-  }
-  
-  .labels {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: absolute;
-    left: 130%;
-    height: 100%;
-    align-items: flex-start;
-    /* background-color: white; */
-    font-weight: bold;
-  }
-  
+  position: absolute;
+  top: 70px;
+  left: 15px;
+  display: flex;
+  flex-direction: row;
+  user-select: none; 
+}
+
+.gradient {
+  width: 100%;
+  height: 100%;
+}
+
+.labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: absolute;
+  left: 130%;
+  height: 100%;
+  align-items: flex-start;
+  font-weight: bold;
+}
+
+.labels span, .variable-name span {
+  /* background-color: white; */
+}
+
+.variable-name {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-weight: bold;
+  margin-right: 5px;
+}
