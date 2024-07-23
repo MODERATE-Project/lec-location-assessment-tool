@@ -10,8 +10,8 @@ function ExportButton({ exportFileProcedure }) {
 
     return (
         <button className='export-button'  onClick={onClick}>
-            <FaFileExport size={23} title={"Export as PDF"} />
-            <span>Export as PDF</span>
+            <FaFileExport size={23} title={"Export to PDF or print the report with the currently displayed information"} />
+            <span>Export</span>
         </button>
         
 

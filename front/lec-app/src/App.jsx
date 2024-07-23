@@ -194,7 +194,7 @@ function App() {
   }
 
   const exportFileProcedure = () => {
-    
+
     window.print() // TODO
   }
 
@@ -222,9 +222,9 @@ function App() {
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <>
-          <ExportButton exportFileProcedure={exportFileProcedure}/>
+          <ExportButton exportFileProcedure={exportFileProcedure} />
           <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />
-          { areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
+          {areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
           <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
         </>}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}

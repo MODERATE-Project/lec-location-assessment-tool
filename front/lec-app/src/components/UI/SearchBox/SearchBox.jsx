@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Select, { createFilter } from "react-select";
-import classes from "./SearchBox.module.css";
+import "./SearchBox.css";
 import CustomMenuList from "./CustomMenuList";
 import { VITE_MUNICIPALITIES_API_URL } from '../../../constants.js'
 
@@ -45,7 +45,7 @@ const SearchBox = ({ onLocationSelected, location }) => {
   };
 
   return (
-    <div className={classes.selectContainer}>
+    <div className="selectContainer">
       <Select
         value={selectedOption}
         filterOption={createFilter({ ignoreAccents: true })}

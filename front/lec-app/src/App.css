@@ -30,10 +30,41 @@
 
 @media print {
 
+
+  .App {
+    width: 100%;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;
+    /* font-size: 12px; */
+    overflow: visible !important;
+  }
+
+  .datatable {
+    overflow: visible !important;
+  }
+
+
+  .gradient {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  .no-print,
   .buildings-alert,
   .export-button,
   .sorting-criteria-container,
-  .left-button {
+  .left-button,
+  .datatable+div {
     visibility: hidden;
   }
+
+  .selectContainer div[class*="IndicatorsContainer"] {
+    display: none;
+  }
+
 }

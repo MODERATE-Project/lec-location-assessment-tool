@@ -99,6 +99,7 @@ const DTable = ({ data, onRowClicked }) => {
 
   return (
     <DataTable
+      className="datatable"
       columns={columns}
       data={data}
       pagination
