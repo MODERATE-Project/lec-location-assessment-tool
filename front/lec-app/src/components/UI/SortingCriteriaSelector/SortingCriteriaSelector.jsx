@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import './SortingCriteriaSelector.css';
 import Loader from '../Loader';
 import { Collapse } from 'react-collapse';
-import { FaCaretLeft, FaCaretRight, FaGripLines, } from "react-icons/fa6";
 import { MdDragIndicator } from "react-icons/md";
+import { LuTextCursorInput } from "react-icons/lu";
+import { TbDragDrop } from "react-icons/tb";
 import { ReactSortable } from "react-sortablejs";
 
 
@@ -58,17 +59,38 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   return (
     <div className="sorting-criteria-container">
       <div className="sorting-criteria-header" onClick={toggleAccordion}>
-        <h2>Sorting Criteria</h2>
-        <p>Select the importance of each variable on a scale from 0 to {upperLimit}</p>
+
+        <div>
+          <h2>Sorting Criteria</h2>
+          <p>Select the importance of each variable on a scale from 0 to {upperLimit}</p>
+        </div>
+
+        <button className="advanced-button" style={{ 'opacity': isOpened ? "1" : "0" }} onClick={
+          (e) => {
+            e.stopPropagation();
+            setAdvanced(prev => !prev)
+          }}>
+          {/* {advanced ? 'simple' : 'advanced'} */}
+          {advanced ? <TbDragDrop /> : <LuTextCursorInput />}
+        </button>
+
       </div>
 
       <Collapse isOpened={isOpened}>
         {isOpened && <div className="sorting-criteria-content" onClick={(e) => e.stopPropagation()}>
+          {/*
+          <div style={{ 'textAlign': "end" }}>
+            <button className="advanced-button" onClick={() => setAdvanced(prev => !prev)}>
+              {/* {advanced ? 'simple' : 'advanced'} */}{/*
+              {advanced ? <TbDragDrop /> : <LuTextCursorInput />}
+            </button>
+          </div>
+*/}
           <ReactSortable className="sorting-criteria-content" disabled={advanced} list={sortableList} setList={setSortableList}>
             {sortableList.map((item, index) => (
 
               <div key={item.id} className="variable-row" style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
-                {!advanced && <MdDragIndicator style={{ 'paddingRight': '10px', 'fontSize': '1.25em' }} />}
+                {!advanced && <MdDragIndicator className='drag-icon' />}
                 {/* {!advanced && <FaGripLines style={{ 'paddingRight': '15px' }} />} */}
                 <label htmlFor={item.name} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }} >{item.name}</label>
                 {advanced && <input
@@ -84,12 +106,6 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
             ))}
           </ReactSortable>
 
-          <div style={{ 'textAlign': "end" }}>
-            <button className="advanced-button" onClick={() => setAdvanced(prev => !prev)}>
-              {advanced ? 'drag' : 'numbers'}
-              {/* {advanced ? <FaCaretRight /> : <FaCaretLeft />} */}
-            </button>
-          </div>
 
           <button className="sort-button dark" onClick={handleSort}>
             {isLoading && <Loader />}

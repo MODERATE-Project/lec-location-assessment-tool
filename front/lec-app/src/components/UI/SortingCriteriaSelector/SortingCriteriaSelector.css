@@ -18,6 +18,10 @@
 
 
 .sorting-criteria-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap:15px;
   cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;   
@@ -38,7 +42,7 @@
 }
 
 .sorting-criteria-content {
-  padding-top: 15px;
+  padding-top: 10px;
   display: flex;
   flex-direction: column;
 }
@@ -61,6 +65,11 @@
 
 }
 
+.drag-icon{
+  padding-right: 10px;
+  font-size: 1.25em;
+}
+
 .sort-button {
   display: flex;
   justify-content: center;
@@ -78,4 +87,19 @@
 
 .ReactCollapse--collapse {
   transition: height 500ms;
+}
+
+
+.advanced-button {
+  font-size: 20px;
+  border-radius: 100%;
+  border-color: black;
+  width: 2em;
+  height: 2em;
+  padding: 0px;
+  transition: opacity ease-in-out 0.2s;
+}
+
+.advanced-button:hover {
+  background-color: #eee;
 }
