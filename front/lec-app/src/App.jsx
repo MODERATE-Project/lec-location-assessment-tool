@@ -11,7 +11,7 @@ import mapWeightsToApi from "./services/sortAdapter"
 import toast, { Toaster } from "react-hot-toast";
 import CancellSelectionButton from "./components/UI/CancellSelectionButton/CancellSelectionButton";
 import { createGradientFunction } from "./services/gradient";
-
+import ExportButton from './components/UI/ExportButton/ExportButton';
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -214,9 +214,12 @@ function App() {
           <div className="buildings-alert">
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
-        {tableData.buildings?.length > 0 && <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />}
-        {tableData.buildings?.length > 0 && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
-        {tableData.buildings?.length > 0 && <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />}
+        {tableData.buildings?.length > 0 && <>
+          <ExportButton />
+          <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />
+          <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />
+          <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
+        </>}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>
       <DTable data={tableData.buildings} onRowClicked={handleRowClick} />

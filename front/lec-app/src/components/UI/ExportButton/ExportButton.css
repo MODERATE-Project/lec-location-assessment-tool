@@ -1,0 +1,20 @@
+.export-button {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    margin-right: 25px;
+    margin-top: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;   
+}
+
+.export-button:hover {
+    background-color: #eee;
+    padding: 15px;
+    animation: bounce-export .3s forwards;
+}
+
+@keyframes bounce-export {
+    to { transform: scale(.9); }
+  }
