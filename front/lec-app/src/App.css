@@ -25,3 +25,15 @@
   color: #f2c75c;
   background-color: #003b49;
 }
+
+
+
+@media print {
+
+  .buildings-alert,
+  .export-button,
+  .sorting-criteria-container,
+  .left-button {
+    visibility: hidden;
+  }
+}

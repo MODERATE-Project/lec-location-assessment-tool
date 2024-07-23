@@ -193,6 +193,11 @@ function App() {
     setOnClearPolygon(true)
   }
 
+  const exportFileProcedure = () => {
+    
+    window.print() // TODO
+  }
+
   return (
     <div className="App">
       <OlMap
@@ -217,7 +222,7 @@ function App() {
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <>
-          <ExportButton />
+          <ExportButton exportFileProcedure={exportFileProcedure}/>
           <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />
           { areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
           <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
