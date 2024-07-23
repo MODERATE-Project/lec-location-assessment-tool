@@ -7,7 +7,7 @@ import { FaVectorSquare } from "react-icons/fa6";
 function DrawingToggleButton({ isDrawingEnabled, onChange }) {
     return (
         <button className={`left-button ${isDrawingEnabled ? 'left-button-enabled' : 'left-button-disabled'}`} onClick={onChange}>
-            <FaVectorSquare size={isDrawingEnabled ? 24 : 23} title={isDrawingEnabled ? "Dibujar área (activado)" : "Dibujar área"} />
+            <FaVectorSquare size={isDrawingEnabled ? 24 : 23} title={isDrawingEnabled ? "Draw area (enabled)" : "Draw area"} />
 
         </button>
 

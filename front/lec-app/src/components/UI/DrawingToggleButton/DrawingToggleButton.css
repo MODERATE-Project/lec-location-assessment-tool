@@ -20,6 +20,6 @@
 }
 
 @keyframes bounce {
-    to { transform: scale(.8); }
+    to { transform: scale(.85); }
   }
   
