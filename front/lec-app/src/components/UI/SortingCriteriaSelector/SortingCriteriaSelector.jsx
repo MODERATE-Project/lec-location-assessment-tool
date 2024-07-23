@@ -63,17 +63,17 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
       </div>
 
       <Collapse isOpened={isOpened}>
-        <div className="sorting-criteria-content" onClick={(e) => e.stopPropagation()}>
+        {isOpened && <div className="sorting-criteria-content" onClick={(e) => e.stopPropagation()}>
           <ReactSortable className="sorting-criteria-content" disabled={advanced} list={sortableList} setList={setSortableList}>
             {sortableList.map((item, index) => (
 
               <div key={item.id} className="variable-row" style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
                 {!advanced && <MdDragIndicator style={{ 'paddingRight': '10px', 'fontSize': '1.25em' }} />}
                 {/* {!advanced && <FaGripLines style={{ 'paddingRight': '15px' }} />} */}
-                <label htmlFor={item} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }} >{item.name}</label>
+                <label htmlFor={item.name} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }} >{item.name}</label>
                 {advanced && <input
                   type="number"
-                  id={item}
+                  id={item.name}
                   min="0"
                   max="10"
                   value={item.value}
@@ -95,7 +95,7 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
             {isLoading && <Loader />}
             Sort Table
           </button>
-        </div>
+        </div>}
       </Collapse >
     </div >
   );
