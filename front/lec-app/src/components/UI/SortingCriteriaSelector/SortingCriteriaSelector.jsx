@@ -77,7 +77,7 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
           <ReactSortable className="sorting-criteria-content" disabled={advanced} list={sortableList} setList={setSortableList}>
             {sortableList.map((item, index) => (
 
-              <div div key={item.id} className="variable-row" style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
+              <div key={item.id} className="variable-row" style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
                 {!advanced && <MdDragIndicator style={{ 'paddingRight': '10px', 'fontSize': '1.25em' }} />}
                 {/* {!advanced && <FaGripLines style={{ 'paddingRight': '15px' }} />} */}
                 <label htmlFor={item} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }} >{item.name}</label>
