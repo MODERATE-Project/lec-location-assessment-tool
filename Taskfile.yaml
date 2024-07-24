@@ -1,26 +1,30 @@
 version: "3"
 
-# Para cargar variables de entono (env-vars)
-dotenv: [.env.development]
-
 tasks:
 
   build-dev:
-    - docker compose -f docker-compose.dev.yaml build --no-cache
+    dotenv: [ '.env.development' ]
+    cmds:
+    - docker compose -f docker-compose.dev.yaml build # --no-cache
 
   build-prod:
-    - docker compose -f docker-compose.prod.yaml build --no-cache
+    dotenv: [ '.env.production' ]
+    cmds:
+    - docker compose -f docker-compose.prod.yaml build # --no-cache
 
 
   start-dev:
+    dotenv: [ '.env.development' ]
+    cmds:
     # - docker compose -f docker-compose.dev.yaml build --no-cache
       - docker compose -f ${PWD}/docker-compose.dev.yaml up -d --remove-orphans
 
   start-prod:
+    dotenv: [ '.env.production' ]
+    cmds:
     # - docker compose -f docker-compose.prod.yaml build --no-cache
     - docker compose -f ${PWD}/docker-compose.prod.yaml up -d --remove-orphans
 
-    
   logs:
     - docker compose -f ${PWD}/docker-compose.prod.yaml logs -f app municipalities_service buildings_service
 
