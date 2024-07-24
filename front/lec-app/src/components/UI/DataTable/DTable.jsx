@@ -4,6 +4,7 @@ const customStyles = {
   headRow: {
     style: {
       backgroundColor: "#003b49",
+      maxWidth:"100vmax",
     },
   },
   headCells: {
@@ -11,7 +12,6 @@ const customStyles = {
       color: "#f2c75c", // Color de texto para un mejor contraste con el fondo oscuro
       fontFamily: "Roboto, sans-serif",
       fontSize: "16px",
-      
     },
     
   },
@@ -20,6 +20,7 @@ const customStyles = {
     style: {
       fontFamily: "Roboto, sans-serif", // Usar la fuente Roboto
       fontSize: "16px",
+      maxWidth:"100vmax"
     },
   },
 };

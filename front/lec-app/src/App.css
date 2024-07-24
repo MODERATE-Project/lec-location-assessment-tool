@@ -46,6 +46,8 @@
 
   .datatable {
     overflow: visible !important;
+    zoom: 90%;
+    /* width: 100% !important; */
   }
 
 
