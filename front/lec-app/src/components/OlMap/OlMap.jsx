@@ -8,6 +8,7 @@ import { Point } from "ol/geom";
 import { Feature } from "ol";
 import './OlMap.css'
 import { useMap } from "../../hooks/useMap";
+import BuildingPopover from '../UI/BuildingPopover/BuildingPopover'
 
 const OlMap = ({
   location,
@@ -49,14 +50,17 @@ const OlMap = ({
 
   const buildingCentroidRef = useRef(null);
   const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
+
+  const [showPopover, setShowPopover] = useState(false);
+  const [popover, setPopover] = useState({ visible: false, building: null, position: [0, 0] });
   
   const centroidStyle = (feature) => {
     let fillColor = 'red'; // Por defecto, rojo
     // if (isPolygonDrawn) {
-      // fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
+    // fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
     // } 
     // if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
-      fillColor = 'DeepSkyBlue'; // Si se ha seleccionado el edificio, azul
+    fillColor = 'DeepSkyBlue'; // Si se ha seleccionado el edificio, azul
     // }
     return new Style({
       image: new CircleStyle({
@@ -75,7 +79,7 @@ const OlMap = ({
         building: building
       });
     });
-    
+
     if (!buildingCentroidRef.current) {
       const vectorSource = new VectorSource({ features });
       const buildingLayer = new VectorLayer({
@@ -85,7 +89,7 @@ const OlMap = ({
       });
 
       buildingCentroidRef.current = buildingLayer;
-      mapRef.current.addLayer(buildingLayer); 
+      mapRef.current.addLayer(buildingLayer);
     } else {
       buildingCentroidRef.current.getSource().clear();
       buildingCentroidRef.current.setStyle(centroidStyle)
@@ -114,14 +118,17 @@ const OlMap = ({
     if (mapRef.current && selectedBuilding) {
       try {
         const coordinates = getBuildingCoordinates(selectedBuilding);
-        createOrUpdateBuildingLayer(coordinates);
+        createOrUpdateBuildingLayer([selectedBuilding]);
         centerMapOnBuilding(coordinates);
         deselectAllFeatures();
+        setShowPopover(true);
       } catch (error) {
         console.error("Error animating map:", error);
       }
+    } else {
+      setShowPopover(false);
     }
-  }, [selectedBuilding, centerMapOnBuilding, mapRef]);
+  }, [selectedBuilding, centerMapOnBuilding, mapRef, createOrUpdateBuildingLayer]);
 
   useEffect(() => {
     if (mapRef.current && availableBuildings) {
@@ -173,12 +180,28 @@ const OlMap = ({
       const pixel = mapRef.current.getEventPixel(event.originalEvent);
       const hit = mapRef.current.forEachFeatureAtPixel(
         pixel,
-        (feature, layer) => layer === buildingLayerRef.current
+        (feature, layer) => {
+          if (layer === buildingLayerRef.current) {
+            const building = feature.get('building');
+            const coordinate = mapRef.current.getCoordinateFromPixel(pixel);
+            setPopover({
+              visible: true,
+              building: building,
+              position: mapRef.current.getPixelFromCoordinate(coordinate)
+            });
+            return true;
+          }
+          return false;
+        },
+        { layerFilter: (layer) => layer === buildingLayerRef.current }
       );
+
+      if (!hit) {
+        setPopover({ visible: false, building: null, position: [0, 0] });
+      }
 
       mapRef.current.getTargetElement().style.cursor = hit ? "pointer" : "";
     };
-
     mapRef.current.on("pointermove", handlePointerMove);
 
     return () => {
@@ -200,6 +223,13 @@ const OlMap = ({
     <div className="map-wrapper">
       <div ref={mapElementRef} className="map"></div>
       {children}
+      {popover.visible && <BuildingPopover building={popover.building} position={popover.position} />}
+      {showPopover && selectedBuilding && (
+        <BuildingPopover
+          building={selectedBuilding}
+          onClose={() => setShowPopover(false)}
+        />
+      )}
     </div>
   );
 };

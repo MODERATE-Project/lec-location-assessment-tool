@@ -1,0 +1,16 @@
+.popover {
+  position: absolute;
+  width: fit-content;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  text-align: justify;
+}
+
+
+.popover p {
+  margin: 0
+}
