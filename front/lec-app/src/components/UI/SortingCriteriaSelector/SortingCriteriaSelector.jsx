@@ -62,7 +62,11 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
 
         <div>
           <h2>Sorting Criteria</h2>
-          <p>Select the importance of each variable on a scale from 0 to {upperLimit}</p>
+          <p>
+            {advanced
+            ?`Select the importance of each variable on a scale from 0 to ${upperLimit}`
+            :'Drag and drop each variable. The higher, the more important.'}
+          </p>
         </div>
 
         <button className="advanced-button" style={{ 'opacity': isOpened ? "1" : "0" }} onClick={
