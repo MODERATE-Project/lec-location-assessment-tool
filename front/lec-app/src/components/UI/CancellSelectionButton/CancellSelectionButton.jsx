@@ -8,7 +8,7 @@ function CancellSelectionButton({ onClick: restoreBuildingsAndRemovePolygon }) {
     }
 
     return (
-        <button className='cancelselection-button' onClick={handleClick}>
+        <button className='cancelselection-button no-print' onClick={handleClick}>
             ✖️ Remove polygon and reset buildings
         </button>
 
