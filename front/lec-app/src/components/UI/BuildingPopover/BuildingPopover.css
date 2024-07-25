@@ -25,7 +25,7 @@
 }
 
 .popover-title {
-  background: #4CAF50;
+  /* background: #4CAF50; */
   color: white;
   margin: 0;
   padding: 10px 15px;
@@ -62,7 +62,7 @@
 
 .info-item svg {
   font-size: 24px;
-  color: #4CAF50;
+  /* color: #4CAF50; */
   margin-bottom: 5px;
 }
 
@@ -84,7 +84,7 @@
 }
 
 .cadastre-link {
-  color: #4CAF50;
+  /* color: #4CAF50; */
   text-decoration: none;
   font-weight: bold;
   display: inline-flex;

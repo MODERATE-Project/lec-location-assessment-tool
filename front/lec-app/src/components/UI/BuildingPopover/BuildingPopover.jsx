@@ -2,17 +2,19 @@ import React from 'react';
 import './BuildingPopover.css';
 import { FaBuilding, FaBolt, FaSolarPanel, FaClipboard, FaMapMarkerAlt, FaLink, FaIdCard } from 'react-icons/fa';
 
-const BuildingPopover = ({ building, position, onClose }) => {
+const BuildingPopover = ({ building, position, onClose, color }) => {
   if (!building) return null;
+
+  const colorUsable = color.luminance() < 0.8?color:color.darker()
 
   return (
     <div className="popover" style={position ? { left: position[0], top: position[1] } : {}}>
-      {!position && <div className="popover-title">
+      {!position && <div className="popover-title" style={color?{background:color, color: color.luminance() > 0.5? '#000000' : '#ffffff' }:{}}>
         <h3><FaBuilding /> Selected Building</h3>
         <button className="close-btn no-print" onClick={onClose}>&times;</button>
       </div>}
       <div className="popover-content">
-        <div className="info-grid">
+        <div className="info-grid" style={color?{color:colorUsable}:{}}>
           <div className="info-item">
             <FaMapMarkerAlt />
             <span>Area</span>
@@ -51,7 +53,7 @@ const BuildingPopover = ({ building, position, onClose }) => {
         </div>
       </div>
       <div className="popover-footer no-print">
-        <a href={building.informatio} target="_blank" rel="noopener noreferrer" className="cadastre-link">
+        <a href={building.informatio} target="_blank" rel="noopener noreferrer" className="cadastre-link" style={{color:colorUsable}}>
           <FaLink /> View Cadastre
         </a>
       </div>

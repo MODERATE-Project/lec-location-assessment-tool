@@ -54,7 +54,7 @@ const OlMap = ({
   const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
 
   const [showPopover, setShowPopover] = useState(false);
-  const [popover, setPopover] = useState({ visible: false, building: null, position: [0, 0] });
+  const [popover, setPopover] = useState({ visible: false, building: null, position: [0, 0], color: null });
   
   const centroidStyle = (feature) => {
     // let fillColor = 'red'; // Por defecto, rojo
@@ -196,6 +196,7 @@ const OlMap = ({
             setPopover({
               visible: true,
               building: building,
+              color: feature.get('color'),
               // position: pixel // NOTE: Sustituir para mostrar popover según cursor
               position: mapRef.current.getPixelFromCoordinate(coordinate) // NOTE: sustituir para mostrar popover según centroide
             });
@@ -233,10 +234,11 @@ const OlMap = ({
     <div className="map-wrapper">
       <div ref={mapElementRef} className="map"></div>
       {children}
-      {popover.visible && <BuildingPopover building={popover.building} position={popover.position} />}
+      {popover.visible && <BuildingPopover building={popover.building} position={popover.position} color={popover.color} />}
       {showPopover && selectedBuilding && (
         <BuildingPopover
           building={selectedBuilding}
+          color={getColor(selectedBuilding.MEAN)}
           onClose={() => setShowPopover(false)}
         />
       )}

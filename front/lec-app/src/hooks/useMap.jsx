@@ -256,6 +256,7 @@ export function useMap({
                 fill: new Fill({
                     stroke: new Stroke({
                         color: "#003b49",
+                        width: 2,
                     }),
                     color: "rgba(249, 200, 14, 0.8)",
                 }),
@@ -318,7 +319,41 @@ export function useMap({
             const buildingClickInteraction = new Select({
                 condition: click,
                 layers: [buildingsLayer],
-                // style: selectStyle,
+                style: (feature) => {
+                    // const currentStyle = feature.getStyle();
+                    const fillColor = feature.get("color");
+
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 10;
+                    canvas.height = 10;
+                    const context = canvas.getContext('2d');
+
+                    context.fillStyle = fillColor;
+                    context.fillRect(0, 0, 10, 10);
+
+                    context.fillStyle = 'white';
+                    context.beginPath();
+                    const radius = 2;
+                    context.arc(5, 5, radius, 0, Math.PI * 2);
+                    context.fill();
+
+
+
+                    // Crear el patrón con el contexto del canvas
+                    const pattern = context.createPattern(canvas, 'repeat');
+
+
+                    return new Style({
+                        stroke: new Stroke({
+                            color: '#000000',
+                            width: 2,
+                        }),
+                        fill: new Fill({
+                            color: pattern,
+                        }),
+                    });
+                },
             });
 
             buildingClickInteraction.on("select", (event) => {
@@ -343,12 +378,12 @@ export function useMap({
 
                 const hoverInteraction = selectInteractionsRef.current.hover;
                 const selectInteraction = selectInteractionsRef.current.click;
-                
+
                 if (currentZoom <= 14) {
                     // setActiveLayer("simplified");
                     selectInteraction.setActive(true);
                     hoverInteraction.setActive(true);
-                    
+
                     setMapBuildingsVisible(false)
                 } else {
                     // setActiveLayer("detailed");
@@ -364,7 +399,7 @@ export function useMap({
         };
 
         // console.log(availableMunicipios.current)
-        
+
         const {
             initialMap,
             simplifiedLayer: simplifiedMunicipalityLayer,
@@ -484,13 +519,14 @@ export function useMap({
                     featureProjection: 'EPSG:4326'
                 });
 
+                const buildingColor = getColor(building['MEAN'])
 
                 const feature = new Feature({
                     geometry: geometry,
-                    building: building
+                    building: building,
+                    color: buildingColor
                 });
 
-                const buildingColor = getColor(building['MEAN'])
 
                 // if (isPolygonDrawn) {
                 //     feature.setStyle(new Style({
@@ -505,16 +541,16 @@ export function useMap({
                 //     }));
                 // } else {
 
-                    feature.setStyle(new Style({
-                        stroke: new Stroke({
-                            color: darken(buildingColor),
-                            width: 1,
-                        }),
-                        fill: new Fill({
-                            // color: 'rgba(255, 0, 0, 0.1)',
-                            color: buildingColor, // TODO test this
-                        })
-                    }))
+                feature.setStyle(new Style({
+                    stroke: new Stroke({
+                        color: darken(buildingColor),
+                        width: 1,
+                    }),
+                    fill: new Fill({
+                        // color: 'rgba(255, 0, 0, 0.1)',
+                        color: buildingColor,
+                    })
+                }))
                 // }
 
                 buildingsLayerRef.current.getSource().addFeature(feature);
@@ -629,7 +665,7 @@ export function useMap({
         }
     }, [isDrawingEnabled]);
 
-    
+
     const removePolygonDrawn = useCallback(() => {
         if (mapRef.current) {
             drawingVectorLayerRef.current.getSource().clear();
