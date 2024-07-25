@@ -329,14 +329,17 @@ export function useMap({
                     canvas.height = 10;
                     const context = canvas.getContext('2d');
 
+                    // Fondo con el color principal
                     context.fillStyle = fillColor;
                     context.fillRect(0, 0, 10, 10);
 
-                    context.fillStyle = 'white';
+                    // Línea diagonal sutil
+                    context.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    context.lineWidth = 1;
                     context.beginPath();
-                    const radius = 2;
-                    context.arc(5, 5, radius, 0, Math.PI * 2);
-                    context.fill();
+                    context.moveTo(0, 0);
+                    context.lineTo(10, 10);
+                    context.stroke();
 
 
 
