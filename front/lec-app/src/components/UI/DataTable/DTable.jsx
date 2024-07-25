@@ -36,7 +36,7 @@ const DTable = ({ data, onRowClicked }) => {
     },
     {
       name: "Potential",
-      selector: (row) => row.MEAN,
+      selector: (row) => parseFloat(row.MEAN).toFixed(5),
       sortable: true,
       
     },

@@ -1,33 +1,60 @@
 import React from 'react';
 import './BuildingPopover.css';
+import { FaBuilding, FaBolt, FaSolarPanel, FaClipboard, FaMapMarkerAlt, FaLink, FaIdCard } from 'react-icons/fa';
 
 const BuildingPopover = ({ building, position, onClose }) => {
   if (!building) return null;
 
   return (
     <div className="popover" style={position ? { left: position[0], top: position[1] } : {}}>
-      {!position && <button className="close-btn" onClick={onClose}>&times;</button>}
-      <p><b>AREA:</b> {building['AREA'].toFixed(2)}</p>
-      <p><b>Potential:</b> {building['MEAN'].toFixed(2)}</p>
-      <p><b>MWh_aprove:</b> {building['MWh_aprove'].toFixed(2)}</p>
-      <p><b>MWh_prod_e:</b> {building['MWh_prod_e'].toFixed(2)}</p>
-      <p><b>currentUse:</b> {building['currentUse']}</p>
-      <p><b>reference:</b> {building['reference']}</p> 
-      <p><b>area_m2:</b> {building['area_m2']}</p>
-      <p><b>id:</b> {building['id']}</p>
-      <p><b>Cadastre:</b> <a href={building['informatio']}>follow link</a></p>
-      {/* 
-      <p><b>Secciones:</b> {building['Secciones']}</p>
-      <p><b>Municipios:</b> {building['Municipios']}</p>
-      <p><b>Porcentaje_Hogares_unipersonales:</b> {building['Porcentaje_Hogares_unipersonales']}</p>
-      <p><b>Porcentaje_mayor_65:</b> {building['Porcentaje_mayor_65']}</p>
-      <p><b>Porcentaje_menor_18:</b> {building['Porcentaje_menor_18']}</p>
-      <p><b>Porcentaje_poblacion:</b> {building['Porcentaje_poblacion']}</p>
-      <p><b>Renta_media:</b> {building['Renta_media']}</p>
-      <p><b>Tamaño_medio_hogar:</b> {building['Tamaño_medio_hogar']}</p>
-      <p><b>Total_edad_media:</b> {building['Total_edad_media']}</p>
-      <p><b>Total_poblacion:</b> {building['Total_poblacion']}</p>
-      */}
+      {!position && <div className="popover-title">
+        <h3><FaBuilding /> Selected Building</h3>
+        <button className="close-btn no-print" onClick={onClose}>&times;</button>
+      </div>}
+      <div className="popover-content">
+        <div className="info-grid">
+          <div className="info-item">
+            <FaMapMarkerAlt />
+            <span>Area</span>
+            <strong>{building.AREA.toFixed(2)} m²</strong>
+          </div>
+          <div className="info-item">
+            <FaBolt />
+            <span>Potential</span>
+            <strong>{building.MEAN.toFixed(2)} MWh</strong>
+          </div>
+          <div className="info-item">
+            <FaSolarPanel />
+            <span>MWh Approved</span>
+            <strong>{building.MWh_aprove.toFixed(2)}</strong>
+          </div>
+          <div className="info-item">
+            <FaSolarPanel />
+            <span>MWh Produced</span>
+            <strong>{building.MWh_prod_e.toFixed(2)}</strong>
+          </div>
+          <div className="info-item">
+            <FaClipboard />
+            <span>Current Use</span>
+            <strong>{building.currentUse}</strong>
+          </div>
+          {/* <div className="info-item">
+            <FaIdCard />
+            <span>Reference</span>
+            <strong>{building.reference}</strong>
+          </div> */}
+          <div className="info-item">
+            <FaIdCard />
+            <span>ID</span>
+            <strong>{building.id}</strong>
+          </div>
+        </div>
+      </div>
+      <div className="popover-footer no-print">
+        <a href={building.informatio} target="_blank" rel="noopener noreferrer" className="cadastre-link">
+          <FaLink /> View Cadastre
+        </a>
+      </div>
     </div>
   );
 };

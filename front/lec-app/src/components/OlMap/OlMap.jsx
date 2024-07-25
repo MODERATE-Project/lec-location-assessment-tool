@@ -48,6 +48,8 @@ const OlMap = ({
     setMapBuildingsVisible
   })
 
+  const CENTROID_THRESHOLD = 20;
+
   const buildingCentroidRef = useRef(null);
   const [isBuildingLayerReady, setBuildingLayerReady] = useState(false);
 
@@ -55,17 +57,18 @@ const OlMap = ({
   const [popover, setPopover] = useState({ visible: false, building: null, position: [0, 0] });
   
   const centroidStyle = (feature) => {
-    let fillColor = 'red'; // Por defecto, rojo
+    // let fillColor = 'red'; // Por defecto, rojo
     // if (isPolygonDrawn) {
     // fillColor = 'green'; // Si se está filtrando mediante un polígono, verde
     // } 
     // if (selectedBuilding && feature.get('building').id === selectedBuilding.id) {
-    fillColor = 'DeepSkyBlue'; // Si se ha seleccionado el edificio, azul
+    // fillColor = 'DeepSkyBlue'; // Si se ha seleccionado el edificio, azul
+    // fillColor = 'DeepSkyBlue'; // Si se ha seleccionado el edificio, azul
     // }
     return new Style({
       image: new CircleStyle({
-        radius: 7,
-        fill: new Fill({ color: fillColor }),
+        radius: 5,
+        // fill: new Fill({ color: 'white' }),
         stroke: new Stroke({ color: "white", width: 2 }),
       }),
     });
@@ -83,7 +86,7 @@ const OlMap = ({
     if (!buildingCentroidRef.current) {
       const vectorSource = new VectorSource({ features });
       const buildingLayer = new VectorLayer({
-        minZoom: 20,
+        minZoom: CENTROID_THRESHOLD,
         source: vectorSource,
         style: centroidStyle,
       });
@@ -136,6 +139,7 @@ const OlMap = ({
     }
   }, [availableBuildings, createOrUpdateBuildingLayer, mapRef]);
 
+  /*
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -166,6 +170,7 @@ const OlMap = ({
       }
     };
   }, [selectedBuilding, mapRef, buildingLayerRef]);
+*/
 
   useEffect(() => {
     if (buildingLayerRef.current) {
@@ -174,20 +179,25 @@ const OlMap = ({
   }, []);
 
   useEffect(() => {
-    if (!mapRef.current || !buildingLayerRef.current) return;
+    if (!mapRef.current || !buildingLayerRef.current || isDrawingEnabled) return;
 
     const handlePointerMove = (event) => {
+
+      const view = mapRef.current.getView();
+      const zoomLevel = view.getZoom();
+  
       const pixel = mapRef.current.getEventPixel(event.originalEvent);
       const hit = mapRef.current.forEachFeatureAtPixel(
         pixel,
         (feature, layer) => {
-          if (layer === buildingLayerRef.current) {
+          if (layer === buildingLayerRef.current && zoomLevel > CENTROID_THRESHOLD) {
             const building = feature.get('building');
-            const coordinate = mapRef.current.getCoordinateFromPixel(pixel);
+            const coordinate = fromLonLat([building.longitude, building.latitude]);
             setPopover({
               visible: true,
               building: building,
-              position: mapRef.current.getPixelFromCoordinate(coordinate)
+              // position: pixel // NOTE: Sustituir para mostrar popover según cursor
+              position: mapRef.current.getPixelFromCoordinate(coordinate) // NOTE: sustituir para mostrar popover según centroide
             });
             return true;
           }
@@ -209,7 +219,7 @@ const OlMap = ({
         mapRef.current.un("pointermove", handlePointerMove);
       }
     };
-  }, [isBuildingLayerReady]);
+  }, [isBuildingLayerReady, isDrawingEnabled]);
 
   useEffect(() => {
     if (onClearPolygon && isBuildingLayerReady) {
