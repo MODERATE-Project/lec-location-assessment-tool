@@ -636,8 +636,22 @@ export function useMap({
 
                 buildingsLayerRef.current.getSource().forEachFeature((buildingFeature) => {
                     const buildingGeometry = buildingFeature.getGeometry();
-                    const isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
+                    let isBuildingInside = drawnGeometry.intersectsExtent(buildingGeometry.getExtent());
 
+                    if (isBuildingInside) {
+                        const coordinates = buildingGeometry.getCoordinates();
+                        if (buildingGeometry.getType() === 'Polygon') {
+                            isBuildingInside = coordinates[0].every(coord => drawnGeometry.intersectsCoordinate(coord));
+                            // isBuildingInside = coordinates[0].some(coord => drawnGeometry.intersectsCoordinate(coord)); // FIXME: interseccion completa o parcial?
+                        } else if (buildingGeometry.getType() === 'MultiPolygon') {
+                            isBuildingInside = coordinates.every(polygon => 
+                            // isBuildingInside = coordinates.some(polygon =>  // FIXME: interseccion completa o parcial?
+                                polygon[0].every(coord => drawnGeometry.intersectsCoordinate(coord))
+                                // polygon[0].some(coord => drawnGeometry.intersectsCoordinate(coord)) // FIXME: interseccion completa o parcial?
+                            );
+                        }
+                    }
+            
                     if (isBuildingInside) {
                         buildingFeature.setStyle(null); // Mostrar edificio
                     } else {
@@ -657,6 +671,7 @@ export function useMap({
                 });
                 setIsPolygonDrawn(true);
                 setAvailableBuildings(newBuildingsList);
+                setSelectedBuilding(null);
             });
 
             return () => {
