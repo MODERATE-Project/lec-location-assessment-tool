@@ -5,11 +5,11 @@ import { Modify, Draw } from 'ol/interaction.js';
 // const source = new VectorSource({ wrapX: false }); // TODO: wrapX: false
 
 let draw = null;
-let modify = null;
+// let modify = null;
 
 const addBoxInteraction = (map, drawingVectorLayer) => {
 
-    modify = new Modify({ source: drawingVectorLayer.getSource() });
+    // modify = new Modify({ source: drawingVectorLayer.getSource() });
 
     draw = new Draw({
         source: drawingVectorLayer.getSource(),
@@ -20,15 +20,15 @@ const addBoxInteraction = (map, drawingVectorLayer) => {
         drawingVectorLayer.getSource().clear();
     })
     map.addInteraction(draw);
-    map.addInteraction(modify);
+    // map.addInteraction(modify);
 
 }
 
 // typeSelect.onchange = function () {  // TODO: efecto de disable de UI
 const removeBoxInteraction = (map) => {
-    if (draw && modify) {
+    if (draw /*&& modify*/) {
         map.removeInteraction(draw);
-        map.removeInteraction(modify);
+        // map.removeInteraction(modify);
     }
 }
 
