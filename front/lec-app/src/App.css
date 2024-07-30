@@ -26,7 +26,9 @@
   background-color: #003b49;
 }
 
-
+:root {
+  --z-top: 2000;
+}
 
 @media print {
 

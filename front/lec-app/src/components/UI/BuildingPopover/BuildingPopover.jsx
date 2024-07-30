@@ -8,7 +8,7 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
   const colorUsable = color.luminance() < 0.8?color:color.darker()
 
   return (
-    <div className="popover" style={position ? { left: position[0], top: position[1] } : {}}>
+    <div className="popover" style={position ? { left: position[0], top: position[1], zIndex: 999 } : { }}>
       {!position && <div className="popover-title" style={color?{background:color, color: color.luminance() > 0.5? '#000000' : '#ffffff' }:{}}>
         <h3><FaBuilding /> Selected Building</h3>
         <button className="close-btn no-print" onClick={onClose}>&times;</button>

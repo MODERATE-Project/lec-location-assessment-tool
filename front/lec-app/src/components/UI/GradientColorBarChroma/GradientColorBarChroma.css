@@ -5,6 +5,7 @@
     display: flex;
     flex-direction: column;
     background-color: white;
+    z-index: var(--z-top);
   }
   
   .color-segment {

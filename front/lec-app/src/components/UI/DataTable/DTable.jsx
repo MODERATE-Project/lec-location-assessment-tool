@@ -1,26 +1,34 @@
 import DataTable from "react-data-table-component";
 
 const customStyles = {
+
+  table: {
+    style: {
+      zIndex: 1000
+    }
+  },
+
   headRow: {
     style: {
       backgroundColor: "#003b49",
-      maxWidth:"100vmax",
+      maxWidth: "100vmax",
     },
   },
+
   headCells: {
     style: {
       color: "#f2c75c", // Color de texto para un mejor contraste con el fondo oscuro
       fontFamily: "Roboto, sans-serif",
       fontSize: "16px",
     },
-    
+
   },
 
   rows: {
     style: {
       fontFamily: "Roboto, sans-serif", // Usar la fuente Roboto
       fontSize: "16px",
-      maxWidth:"100vmax"
+      maxWidth: "100vmax"
     },
   },
 };
@@ -32,70 +40,70 @@ const DTable = ({ data, onRowClicked }) => {
       name: "Current use",
       selector: (row) => row.currentUse,
       sortable: true,
-      
+
     },
     {
       name: "Potential",
       selector: (row) => parseFloat(row.MEAN).toFixed(5),
       sortable: true,
-      
+
     },
     {
       name: "Area",
       selector: (row) => row.AREA,
       sortable: true,
-      
+
     },
     {
       name: "Average Income",
       selector: (row) => row.Renta_media,
       sortable: true,
-      
+
     },
     {
       name: "Total Population",
       selector: (row) => row.Total_poblacion,
       sortable: true,
-      
+
     },
     {
       name: "% Population",
       selector: (row) => row.Porcentaje_poblacion,
       sortable: true,
-      
+
     },
     {
       name: "% Single-Person Households",
       selector: (row) => row.Porcentaje_Hogares_unipersonales,
       sortable: true,
-      
+
     },
     {
       name: "% Greater than 65",
       selector: (row) => row.Porcentaje_mayor_65,
       sortable: true,
-      
+
     },
     {
       name: "% less than 18",
       selector: (row) => row.Porcentaje_menor_18,
       sortable: true,
-      
+
     },
     {
       name: "Average Household Size",
       selector: (row) => row.Tamaño_medio_hogar,
       sortable: true,
-      
+
     },
     {
       name: "Average age",
       selector: (row) => row.Total_edad_media,
       sortable: true,
-      
+
     },
 
-    
+
   ];
 
   return (
@@ -106,7 +114,7 @@ const DTable = ({ data, onRowClicked }) => {
       pagination
       highlightOnHover
       customStyles={customStyles}
-      resizableColumns 
+      resizableColumns
       showGridlines
       onRowClicked={onRowClicked}
     />
