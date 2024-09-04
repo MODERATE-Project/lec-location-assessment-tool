@@ -17,6 +17,7 @@ jobs:
       build_args: |
         VITE_MUNICIPALITIES_API_URL=/municipalities
         VITE_BUILDINGS_API_URL=/buildings
+        VITE_REPORT_API_URL=/report
         VITE_GEOSERVER_API_URL=/geoserver
     secrets:
       wif_provider: ${{ secrets.WIF_PROVIDER }}

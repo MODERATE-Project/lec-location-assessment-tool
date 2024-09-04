@@ -7,12 +7,15 @@ services:
         VITE_MUNICIPALITIES_API_URL: /municipalities
         VITE_BUILDINGS_API_URL: /buildings
         VITE_GEOSERVER_API_URL: /geoserver
+        VITE_REPORT_API_URL: /report
     image: moderate-lec/lec-app:$DOCKER_IMAGE_TAG
     environment:
       - WDS_SOCKET_PORT=3000
       - MODERATE_GEOSERVER_PROXY_PASS_URL=http://geoserver:8080
       - MODERATE_MUNICIPALITIES_SVC_PROXY_PASS_URL=http://municipalities_service:5000
       - MODERATE_BUILDINGS_SVC_PROXY_PASS_URL=http://buildings_service:5000
+      - MODERATE_REPORT_SVC_PROXY_PASS_URL=http://report_service:5000
+      
     restart: always
     ports:
       - 80:80
@@ -33,6 +36,15 @@ services:
     image: moderate-lec/buildings-svc:$DOCKER_IMAGE_TAG
     ports:
       - 5001:5000
+    restart: always
+
+  report_service:
+    container_name: report-svc
+    build:
+      context: back/report_svc
+    image: moderate-lec/report-svc:$DOCKER_IMAGE_TAG
+    ports:
+      - 5002:5000
     restart: always
 
   geoserver:

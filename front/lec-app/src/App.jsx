@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import DTable from "./components/UI/DataTable/DTable";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
 import GradientColorBar from './components/UI/GradientColorBar/GradientColorBar';
-import { VITE_MUNICIPALITIES_API_URL, VITE_BUILDINGS_API_URL, VITE_GEOSERVER_API_URL } from "./constants"
+import { VITE_MUNICIPALITIES_API_URL, VITE_BUILDINGS_API_URL, VITE_REPORT_API_URL, VITE_GEOSERVER_API_URL } from "./constants"
 import './App.css'
 import OlMap from "./components/OlMap/OlMap";
 import SortingCriteriaSelector from "./components/UI/SortingCriteriaSelector/SortingCriteriaSelector";
@@ -48,6 +48,10 @@ function App() {
     console.debug(
       "VITE_BUILDINGS_API_URL",
       VITE_BUILDINGS_API_URL
+    );
+    console.debug(
+      "VITE_REPORT_API_URL",
+      VITE_REPORT_API_URL
     );
     console.debug(
       "VITE_GEOSERVER_API_URL",
