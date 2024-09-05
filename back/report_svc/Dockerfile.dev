@@ -1,5 +1,17 @@
-FROM python:3.9-slim
+FROM python:3.9-buster 
 WORKDIR /report_svc/src
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
+RUN echo "deb http://deb.debian.org/debian bookworm contrib non-free" > /etc/apt/sources.list.d/contrib.list && \
+    apt-get update -y && \
+    apt-get install --no-install-recommends -y libgdal-dev=${LIBGDAL_VERSION} || \
+    apt-get install -y --fix-missing
+
+RUN apt-get install -y fonts-liberation ttf-mscorefonts-installer && \
+    fc-cache -f -v && \
+    rm -rf /var/lib/apt/lists/*
+
+
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY src /report_svc/src

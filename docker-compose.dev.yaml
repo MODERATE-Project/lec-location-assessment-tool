@@ -81,3 +81,13 @@ services:
       - ./geoserver_data/data/municipalities:/opt/geoserver/data_dir/data/municipalities
       - ./geoserver_data/workspaces/moderate_municipios:/opt/geoserver/data_dir/workspaces/moderate_municipios
 
+  docx-to-pdf:
+    image: moalhaddar/docx-to-pdf:latest
+    container_name: docx-to-pdf
+    ports:
+      - "5003:8080"
+    environment:
+      - pool.size=2
+    # volumes:
+    #   - ./fonts:/usr/share/fonts/custom
+    restart: always

@@ -26,3 +26,8 @@ Werkzeug==3.0.0
 zipp==3.17.0
 gunicorn
 python-dotenv
+python-docx==1.1.2
+plum-dispatch==1.7.4
+Spire.Doc==12.7.1
+matplotlib
+requests
