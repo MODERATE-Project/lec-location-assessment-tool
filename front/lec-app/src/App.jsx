@@ -11,7 +11,7 @@ import mapWeightsToApi from "./services/sortAdapter"
 import toast, { Toaster } from "react-hot-toast";
 import CancellSelectionButton from "./components/UI/CancellSelectionButton/CancellSelectionButton";
 import { createGradientFunction } from "./services/gradient";
-import ExportButton from './components/UI/ExportButton/ExportButton';
+import ExportPanel from './components/UI/ExportPanel/ExportPanel';
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -197,10 +197,74 @@ function App() {
     setOnClearPolygon(true)
   }
 
-  const exportFileProcedure = () => {
+  const generateReportProcedure = () => {
+    const url = `${VITE_REPORT_API_URL}`;
+  
+    const data = {
+      '${MUNICIPALITY_TITLE}': 'CREVILLENT',
+      '${MUNICIPALITY}': 'Crevillent',
+      '${NUM_BUILDINGS}': '12',
+      '${PCT_1} ': '69',
+      '${PCT_4} ': '13',
+      '${PCT_5} ': '10',
+      '${PCT_6} ': '8'
+    };
+  
+    toast.promise(
+    fetch(url, {
+      method: 'POST', // Usamos el método POST
+      headers: {
+        'Content-Type': 'application/json', // Indicamos que enviamos JSON
+      },
+      body: JSON.stringify(data) // Enviamos los datos en el cuerpo de la solicitud
+    })
+    .then((res) => {
+      // Extraemos el nombre del archivo del header 'Content-Disposition'
+      const disposition = res.headers.get('Content-Disposition');
+      let filename = `report_${data['${MUNICIPALITY}']}.pdf`; // Nombre por defecto
+  
+      if (disposition && disposition.includes('filename')) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(disposition);
+        if (matches != null && matches[1]) { 
+          filename = matches[1].replace(/['"]/g, ''); // Limpiamos las comillas
+        }
+      }
+  
+      return res.blob().then(blob => {
 
-    window.print() // TODO
-  }
+
+
+
+
+        const url = window.URL.createObjectURL(blob); // Creamos el objeto URL temporal
+
+        // const newTab = window.open(url, '_blank'); # si se quisiera mostrar el archivo en una nueva pestaña
+  
+        // Simulamos un clic para permitir la descarga con el nombre correcto
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename; // Asignamos el nombre correcto al archivo
+        document.body.appendChild(a); // Añadimos el enlace al DOM
+        a.click(); // Simulamos el clic para que se pueda descargar con el nombre correcto
+        a.remove(); // Removemos el enlace después del clic
+  
+        // Liberamos el objeto URL después de un tiempo
+        newTab.onload = () => window.URL.revokeObjectURL(url);
+  
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error); // Manejamos errores
+    })
+    ,
+    {
+      loading: 'Generating report, please wait...',
+      success: <b>Report generated. Downloading...</b>,
+      error: <b>Could not generate the report, please try again.</b>,
+    })
+  };
+
 
   return (
     <div className="App">
@@ -226,7 +290,7 @@ function App() {
             <p>Click on table rows or zoom in to see and interact with the buildings</p>
           </div>}
         {tableData.buildings?.length > 0 && <>
-          <ExportButton exportFileProcedure={exportFileProcedure} />
+          <ExportPanel exportFileProcedure={generateReportProcedure} />
           <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />
           {areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
           <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />

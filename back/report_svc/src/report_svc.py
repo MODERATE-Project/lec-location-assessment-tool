@@ -6,10 +6,14 @@ import docx
 from docx.shared import Inches
 import io
 import matplotlib.pyplot as plt
+import requests
 
 
 app = Flask(__name__)
 CORS(app)
+
+BASE_DIR = '/report_svc/data'
+
 
 # buildings = get_buildings_data()
 
@@ -59,25 +63,28 @@ def replace_text_in_headers_footers(sections, data):
 
 
 
-@app.route('/report', methods=['GET'])
+@app.route('/report', methods=['POST'])
 def get_report():
 
-    data = { '${MUNICIPALITY_TITLE}':'CREVILLENT', 
-            '${MUNICIPALITY}': 'Crevillent', 
-            '${NUM_BUILDINGS}': '12',
-            '${PCT_1} ': '69',
-            '${PCT_4} ': '13',
-            '${PCT_5} ': '10',
-            '${PCT_6} ': '8' # NOTE: si pones el int en vez de string peta, para probar lo que pasa si el servicio de docx to pdf falla
-            }
+    data = request.json 
+
+    # data = { '${MUNICIPALITY_TITLE}':'CREVILLENT', 
+    #         '${MUNICIPALITY}': 'Crevillent', 
+    #         '${NUM_BUILDINGS}': '12',
+    #         '${PCT_1} ': '69',
+    #         '${PCT_4} ': '13',
+    #         '${PCT_5} ': '10',
+    #         '${PCT_6} ': '8' # NOTE: si pones el int en vez de string peta, para probar lo que pasa si el servicio de docx to pdf falla
+    #         }
+
+    print('aqui van los datos', data)
 
 
-
-    doc_path = '../data/report_template.docx'
-    report_filled_path = '../data/generated_report.docx'
-    pdf_path = '../data/generated_report.pdf'
+    doc_path = f'{BASE_DIR}/report_template.docx'
+    report_filled_path = 'generated_report.docx'
+    pdf_path = 'generated_report.pdf'
+    
     # convert_file(doc_path, 'pdf', outputfile=pdf_path)
-
     # convert_odt_to_pdf(doc_path, pdf_path)
 
     # Load DOCX template
@@ -100,10 +107,6 @@ def get_report():
     # document.SaveToFile(pdf_path, FileFormat.PDF)
     # document.Close()
 
-
-
-    import requests
-
     # Abre el archivo en modo binario
     with open(report_filled_path, 'rb') as file:
         files = {'document': file}
@@ -116,7 +119,7 @@ def get_report():
             with open(pdf_path, 'wb') as result_file:
                 result_file.write(response.content)
 
-            return send_file(pdf_path)
+            return send_file(pdf_path, as_attachment=True, download_name=f"report_{data['${MUNICIPALITY}']}.pdf", mimetype='application/pdf')
 
         # return f"Error in processing: {response.status_code}", 500
 
