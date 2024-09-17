@@ -81,9 +81,9 @@ def get_report():
 
 
     doc_path = f'{BASE_DIR}/report_template.docx'
-    report_filled_path = 'generated_report.docx'
-    pdf_path = 'generated_report.pdf'
-    
+    report_filled_path = f'{BASE_DIR}/generated_report.docx'
+    pdf_path = f'{BASE_DIR}/generated_report.pdf'
+
     # convert_file(doc_path, 'pdf', outputfile=pdf_path)
     # convert_odt_to_pdf(doc_path, pdf_path)
 
