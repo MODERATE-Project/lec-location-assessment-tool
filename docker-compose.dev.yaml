@@ -82,7 +82,7 @@ services:
       - ./geoserver_data/workspaces/moderate_municipios:/opt/geoserver/data_dir/workspaces/moderate_municipios
 
   docx-to-pdf:
-    image: moalhaddar/docx-to-pdf:latest
+    image: moalhaddar/docx-to-pdf:2.1.0-12
     container_name: docx-to-pdf
     ports:
       - "5003:8080"
