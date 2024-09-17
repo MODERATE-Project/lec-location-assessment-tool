@@ -239,7 +239,7 @@ function App() {
 
         const url = window.URL.createObjectURL(blob); // Creamos el objeto URL temporal
 
-        const newTab = window.open(url, '_blank'); # si se quisiera mostrar el archivo en una nueva pestaña
+        // const newTab = window.open(url, '_blank'); // si se quisiera mostrar el archivo en una nueva pestaña
   
         // Simulamos un clic para permitir la descarga con el nombre correcto
         const a = document.createElement('a');
@@ -250,7 +250,7 @@ function App() {
         a.remove(); // Removemos el enlace después del clic
   
         // Liberamos el objeto URL después de un tiempo
-        newTab.onload = () => window.URL.revokeObjectURL(url);
+        // newTab.onload = () => window.URL.revokeObjectURL(url);
   
       });
     })
