@@ -239,7 +239,7 @@ function App() {
 
         const url = window.URL.createObjectURL(blob); // Creamos el objeto URL temporal
 
-        // const newTab = window.open(url, '_blank'); # si se quisiera mostrar el archivo en una nueva pestaña
+        const newTab = window.open(url, '_blank'); # si se quisiera mostrar el archivo en una nueva pestaña
   
         // Simulamos un clic para permitir la descarga con el nombre correcto
         const a = document.createElement('a');
