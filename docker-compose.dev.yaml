@@ -67,6 +67,7 @@ services:
     environment:
       - DEBUG=True
       - PYTHONPATH=/buildings_svc/src
+      - REPORT_FILE=${REPORT_FILE}
 
   geoserver:
     container_name: geoserver-instance
@@ -89,5 +90,5 @@ services:
     environment:
       - pool.size=2
     # volumes:
-    #   - ./fonts:/usr/share/fonts/custom
+      # - ./fonts:/usr/share/fonts/custom
     restart: always

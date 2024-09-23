@@ -1,18 +1,17 @@
 from flask import Flask, jsonify, request, make_response, send_file
 from flask_cors import CORS
-from spire.doc import *
-from spire.doc.common import *
 import docx
 from docx.shared import Inches
 import io
 import matplotlib.pyplot as plt
 import requests
-
+import os
 
 app = Flask(__name__)
 CORS(app)
 
 BASE_DIR = '/report_svc/data'
+REPORT_FILE = os.getenv("REPORT_FILE", 'report_template.docx')
 
 
 # buildings = get_buildings_data()
@@ -80,9 +79,10 @@ def get_report():
     print('aqui van los datos', data)
 
 
-    doc_path = f'{BASE_DIR}/report_template.docx'
-    report_filled_path = f'{BASE_DIR}/generated_report.docx'
-    pdf_path = f'{BASE_DIR}/generated_report.pdf'
+    doc_path = os.path.join(BASE_DIR, REPORT_FILE)
+    report_filled_path = os.path.join(BASE_DIR, 'generated_report.docx')
+    pdf_path = os.path.join(BASE_DIR, 'generated_report.pdf')
+
 
     # convert_file(doc_path, 'pdf', outputfile=pdf_path)
     # convert_odt_to_pdf(doc_path, pdf_path)
@@ -121,7 +121,7 @@ def get_report():
 
             return send_file(pdf_path, as_attachment=True, download_name=f"report_{data['${MUNICIPALITY}']}.pdf", mimetype='application/pdf')
 
-        # return f"Error in processing: {response.status_code}", 500
+        return f"Error in processing: {response.status_code}", 500
 
     # return send_file(report_filled_path, as_attachment=True)
 
