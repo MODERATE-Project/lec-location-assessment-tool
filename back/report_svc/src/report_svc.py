@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import requests
 import os
 
+import fields.field_manager as field_manager
+
 app = Flask(__name__)
 CORS(app)
 
@@ -28,8 +30,10 @@ def replace_text_in_paragraphs(paragraphs, data):
     """Helper function to replace placeholders in regular paragraphs"""
     for paragraph in paragraphs:
         for key, value in data.items():
-            if key in paragraph.text:
-                paragraph.text = paragraph.text.replace(key, value)
+            key_pattern = f"${{{key}}}"
+            if key_pattern in paragraph.text:
+                # paragraph.text = paragraph.text.replace(key_pattern, value) # FIXME: This is the correct final way
+                paragraph.text = paragraph.text.replace(key, value) # FIXME: This is used for testing
         
         if "{{plot}}" in paragraph.text:
             # Clear the placeholder text
@@ -78,6 +82,9 @@ def get_report():
 
     print('aqui van los datos', data)
 
+    municipality = data.get("MUNICIPALITY").lower()
+    
+    municipality_parameters = field_manager.get_and_compute_as_needed(municipality=municipality, field_dict=data, base_dir=BASE_DIR)
 
     doc_path = os.path.join(BASE_DIR, REPORT_FILE)
     report_filled_path = os.path.join(BASE_DIR, 'generated_report.docx')
@@ -90,10 +97,10 @@ def get_report():
     # Load DOCX template
     doc = docx.Document(doc_path)
 
-    replace_text_in_paragraphs(doc.paragraphs, data)
+    replace_text_in_paragraphs(doc.paragraphs, municipality_parameters)
 
     # Replace placeholders in headers and footers
-    replace_text_in_headers_footers(doc.sections, data)
+    replace_text_in_headers_footers(doc.sections, municipality_parameters)
 
    
     doc.save(report_filled_path)
@@ -119,7 +126,7 @@ def get_report():
             with open(pdf_path, 'wb') as result_file:
                 result_file.write(response.content)
 
-            return send_file(pdf_path, as_attachment=True, download_name=f"report_{data['${MUNICIPALITY}']}.pdf", mimetype='application/pdf')
+            return send_file(pdf_path, as_attachment=True, download_name=f"report_{data['MUNICIPALITY']}.pdf", mimetype='application/pdf')
 
         return f"Error in processing: {response.status_code}", 500
 

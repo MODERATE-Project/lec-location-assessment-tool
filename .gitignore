@@ -172,3 +172,6 @@ renta_poblacion_secciones_2020.csv
 
 
 node_modules/
+
+.vscode/
+data/**

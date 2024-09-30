@@ -201,13 +201,13 @@ function App() {
     const url = `${VITE_REPORT_API_URL}`;
   
     const data = {
-      '${MUNICIPALITY_TITLE}': 'CREVILLENT',
-      '${MUNICIPALITY}': 'Crevillent',
-      '${NUM_BUILDINGS}': '12',
-      '${PCT_1} ': '69',
-      '${PCT_4} ': '13',
-      '${PCT_5} ': '10',
-      '${PCT_6} ': '8'
+      'MUNICIPALITY_TITLE': 'CREVILLENT',
+      'MUNICIPALITY': 'Crevillent',
+      'NUM_BUILDINGS': '12',
+      'PCT_1 ': '69',
+      'PCT_4 ': '13',
+      'PCT_5 ': '10',
+      'PCT_6 ': '8'
     };
   
     toast.promise(
