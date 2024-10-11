@@ -21,13 +21,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap:15px;
+  gap: 15px;
   cursor: pointer;
-  user-select: none;        
+  user-select: none;
   /* flex-wrap: wrap; */
   flex-wrap: nowrap;
   max-width: 400rem;
 }
+
 .sorting-criteria-container p {
   margin: 0;
   /* border-bottom: 1px solid #ccc; */
@@ -45,6 +46,7 @@
   display: flex;
   flex-direction: column;
 }
+
 .variable-row {
   display: flex;
   align-items: center;
@@ -60,11 +62,10 @@
 .variable-row input[type="number"] {
   width: 60px;
   font-size: 18px;
-  /* Adjust font size as needed */
 
 }
 
-.drag-icon{
+.drag-icon {
   padding-right: 10px;
   font-size: 1.25em;
 }
@@ -101,4 +102,82 @@
 
 .advanced-button:hover {
   background-color: #eee;
+}
+
+.unchecked-row {
+  opacity: 0.5;
+  color: #888;
+  /* background-color: #f0f0f0; */
+  transition: all 0.3s ease;
+}
+
+.unchecked-row label {
+  text-decoration: line-through;
+}
+
+.unchecked-row:hover {
+  opacity: 0.8;
+}
+
+.sorting-criteria-content .unchecked-row {
+  order: 1;
+}
+
+.sorting-criteria-content .variable-row:not(.unchecked-row) {
+  order: 0;
+}
+
+
+.variable-row input[type='checkbox'] {
+  /* Ocultamos el checkbox nativo */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 2px solid #003b49;
+  /* Usamos el color del botón */
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.variable-row input[type='checkbox']:checked {
+  background-color: #003b49;
+  /* Fondo similar al botón */
+  border-color: #003b49;
+}
+
+.variable-row input[type='checkbox']:checked::after {
+  content: '\2714'; 
+  /* Símbolo de check */
+  font-size: 14px;
+  font-weight: bolder;
+  color: #f2c75c;
+  /* Color del texto en el hover del botón */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.variable-row input[type='checkbox']:hover {
+  border-color: #f2c75c;
+  /* Cambia el borde al color del hover del botón */
+}
+
+.variable-row input[type='checkbox']:checked:hover {
+  background-color: #f2c75c;
+  border-color: #f2c75c;
+}
+
+.variable-row input[type='checkbox']:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(242, 199, 92, 0.5);
+}
+
+.variable-row input[type='checkbox']:checked:hover::after {
+  color: #003b49;
 }

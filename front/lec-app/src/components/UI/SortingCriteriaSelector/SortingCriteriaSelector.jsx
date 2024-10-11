@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import './SortingCriteriaSelector.css';
 import Loader from '../Loader';
 import { Collapse } from 'react-collapse';
@@ -13,17 +13,24 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   const [advanced, setAdvanced] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const [sortableList, setSortableList] = useState([
-    { id: 1, value: 1, name: 'Rent' },
-    { id: 2, value: 1, name: 'Age' },
-    { id: 3, value: 1, name: 'Population' },
-    { id: 4, value: 1, name: 'Single-person households' },
-    { id: 5, value: 1, name: 'Elderly Percentage' },
-    { id: 6, value: 1, name: 'Youth Percentage' },
-    { id: 7, value: 1, name: 'Average Persons Per Household' },
-    { id: 8, value: 1, name: 'Potential Production' },
-  ])
+    { id: 1, value: 1, name: 'Rent', checked: true },
+    { id: 2, value: 1, name: 'Age', checked: true },
+    { id: 3, value: 1, name: 'Population', checked: true },
+    { id: 4, value: 1, name: 'Single-person households', checked: true },
+    { id: 5, value: 1, name: 'Elderly Percentage', checked: true },
+    { id: 6, value: 1, name: 'Youth Percentage', checked: true },
+    { id: 7, value: 1, name: 'Average Persons Per Household', checked: true },
+    { id: 8, value: 1, name: 'Potential Production', checked: true },
+  ]);
 
   const upperLimit = 10;
+
+  const reorderList = useCallback((list) => {
+    const checkedItems = list.filter(item => item.checked);
+    const uncheckedItems = list.filter(item => !item.checked);
+    return [...checkedItems, ...uncheckedItems];
+  }, []);
+
 
   // Function to handle importance assignment
   const handleImportanceChange = (index, importance) => {
@@ -34,12 +41,39 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
     setSortableList((prev) => prev.map((item, idx) => (idx === index ? { ...item, value: importanceValue } : item)));
   };
 
+  const handleCheckboxChange = (index) => {
+    setSortableList((prev) => {
+      const newList = prev.map((item, idx) =>
+        idx === index ? { ...item, checked: !item.checked } : item
+      );
+      return reorderList(newList);
+    });
+  };
+
   const handleSort = () => {
 
+    const checkedItems = sortableList.filter(i => i.checked);
     const sortValuesDict = sortableList.reduce((acc, item, idx) => {
-      acc[item.name] = advanced ? item.value : sortableList.length - idx
-      return acc
-    }, {})
+      //   acc[item.name] = item.checked ? (advanced ? item.value : sortableList.length - idx - sortableList.lenght_but_only_checked_ones) : 0;
+      //   return acc;
+      // }, {});
+
+      if (item.checked) {
+        if (advanced) {
+          acc[item.name] = item.value;
+        } else {
+          // El peso se basa solo en los seleccionados
+          const idxInChecked = checkedItems.findIndex(i => i.name === item.name);
+          acc[item.name] = checkedItems.length - idxInChecked;
+        }
+      } else {
+        // Si el ítem no está marcado, el peso es 0
+        acc[item.name] = 0;
+      }
+
+      return acc;
+    }, {});
+
 
     onSort(sortValuesDict);
   };
@@ -55,6 +89,9 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
     return baseSize + increment * scale;
   };
 
+  const setList = (newList) => {
+    setSortableList(reorderList(newList));
+  };
 
   return (
     <div className="sorting-criteria-container">
@@ -64,12 +101,13 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
           <h2>Sorting Criteria</h2>
           <p>
             {advanced
-            ?`Select the importance of each variable on a scale from 0 to ${upperLimit}`
-            :'Drag and drop each variable. The higher, the more important.'}
+              ? `Select the importance of each variable on a scale from 0 to ${upperLimit}`
+              : 'Drag and drop each variable. The higher, the more important.'}
           </p>
         </div>
 
-        <button className="advanced-button" style={{ 'opacity': isOpened ? "1" : "0" }} onClick={
+        {/* oculto */}
+        <button className="advanced-button" style={{ 'opacity': isOpened ? "1" : "0", display: "none" }} onClick={
           (e) => {
             e.stopPropagation();
             setAdvanced(prev => !prev)
@@ -90,13 +128,14 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
             </button>
           </div>
 */}
-          <ReactSortable className="sorting-criteria-content" disabled={advanced} list={sortableList} setList={setSortableList}>
+          <ReactSortable className="sorting-criteria-content" disabled={advanced} list={sortableList} setList={setList}>
             {sortableList.map((item, index) => (
 
-              <div key={item.id} className="variable-row" style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
+              <div key={item.id} className={`variable-row ${!item.checked ? 'unchecked-row' : ''}`} style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
+
                 {!advanced && <MdDragIndicator className='drag-icon' />}
                 {/* {!advanced && <FaGripLines style={{ 'paddingRight': '15px' }} />} */}
-                <label htmlFor={item.name} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }} >{item.name}</label>
+                <label htmlFor={item.name} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }}>{item.name}</label>
                 {advanced && <input
                   type="number"
                   id={item.name}
@@ -105,11 +144,15 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
                   value={item.value}
                   onChange={(e) => handleImportanceChange(index, e.target.value)}
                 />}
+                <input
+                  type='checkbox'
+                  id={item.name}
+                  checked={item.checked}
+                  onChange={() => handleCheckboxChange(index)}
+                />
               </div>
-
             ))}
           </ReactSortable>
-
 
           <button className="sort-button dark" onClick={handleSort}>
             {isLoading && <Loader />}
