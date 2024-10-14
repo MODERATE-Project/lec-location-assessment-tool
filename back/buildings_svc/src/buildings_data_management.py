@@ -18,7 +18,7 @@ def get_buildings_data():
 def get_buildings_dataframe():
     current_directory = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(
-        current_directory, '../data/buildings_epsg4326.csv')
+        current_directory, '../data/buildings_epsg4326_with_pannels.csv')
 
     buildings_df = pd.read_csv(file_path, header=0)
     buildings_df['id'] = buildings_df.index

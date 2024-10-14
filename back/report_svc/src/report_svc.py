@@ -2,12 +2,23 @@ from flask import Flask, jsonify, request, make_response, send_file
 from flask_cors import CORS
 import docx
 from docx.shared import Inches
-import io
-import matplotlib.pyplot as plt
 import requests
 import os
 
 import fields.field_manager as field_manager
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    # Formato del mensaje
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',  # Formato de la fecha
+    handlers=[
+        logging.StreamHandler()  # Enviar los logs a la consola (stdout)
+    ]
+)
+
+log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
@@ -28,30 +39,32 @@ REPORT_FILE = os.getenv("REPORT_FILE", 'report_template.docx')
 
 def replace_text_in_paragraphs(paragraphs, data):
     """Helper function to replace placeholders in regular paragraphs"""
+
     for paragraph in paragraphs:
         for key, value in data.items():
             key_pattern = f"${{{key}}}"
+            
             if key_pattern in paragraph.text:
-                # paragraph.text = paragraph.text.replace(key_pattern, value) # FIXME: This is the correct final way
-                paragraph.text = paragraph.text.replace(key, value) # FIXME: This is used for testing
-        
-        if "{{plot}}" in paragraph.text:
-            # Clear the placeholder text
-            paragraph.text = ""
-            # Add the plot image to this paragraph
-            run = paragraph.add_run()
+                
+                if "IMG" in key or "PLOT" in key:
 
-            fig, ax = plt.subplots()
-            ax.plot([1, 2, 3, 4], [1, 4, 2, 3])
-            ax.set_title('Sample Plot')
+                    # Clear the placeholder text
+                    paragraph.text = ""
 
-            # Save plot as image and insert into DOCX
-            image_stream = io.BytesIO()
-            plt.savefig(image_stream, format='png')
-            image_stream.seek(0)
+                    # Add the plot image to this paragraph
+                    run = paragraph.add_run()
 
+                    log.info(f"embbeding img_file: {value}")
+                    try:
+                        with open(os.path.join(BASE_DIR, value), 'rb') as image_stream:
+                            run.add_picture(image_stream, width=Inches(4.0))
+                    except FileNotFoundError:
+                        print(f"Error: No se pudo encontrar el archivo de imagen {value}")
 
-            run.add_picture(image_stream, width=Inches(4.0))
+                else:
+                    # paragraph.text = paragraph.text.replace(key_pattern, value) # FIXME: This is the correct final way
+                    paragraph.text = paragraph.text.replace(key, str(value))  # FIXME: This is used for testing
+
 
 
 def replace_text_in_headers_footers(sections, data):
@@ -64,15 +77,13 @@ def replace_text_in_headers_footers(sections, data):
         replace_text_in_paragraphs(footer.paragraphs, data)
 
 
-
-
 @app.route('/report', methods=['POST'])
 def get_report():
 
-    data = request.json 
+    data = request.json
 
-    # data = { '${MUNICIPALITY_TITLE}':'CREVILLENT', 
-    #         '${MUNICIPALITY}': 'Crevillent', 
+    # data = { '${MUNICIPALITY_TITLE}':'CREVILLENT',
+    #         '${MUNICIPALITY}': 'Crevillent',
     #         '${NUM_BUILDINGS}': '12',
     #         '${PCT_1} ': '69',
     #         '${PCT_4} ': '13',
@@ -82,14 +93,14 @@ def get_report():
 
     print('aqui van los datos', data)
 
-    municipality = data.get("MUNICIPALITY").lower()
-    
-    municipality_parameters = field_manager.get_and_compute_as_needed(municipality=municipality, field_dict=data, base_dir=BASE_DIR)
+    municipality = data.get("MUNICIPALITY").capitalize()
+
+    municipality_parameters = field_manager.get_and_compute_as_needed(
+        municipality=municipality, field_dict=data, base_dir=BASE_DIR)
 
     doc_path = os.path.join(BASE_DIR, REPORT_FILE)
     report_filled_path = os.path.join(BASE_DIR, 'generated_report.docx')
     pdf_path = os.path.join(BASE_DIR, 'generated_report.pdf')
-
 
     # convert_file(doc_path, 'pdf', outputfile=pdf_path)
     # convert_odt_to_pdf(doc_path, pdf_path)
@@ -102,22 +113,21 @@ def get_report():
     # Replace placeholders in headers and footers
     replace_text_in_headers_footers(doc.sections, municipality_parameters)
 
-   
     doc.save(report_filled_path)
 
     # document = Document()
-# 
+#
     # Load a doc or docx file
     # document.LoadFromFile(report_filled_path)
 
-    #Save the document to PDF
+    # Save the document to PDF
     # document.SaveToFile(pdf_path, FileFormat.PDF)
     # document.Close()
 
     # Abre el archivo en modo binario
     with open(report_filled_path, 'rb') as file:
         files = {'document': file}
-    
+
         # Realiza la solicitud POST al contenedor 'docx-to-pdf'
         response = requests.post("http://docx-to-pdf:8080/pdf", files=files)
 

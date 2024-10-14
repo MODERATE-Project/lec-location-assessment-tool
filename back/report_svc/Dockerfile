@@ -1,4 +1,4 @@
-FROM python:3.9-bookworm
+FROM python:3.11-bookworm
 ENV LIBGDAL_VERSION=3.6.2+dfsg-1+b2
 ENV PYTHONPATH=/report_svc/src
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1

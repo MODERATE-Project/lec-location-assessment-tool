@@ -68,6 +68,7 @@ services:
       - DEBUG=True
       - PYTHONPATH=/buildings_svc/src
       - REPORT_FILE=${REPORT_FILE}
+      - BUILDINGS_API_URL=buildings_service:5000/buildings
 
   geoserver:
     container_name: geoserver-instance

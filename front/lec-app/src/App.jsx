@@ -204,10 +204,10 @@ function App() {
       'MUNICIPALITY_TITLE': 'CREVILLENT',
       'MUNICIPALITY': 'Crevillent',
       'NUM_BUILDINGS': '12',
-      'PCT_1 ': '69',
-      'PCT_4 ': '13',
-      'PCT_5 ': '10',
-      'PCT_6 ': '8'
+      'PCT_1': '69',
+      'PCT_4': '13',
+      'PCT_5': '10',
+      'PCT_6': '8'
     };
   
     toast.promise(

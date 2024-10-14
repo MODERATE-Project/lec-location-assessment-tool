@@ -3,15 +3,19 @@ from fields.field_factory import FieldFactory
 import importlib
 import inspect
 import os
+import logging
+
+log = logging.getLogger(__name__)
+
 
 def load_yaml(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
 
 
-def save_yaml(name, data):
+def save_yaml(name, data, base_dir):
     yaml_filename = f'parameters_{name}.yaml'
-    with open(yaml_filename, 'w') as file:
+    with open(os.path.join(base_dir, yaml_filename), 'w') as file:
         yaml.safe_dump(data, file)
 
 
@@ -34,10 +38,10 @@ def get_yaml_parameters(name, base_dir):
 
 def compute_all(fields):
     for field in fields:
-        field.compute()
+        field.compute(municipality)
 
 
-def get_and_compute_as_needed(municipality, field_dict, base_dir=""):
+def get_and_compute_as_needed(municipality, field_dict, base_dir="../data"):
 
     yaml_data = get_yaml_parameters(municipality, base_dir)
 
@@ -46,10 +50,11 @@ def get_and_compute_as_needed(municipality, field_dict, base_dir=""):
     fields = FieldFactory.create_from_dict(field_dict, yaml_data, compute_map)
 
     for field in fields:
-        field.compute()
+        log.info(f'Municipality: {municipality}')
+        field.compute(municipality, yaml_data)
         yaml_data[field.name] = field.value
 
-    save_yaml(str(municipality), yaml_data)
+    save_yaml(str(municipality), yaml_data, base_dir=base_dir)
 
     return yaml_data
 
@@ -60,8 +65,8 @@ if __name__ == "__main__":
         'MUNICIPALITY': 'Crevillent',  # Valor recibido desde el frontend
     }
 
-    municipality = field_dict.get("MUNICIPALITY").lower()
+    municipality = field_dict.get("MUNICIPALITY").capitalize()
     
-    yaml_data = get_and_compute_as_needed(municipality=municipality)
+    yaml_data = get_and_compute_as_needed(municipality=municipality, field_dict=field_dict)
     
-    print(yaml_data)
+    log.info(yaml_data)
