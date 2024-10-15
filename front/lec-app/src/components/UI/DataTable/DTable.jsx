@@ -102,6 +102,12 @@ const DTable = ({ data, onRowClicked }) => {
       sortable: true,
 
     },
+    {
+      name: "Pannels",
+      selector: (row) => row.pannels,
+      sortable: true,
+
+    },
 
 
   ];
