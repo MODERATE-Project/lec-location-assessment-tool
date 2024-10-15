@@ -13,9 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src /report_svc/src
 COPY data /report_svc/data
 
-RUN adduser --disabled-password --no-create-home appuser
-RUN chown -R appuser:appuser /report_svc  
-RUN chmod -R u+rwx /report_svc 
+RUN adduser --disabled-password --no-create-home appuser \
+    && chown -R appuser:appuser /report_svc \
+    && chmod -R u+rwx /report_svc 
 USER appuser
 
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "src.report_svc:app"]

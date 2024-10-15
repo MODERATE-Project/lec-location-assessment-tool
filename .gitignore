@@ -175,3 +175,5 @@ node_modules/
 
 .vscode/
 data/**
+
+back/report_svc/data/generated_report.*

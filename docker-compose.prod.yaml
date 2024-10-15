@@ -45,8 +45,6 @@ services:
     image: moderate-lec/report-svc:$DOCKER_IMAGE_TAG
     environment:
       - BUILDINGS_API_URL=$MODERATE_BUILDINGS_SVC_PROXY_PASS_URL
-    volumes:
-      - './back/report_svc/data:/report_svc/data'
     ports:
       - 5002:5000
     restart: always
