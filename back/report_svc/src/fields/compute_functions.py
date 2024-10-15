@@ -124,8 +124,33 @@ def compute_NTOTAL_PARCELAS(args):
     municipality = args[0]
     data = _from_data(municipality)
 
-    value = np.sum(data['pannels'])
+    value = np.count_nonzero(data['pannels'])
     log.info(f'value: {value}')
     return int(value)
 
-    
+
+def compute_N_PARCELAS_NO_ADECUADAS(args):
+    municipality = args[0]
+    data = _from_data(municipality)
+
+    value = np.count_nonzero(data['MEAN'] == 0)
+    log.info(f'value: {value}')
+    return int(value)
+
+
+def compute_N_PARCELAS_ADECUADAS(args):
+    municipality = args[0]
+    data = _from_data(municipality)
+
+    value = np.count_nonzero(data['MEAN'] > 0)
+    log.info(f'value: {value}')
+    return int(value)
+
+
+def compute_TOTAL_PANELES(args):
+    municipality = args[0]
+    data = _from_data(municipality)
+
+    value = np.sum(data['pannels'])
+    log.info(f'value: {value}')
+    return int(value)
