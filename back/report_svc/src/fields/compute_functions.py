@@ -21,7 +21,6 @@ BUILDINGS_API_URL = getenv(
 
 
 def _get_data(municipality):
-    log.info(f'municipality: {municipality}')
     try:
         url = f'http://{BUILDINGS_API_URL}?municipio={municipality}'
         response = requests.get(url)
@@ -70,7 +69,6 @@ def compute_PARAMETRO_3(_):
 def compute_NUM_BUILDINGS(args):
     log.info(f'args: {args}')
     municipality = args[0]
-    log.info(f'municipality: {municipality}')
     data = _from_data(municipality)
     return str(len(data))
 
@@ -131,9 +129,9 @@ def compute_NTOTAL_PARCELAS(args):
 
 def compute_N_PARCELAS_NO_ADECUADAS(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _get_data(f'{municipality}&filtered=False')
 
-    value = np.count_nonzero(data['MEAN'] == 0)
+    value = len(data['MEAN'] == 0)
     log.info(f'value: {value}')
     return int(value)
 
@@ -142,7 +140,7 @@ def compute_N_PARCELAS_ADECUADAS(args):
     municipality = args[0]
     data = _from_data(municipality)
 
-    value = np.count_nonzero(data['MEAN'] > 0)
+    value = len(data['MEAN'] > 0)
     log.info(f'value: {value}')
     return int(value)
 

@@ -43,9 +43,9 @@ def get_buildings_sorted_by_mean(buildings_df: pd.DataFrame):
     return sorted_by_mean_df
 
 
-def dataframe_to_json(buildings_df: pd.DataFrame, max=20):
+def dataframe_to_json(buildings_df: pd.DataFrame, max=20, filtered=True):
 
     # filtered_df = buildings_df.head(max) # removing filtering
-    filtered_df = buildings_df[buildings_df['MEAN'] != 0]
+    if filtered: filtered_df = buildings_df[buildings_df['MEAN'] != 0]
     filtered_df = filtered_df.applymap(lambda x: "undefined" if pd.isna(x) else x)
     return filtered_df.to_dict(orient='records')
