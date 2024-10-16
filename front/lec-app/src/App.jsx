@@ -221,7 +221,7 @@ function App() {
     .then((res) => {
       // Extraemos el nombre del archivo del header 'Content-Disposition'
       const disposition = res.headers.get('Content-Disposition');
-      let filename = `report_${data['${MUNICIPALITY}']}.pdf`; // Nombre por defecto
+      let filename = `report_${data['MUNICIPALITY']}.pdf`; // Nombre por defecto
   
       if (disposition && disposition.includes('filename')) {
         const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
