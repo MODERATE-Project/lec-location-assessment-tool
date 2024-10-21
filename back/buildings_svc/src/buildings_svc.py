@@ -20,8 +20,12 @@ buildings_df = get_buildings_dataframe()
 @app.route('/buildings', methods=['GET'])
 def get_buildings():
     municipio = request.args.get('municipio', None)  # Obtiene el parámetro municipio; si no está presente, retorna None
-    filtered = request.args.get('filtered', True)
-
+    filtered = request.args.get('filtered', default="true")
+    if filtered.lower() == "false":
+        filtered = False
+    else:
+        filtered = True
+    
     filtered_buildings = get_buildings_sorted_by_mean(buildings_df[ buildings_df['Municipios'] == municipio ])
     
     res = make_response(jsonify({"buildings": dataframe_to_json(filtered_buildings, filtered=filtered)}))

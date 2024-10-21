@@ -69,14 +69,16 @@ def compute_PARAMETRO_3(_):
 def compute_NUM_BUILDINGS(args):
     log.info(f'args: {args}')
     municipality = args[0]
-    data = _from_data(municipality)
-    return str(len(data))
+    # data = _from_data(municipality)
+    data = _get_data(f'{municipality}&filtered=false')
+    return len(data)
 
 
 def compute_SURFACE(args):
     municipality = args[0]
     data = _from_data(municipality)
-    return sum(data['AREA']) / 1_000_000  # pasar a km2
+    total = data['AREA'].sum() / 1_000_000  # pasar a km2
+    return f"{total:.2f}"
 
 
 def compute_IMG_PARCELAS(args):
@@ -119,19 +121,19 @@ def compute_PLOT(args):
 
 
 def compute_NTOTAL_PARCELAS(args):
-    municipality = args[0]
-    data = _from_data(municipality)
+    # municipality = args[0]
+    # data = _from_data(municipality)
 
-    value = np.count_nonzero(data['pannels'])
-    log.info(f'value: {value}')
-    return int(value)
-
+    # value = len(data[data.MEAN > 0])
+    # log.info(f'value: {value}')
+    # return int(value)
+    return compute_NUM_BUILDINGS(args)
 
 def compute_N_PARCELAS_NO_ADECUADAS(args):
     municipality = args[0]
-    data = _get_data(f'{municipality}&filtered=False')
+    data = _get_data(f'{municipality}&filtered=false')
 
-    value = len(data['MEAN'] == 0)
+    value = len(data[data['MEAN'] == 0])
     log.info(f'value: {value}')
     return int(value)
 
@@ -140,7 +142,7 @@ def compute_N_PARCELAS_ADECUADAS(args):
     municipality = args[0]
     data = _from_data(municipality)
 
-    value = len(data['MEAN'] > 0)
+    value = len(data[data.MEAN > 0])
     log.info(f'value: {value}')
     return int(value)
 
