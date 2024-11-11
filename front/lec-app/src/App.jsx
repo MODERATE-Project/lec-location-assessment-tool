@@ -12,6 +12,8 @@ import toast, { Toaster } from "react-hot-toast";
 import CancellSelectionButton from "./components/UI/CancellSelectionButton/CancellSelectionButton";
 import { createGradientFunction } from "./services/gradient";
 import ExportPanel from './components/UI/ExportPanel/ExportPanel';
+import { MultiSelect } from 'primereact/multiselect';
+import 'primereact/resources/themes/fluent-light/theme.css';
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -29,6 +31,8 @@ function App() {
     maxValue: 1
   })
   const [areMapBuildingsVisible, setMapBuildingsVisible] = useState(false)
+  const [buildingTypes, setBuildingTypes] = useState([])
+  const [selectedBuildingTypes, setSelectedBuildingTypes] = useState([])
 
 
   const handleRowClick = (building) => {
@@ -113,7 +117,7 @@ function App() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        const values = data.buildings.map(building => building['MEAN'])
+        const values = data.buildings.map(building => building['production'])
         const maxValue = Math.min(...values)
         const minValue = Math.max(...values)
         data.maxValue = maxValue
@@ -128,6 +132,10 @@ function App() {
         setTableData(data); // Guarda los datos en el estado local
         setInitialTableData(data);
         setSelectedBuilding(null);
+
+        const uniqueTypes = Array.from(new Set(data.buildings.map(b => b.currentUse)));
+        setBuildingTypes(uniqueTypes);
+    
       })
       .catch((error) => {
         console.error("Hubo un error al obtener los datos:", error);
@@ -155,6 +163,16 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    if (selectedBuildingTypes.length > 0) {
+        const filteredData = initialTableData.buildings.filter(b => selectedBuildingTypes.includes(b.currentUse));
+        setTableData({ buildings: filteredData });
+    } else {
+        setTableData(initialTableData);
+    }
+}, [selectedBuildingTypes, initialTableData]);
+
+
   const handleDrawingToggleButtonChange = () => {
     setIsDrawingEnabled(prevState => !prevState);
     console.log('isDrawingEnabled', isDrawingEnabled)
@@ -165,7 +183,7 @@ function App() {
 
     /*
     // NOTE: uncomment in case that gradient has to relative to selected buildings (drawing a polygon)
-    const values = buildings.map(building => building['MEAN'])
+    const values = buildings.map(building => building['production'])
     const maxValue = Math.min(...values)
     const minValue = Math.max(...values)
 
@@ -183,7 +201,7 @@ function App() {
 
     /*
     // NOTE: uncomment in case that gradient has to relative to selected buildings (drawing a polygon)
-    const values = initialTableData.buildings.map(building => building['MEAN'])
+    const values = initialTableData.buildings.map(building => building['production'])
     const maxValue = Math.min(...values)
     const minValue = Math.max(...values)
 
@@ -294,6 +312,16 @@ function App() {
           <SortingCriteriaSelector onSort={handleSortingCriteria} isLoading={isLoading} />
           {areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
           <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
+          <MultiSelect
+            id = "buildingTypesSelector"
+            value={selectedBuildingTypes}
+            onChange={(e) => setSelectedBuildingTypes(e.value)}
+            options={buildingTypes.map(type => ({ label: type, value: type }))}
+            optionLabel="label"
+            placeholder="Building type filter"
+            className="w-full md:w-20rem"
+          />
+
         </>}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>

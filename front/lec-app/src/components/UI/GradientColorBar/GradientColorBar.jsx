@@ -12,7 +12,7 @@ const GradientColorBar = ({
   height = 200,
   minValue = 0,
   maxValue = 1,
-  variableName = 'Potential'
+  variableName = 'Production'
 }) => {
   // Crear el gradiente usando chroma.js
   const gradientString = `linear-gradient(to top, ${gradient.join(', ')})`;
