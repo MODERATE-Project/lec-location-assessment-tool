@@ -18,7 +18,7 @@ def get_buildings_data():
 def get_buildings_dataframe():
     current_directory = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(
-        current_directory, '../data/buildings_epsg4326_with_pannels.csv')
+        current_directory, '../data/buildings_epsg4326_with_capacity.csv')
 
     buildings_df = pd.read_csv(file_path, header=0)
     buildings_df['id'] = buildings_df.index
@@ -39,8 +39,8 @@ def get_buildings_sorted_by_weights(buildings_df, weights: dict):
 
 
 def get_buildings_sorted_by_mean(buildings_df: pd.DataFrame):
-    sorted_by_mean_df = buildings_df.sort_values(by='MEAN', ascending=False)
-    return sorted_by_mean_df
+    sorted_by_production_df = buildings_df.sort_values(by='production', ascending=False)
+    return sorted_by_production_df
 
 
 def dataframe_to_json(buildings_df: pd.DataFrame, max=20, filtered=True):

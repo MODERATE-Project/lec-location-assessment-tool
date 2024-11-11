@@ -13,14 +13,14 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   const [advanced, setAdvanced] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const [sortableList, setSortableList] = useState([
-    { id: 1, value: 1, name: 'Rent', checked: true },
-    { id: 2, value: 1, name: 'Age', checked: true },
-    { id: 3, value: 1, name: 'Population', checked: true },
-    { id: 4, value: 1, name: 'Single-person households', checked: true },
-    { id: 5, value: 1, name: 'Elderly Percentage', checked: true },
-    { id: 6, value: 1, name: 'Youth Percentage', checked: true },
-    { id: 7, value: 1, name: 'Average Persons Per Household', checked: true },
-    { id: 8, value: 1, name: 'Potential Production', checked: true },
+    { id: 1, value: 1, name: 'Production', checked: true },
+    { id: 2, value: 1, name: 'Rent', checked: false },
+    { id: 3, value: 1, name: 'Age', checked: false },
+    { id: 4, value: 1, name: 'Population', checked: false },
+    { id: 5, value: 1, name: 'Single-person households', checked: false },
+    { id: 6, value: 1, name: 'Elderly Percentage', checked: false },
+    { id: 7, value: 1, name: 'Youth Percentage', checked: false },
+    { id: 8, value: 1, name: 'Average Persons Per Household', checked: false },
   ]);
 
   const upperLimit = 10;

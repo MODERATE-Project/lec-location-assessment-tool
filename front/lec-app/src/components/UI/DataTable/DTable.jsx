@@ -43,8 +43,26 @@ const DTable = ({ data, onRowClicked }) => {
 
     },
     {
+      name: "Production",
+      selector: (row) => parseFloat(row.production).toFixed(5),
+      sortable: true,
+
+    },
+    {
       name: "Potential",
       selector: (row) => parseFloat(row.MEAN).toFixed(5),
+      sortable: true,
+
+    },
+    {
+      name: "Pannels",
+      selector: (row) => row.pannels,
+      sortable: true,
+
+    },
+    {
+      name: "Pannels",
+      selector: (row) => row.pannels,
       sortable: true,
 
     },
@@ -99,12 +117,6 @@ const DTable = ({ data, onRowClicked }) => {
     {
       name: "Average age",
       selector: (row) => row.Total_edad_media,
-      sortable: true,
-
-    },
-    {
-      name: "Pannels",
-      selector: (row) => row.pannels,
       sortable: true,
 
     },
