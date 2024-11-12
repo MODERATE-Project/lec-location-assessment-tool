@@ -8,6 +8,8 @@ from os import getenv, path
 import pandas as pd
 import logging
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+import seaborn as sns
 import io
 import numpy as np
 
@@ -19,6 +21,7 @@ BASE_DIR = '/report_svc/data'
 BUILDINGS_API_URL = getenv(
     'BUILDINGS_API_URL', 'http://buildings_service:5000/buildings')
 
+sns.set_theme(font_scale=1.7, context='talk', style='whitegrid')
 
 def _get_data(municipality):
     try:
@@ -106,8 +109,9 @@ def compute_PLOT(args):
            colors=colors, explode=explode, startangle=90)
 
     ax.set_title('Área de tejado por uso')
-
     ax.legend(labels, loc='lower left')
+    
+    fig.tight_layout()
 
     image_path = f"{municipality}_plot.png"
 
@@ -154,3 +158,74 @@ def compute_TOTAL_PANELES(args):
     value = np.sum(data['pannels'])
     log.info(f'value: {value}')
     return int(value)
+
+def compute_PCT_7(args):
+
+    # total = float(args[1]['NTOTAL_PARCELAS']) if 'NTOTAL_PARCELAS' in args[1] else compute_NTOTAL_PARCELAS(args)
+    total = float(args[1]['NUM_BUILDINGS']) if 'NUM_BUILDINGS' in args[1] else compute_NUM_BUILDINGS(args)
+    adecuadas = float(args[1]['N_PARCELAS_ADECUADAS']) if 'N_PARCELAS_ADECUADAS' in args[1] else compute_N_PARCELAS_ADECUADAS(args)
+        
+    return "{:.2f}".format(adecuadas/total)
+
+
+def compute_PLOT_APPROPIATE_ROOF_AREA(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+
+    df_grouped = df.groupby('currentUse').agg(
+        area_total=('AREA', 'sum'),
+    ).reset_index().sort_values(by='area_total', ascending=False)
+
+    plt.subplots(figsize=(10, 6))
+    ax = sns.barplot(df_grouped, x='currentUse', y='area_total')
+
+    ax.set_ylabel('Totala area (m²)')
+    ax.set_title('Appropriate roof area')
+
+    ax.ticklabel_format(axis='y', style='plain')
+
+    image_path = f"{municipality}_PLOT_APPROPIATE_ROOF_AREA.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+
+    plt.close()
+    return image_path
+
+
+def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+    
+    data = []
+    area_ranges = [(0, 100), (100, 300), (300, 800), (800, float('inf'))]
+    for min_area, max_area in area_ranges:
+        label = f'{min_area}-{max_area} m²' if max_area != float('inf') else f'>{min_area} m²'
+        for use_type in df['currentUse'].unique():
+            mask = (df['currentUse'] == use_type) & (df['AREA'] >= min_area) & (df['AREA'] < max_area)
+            suitable_count = mask.sum()
+            total_count = len(df[df['currentUse'] == use_type])
+            percentage = suitable_count / total_count * 100 if total_count > 0 else 0
+            data.append({'currentUse': use_type, 'Area Range': label, 'Percentage': percentage})
+    df_plot = pd.DataFrame(data)
+
+    plt.figure(figsize=(10, 6))
+    ax = sns.barplot(data=df_plot, x='Area Range', y='Percentage', hue='currentUse')
+
+    plt.xlabel(None)
+    plt.ylabel(None)
+    plt.title('Surgace of suitable roofs')
+    plt.tight_layout()
+    formatter = FuncFormatter(lambda x, pos: f'{x:.0f}%') 
+    plt.gca().yaxis.set_major_formatter(formatter)
+    
+    sns.move_legend(
+        ax, "lower center",
+        bbox_to_anchor=(.5, -0.25), ncol=3, title=None, frameon=False,
+    )
+
+
+    image_path = f"{municipality}_PLOT_DISTRIB_AREAS_POR_USO.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+
+    plt.close()
+    return image_path
+

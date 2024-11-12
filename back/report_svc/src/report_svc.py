@@ -57,7 +57,7 @@ def replace_text_in_paragraphs(paragraphs, data):
                     log.info(f"embbeding img_file: {value}")
                     try:
                         with open(os.path.join(BASE_DIR, value), 'rb') as image_stream:
-                            run.add_picture(image_stream, width=Inches(4.0))
+                            run.add_picture(image_stream, width=Inches(5.0))
                     except FileNotFoundError:
                         print(f"Error: No se pudo encontrar el archivo de imagen {value}")
 

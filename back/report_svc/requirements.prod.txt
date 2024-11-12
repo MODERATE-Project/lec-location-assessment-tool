@@ -32,3 +32,4 @@ Spire.Doc==12.7.1
 matplotlib
 requests
 pyyaml
+seaborn
