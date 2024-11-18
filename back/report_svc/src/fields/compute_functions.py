@@ -21,7 +21,7 @@ BASE_DIR = '/report_svc/data'
 BUILDINGS_API_URL = getenv(
     'BUILDINGS_API_URL', 'http://buildings_service:5000/buildings')
 
-sns.set_theme(font_scale=1.7, context='talk', style='whitegrid')
+sns.set_theme(font_scale=1.2, context='talk', style='whitegrid')
 
 def _get_data(municipality):
     try:
@@ -48,20 +48,58 @@ def _from_data(municipality):
         return data
 
 
-def compute_PCT_1(_):
-    return 69
+def compute_PCT_1(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+
+    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    log.info(f"total: {total}")
+    percentage = len(df[df['currentUse'] == 'residential']) / total * 100
+    return f"{percentage:.2f}"
+
+def compute_PCT_2(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+
+    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse'] == 'industrial']) / total * 100
+    return f"{percentage:.2f}"
+
+def compute_PCT_3(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+
+    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse'] == 'agriculture']) / total * 100
+    return f"{percentage:.2f}"
+
+def compute_PCT_4(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+
+    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    pct_industrial = len(df[df['currentUse'].isin(['industrial', 'agriculture'])]) / total * 100
+    
+    return f"{pct_industrial:.2f}"
 
 
-def compute_PCT_4(_):
-    return 13
+def compute_PCT_5(args):
+    municipality = args[0]
+    df = _from_data(municipality)
+
+    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse'].isin(['retail', 'office'])]) / total * 100
+    return f"{percentage:.2f}"
 
 
-def compute_PCT_5(_):
-    return 10
 
+def compute_PCT_6(args):
+    municipality = args[0]
+    df = _from_data(municipality)
 
-def compute_PCT_6(_):
-    return 8
+    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse'] == 'publicServices']) / total * 100
+    return f"{percentage:.2f}"
 
 
 def compute_PARAMETRO_3(_):
@@ -104,7 +142,7 @@ def compute_PLOT(args):
               '#f9d02e']  # Colores personalizados
     explode = (0, 0, 0, 0)  # No separar ninguna porción del pastel
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.pie(percentages, labels=labels, autopct='%1.0f%%',
            colors=colors, explode=explode, startangle=90)
 
@@ -176,14 +214,17 @@ def compute_PLOT_APPROPIATE_ROOF_AREA(args):
         area_total=('AREA', 'sum'),
     ).reset_index().sort_values(by='area_total', ascending=False)
 
+    df_grouped['currentUse'] = df_grouped['currentUse'].replace('publicServices', 'public services')
+
     plt.subplots(figsize=(10, 6))
-    ax = sns.barplot(df_grouped, x='currentUse', y='area_total')
+    ax = sns.barplot(df_grouped, x='currentUse', y='area_total', hue='currentUse')
 
     ax.set_ylabel('Totala area (m²)')
     ax.set_title('Appropriate roof area')
 
     ax.ticklabel_format(axis='y', style='plain')
-
+    ax.tick_params(axis='x', rotation=40)
+    
     image_path = f"{municipality}_PLOT_APPROPIATE_ROOF_AREA.png"
     plt.savefig(path.join(BASE_DIR, image_path), format='png')
 
@@ -207,21 +248,26 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
             data.append({'currentUse': use_type, 'Area Range': label, 'Percentage': percentage})
     df_plot = pd.DataFrame(data)
 
-    plt.figure(figsize=(10, 6))
-    ax = sns.barplot(data=df_plot, x='Area Range', y='Percentage', hue='currentUse')
+    fig, ax = plt.subplots(figsize=(10, 6)) 
+    sns.barplot(data=df_plot, x='Area Range', y='Percentage', hue='currentUse', ax=ax)
 
-    plt.xlabel(None)
-    plt.ylabel(None)
-    plt.title('Surgace of suitable roofs')
+    ax.set_xlabel(None)
+    ax.set_ylabel(None)
+    ax.set_title('Surface of suitable roofs')
+    ax.set_ylabel(None)
+    ax.set_xlabel(None)
+    ax.set_title('Surface of suitable roofs')
+
     plt.tight_layout()
     formatter = FuncFormatter(lambda x, pos: f'{x:.0f}%') 
-    plt.gca().yaxis.set_major_formatter(formatter)
+    ax.yaxis.set_major_formatter(formatter)
     
     sns.move_legend(
         ax, "lower center",
         bbox_to_anchor=(.5, -0.25), ncol=3, title=None, frameon=False,
     )
 
+    fig.subplots_adjust(bottom=0.5)  # TODO: Ajustar este valor
 
     image_path = f"{municipality}_PLOT_DISTRIB_AREAS_POR_USO.png"
     plt.savefig(path.join(BASE_DIR, image_path), format='png')
@@ -229,3 +275,9 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
     plt.close()
     return image_path
 
+def compute_RADIACION_SOLAR(args):
+    municipality = args[0]
+    data = _from_data(municipality)
+
+    mean_value = data['MEAN'].mean()
+    return f"{mean_value:.2f}"
