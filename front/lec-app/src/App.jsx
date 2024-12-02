@@ -117,7 +117,7 @@ function App() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        const values = data.buildings.map(building => building['production'])
+        const values = data.buildings.map(building => building['MEAN'])
         const maxValue = Math.min(...values)
         const minValue = Math.max(...values)
         data.maxValue = maxValue

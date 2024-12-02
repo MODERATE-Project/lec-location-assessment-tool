@@ -522,7 +522,7 @@ export function useMap({
                     featureProjection: 'EPSG:4326'
                 });
 
-                const buildingColor = getColor(building['production'])
+                const buildingColor = getColor(building['MEAN'])
 
                 const feature = new Feature({
                     geometry: geometry,
