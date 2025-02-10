@@ -138,27 +138,44 @@ def compute_PLOT(args):
 
     log.info(f'percentages: {percentages}')
     labels = ['Residencial', 'Industrial', 'Comercial', 'Servicios Públicos']
-    colors = ['#4f81bd', '#c0504d', '#9e9e9e',
-              '#f9d02e']  # Colores personalizados
-    explode = (0, 0, 0, 0)  # No separar ninguna porción del pastel
+    colors = ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000']
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.pie(percentages, labels=labels, autopct='%1.0f%%',
-           colors=colors, explode=explode, startangle=90)
-
-    ax.set_title('Área de tejado por uso')
-    ax.legend(labels, loc='lower left')
+    # Configurar el estilo de seaborn
+    # sns.set_style("whitegrid")
     
-    fig.tight_layout()
+    # Crear la figura
+    fig = plt.figure(figsize=(10, 8))
 
+    # Create pie chart
+    plt.pie(percentages, 
+            labels=labels,
+            colors=colors,
+            autopct='%1.0f%%',
+            pctdistance=0.85,
+            labeldistance=1.1,
+            startangle=90,
+            counterclock=False)
+
+    # Add title
+    plt.title('Área de tejado por uso')
+
+    # Equal aspect ratio ensures that pie is drawn as a circle
+    plt.axis('equal')
+
+    # Add legend
+    plt.legend(labels, loc='lower center', 
+            ncol=len(labels), frameon=False)
+
+    # Ajustar el layout
+    plt.tight_layout()
+    
     image_path = f"{municipality}_plot.png"
-
-    # Guardar el gráfico como imagen
-    plt.savefig(path.join(BASE_DIR, image_path), format='png')
-
-    # Cerrar la figura para liberar memoria
+    plt.savefig(path.join(BASE_DIR, image_path),
+                format='png',
+                bbox_inches='tight',
+                dpi=300)
     plt.close(fig)
-
+    
     return image_path
 
 
