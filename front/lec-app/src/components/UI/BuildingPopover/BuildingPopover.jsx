@@ -19,25 +19,25 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
             <FaMapMarkerAlt />
             <span>Area</span>
             <strong>{building.AREA.toFixed(2)}</strong> 
-            <strong>m²</strong>
+            <span>m²</span>
           </div>
           <div className="info-item">
             <FaBolt />
             <span>Potential</span>
             <strong>{building.MEAN.toFixed(2)}</strong>
-            <strong>kWh/m²</strong>
+            <span>kWh/m²</span>
           </div>
           <div className="info-item">
             <FaSolarPanel />
             <span>Total Production</span>
             <strong>{building.production.toFixed(2)}</strong>
-            <strong>MW/h year</strong>
+            <span>MW/h year</span>
           </div>
           <div className="info-item">
             <FaSolarPanel />
             <span>Num. pannels</span>
             <strong>{building.pannels.toFixed(2)}</strong>
-            <strong>units</strong>
+            <span>units</span>
           </div>
           <div className="info-item">
             <FaClipboard />
