@@ -216,15 +216,18 @@ def compute_PLOT_APPROPIATE_ROOF_AREA(args):
 
     df_grouped['currentUse'] = df_grouped['currentUse'].replace('publicServices', 'public services')
 
-    plt.subplots(figsize=(10, 6))
+    plt.subplots(figsize=(10, 7))
     ax = sns.barplot(df_grouped, x='currentUse', y='area_total', hue='currentUse')
 
     ax.set_ylabel('Totala area (m²)')
     ax.set_title('Appropriate roof area')
 
     ax.ticklabel_format(axis='y', style='plain')
-    ax.tick_params(axis='x', rotation=40)
+    # ax.tick_params(axis='x', rotation=45)
+    plt.xticks(rotation=45, ha='right')
     
+    plt.tight_layout()
+
     image_path = f"{municipality}_PLOT_APPROPIATE_ROOF_AREA.png"
     plt.savefig(path.join(BASE_DIR, image_path), format='png')
 
