@@ -18,22 +18,26 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
           <div className="info-item">
             <FaMapMarkerAlt />
             <span>Area</span>
-            <strong>{building.AREA.toFixed(2)} m²</strong>
+            <strong>{building.AREA.toFixed(2)}</strong> 
+            <strong>m²</strong>
           </div>
           <div className="info-item">
             <FaBolt />
             <span>Potential</span>
-            <strong>{building.MEAN.toFixed(2)} MWh</strong>
+            <strong>{building.MEAN.toFixed(2)}</strong>
+            <strong>MWh/m²</strong>
           </div>
           <div className="info-item">
             <FaSolarPanel />
-            <span>MWh Approved</span>
-            <strong>{building.MWh_aprove.toFixed(2)}</strong>
+            <span>Total Production</span>
+            <strong>{building.production.toFixed(2)}</strong>
+            <strong>MW/h año</strong>
           </div>
           <div className="info-item">
             <FaSolarPanel />
-            <span>MWh Produced</span>
-            <strong>{building.MWh_prod_e.toFixed(2)}</strong>
+            <span>Num. pannels</span>
+            <strong>{building.pannels.toFixed(2)}</strong>
+            <strong>units</strong>
           </div>
           <div className="info-item">
             <FaClipboard />
@@ -45,11 +49,11 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
             <span>Reference</span>
             <strong>{building.reference}</strong>
           </div> */}
-          <div className="info-item">
+          {/* <div className="info-item">
             <FaIdCard />
             <span>ID</span>
             <strong>{building.id}</strong>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="popover-footer no-print">
