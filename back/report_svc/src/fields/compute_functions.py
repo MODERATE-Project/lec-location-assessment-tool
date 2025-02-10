@@ -268,7 +268,7 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
             data.append({'currentUse': use_type, 'Area Range': label, 'Percentage': percentage})
     df_plot = pd.DataFrame(data)
 
-    fig, ax = plt.subplots(figsize=(10, 6)) 
+    fig, ax = plt.subplots(figsize=(10, 8)) 
     sns.barplot(data=df_plot, x='Area Range', y='Percentage', hue='currentUse', ax=ax)
 
     ax.set_xlabel(None)
@@ -284,10 +284,10 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
     
     sns.move_legend(
         ax, "lower center",
-        bbox_to_anchor=(.5, -0.25), ncol=3, title=None, frameon=False,
+        bbox_to_anchor=(.5, -0.4), ncol=3, title=None, frameon=False,
     )
 
-    fig.subplots_adjust(bottom=0.5)  # TODO: Ajustar este valor
+    fig.subplots_adjust(bottom=0.25) 
 
     image_path = f"{municipality}_PLOT_DISTRIB_AREAS_POR_USO.png"
     plt.savefig(path.join(BASE_DIR, image_path), format='png')
