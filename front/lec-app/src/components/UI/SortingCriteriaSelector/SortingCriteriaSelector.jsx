@@ -13,7 +13,8 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   const [advanced, setAdvanced] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const [sortableList, setSortableList] = useState([
-    { id: 1, value: 1, name: 'Production', checked: true },
+    { id: 1, value: 1, name: 'Total Production', checked: true },
+    { id: 1, value: 1, name: 'Potential', checked: false },
     { id: 2, value: 1, name: 'Rent', checked: false },
     { id: 3, value: 1, name: 'Age', checked: false },
     { id: 4, value: 1, name: 'Population', checked: false },

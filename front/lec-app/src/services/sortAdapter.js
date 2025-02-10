@@ -8,7 +8,8 @@ export default function mapWeightsToApi(weights) {
         "Porcentaje_mayor_65": weights["Elderly Percentage"],
         "Porcentaje_menor_18": weights["Youth Percentage"],
         "Tamaño_medio_hogar": weights["Average Persons Per Household"],
-        "production": weights["Production"],
+        "production": weights["Total Production"],
+        "MEAN": weights["Potential"],
     }
 
 }
