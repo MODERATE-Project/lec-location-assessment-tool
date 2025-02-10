@@ -43,14 +43,14 @@ const DTable = ({ data, onRowClicked }) => {
 
     },
     {
-      name: "Production",
+      name: "Production [MW/h year]",
       selector: (row) => parseFloat(row.production),
       cell: (row) => parseFloat(row.production).toFixed(5),
       sortable: true,
       
     },
     {
-      name: "Potential",
+      name: "Potential [kWh/m²]",
       selector: (row) => parseFloat(row.MEAN),
       cell: (row) => parseFloat(row.MEAN).toFixed(5),
       sortable: true,
@@ -70,7 +70,7 @@ const DTable = ({ data, onRowClicked }) => {
 
     },
     {
-      name: "Area",
+      name: "Area [m²]",
       selector: (row) => row.AREA,
       sortable: true,
 
