@@ -283,6 +283,10 @@ function App() {
     })
   };
 
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 
   return (
     <div className="App">
@@ -316,7 +320,10 @@ function App() {
             id = "buildingTypesSelector"
             value={selectedBuildingTypes}
             onChange={(e) => setSelectedBuildingTypes(e.value)}
-            options={buildingTypes.map(type => ({ label: type, value: type }))}
+            options={buildingTypes.map(type => ({ 
+              label: capitalize(type.replace(/([a-z])([A-Z])/g, '$1 $2')), 
+              value: type 
+            }))}
             optionLabel="label"
             placeholder="Building type filter"
             className="w-full md:w-20rem"
