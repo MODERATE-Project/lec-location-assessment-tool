@@ -43,14 +43,14 @@ const DTable = ({ data, onRowClicked }) => {
 
     },
     {
-      name: "Production [MW/h year]",
+      name: "Production [MW/h per year]",
       selector: (row) => parseFloat(row.production),
       cell: (row) => parseFloat(row.production).toFixed(5),
       sortable: true,
       
     },
     {
-      name: "Potential [kWh/m² year]",
+      name: "Potential [kWh/m² per year]",
       selector: (row) => parseFloat(row.MEAN),
       cell: (row) => parseFloat(row.MEAN).toFixed(5),
       sortable: true,
