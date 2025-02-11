@@ -57,15 +57,15 @@ const DTable = ({ data, onRowClicked }) => {
       
     },
     // {
-    //   name: "Pannels",
-    //   selector: (row) => row.pannels,
+    //   name: "Panels",
+    //   selector: (row) => row.panels,
     //   sortable: true,
 
     // },
     {
-      name: "Pannels",
-      selector: (row) => parseInt(row.pannels),
-      cell: (row) => row.pannels,
+      name: "Panels",
+      selector: (row) => parseInt(row.panels),
+      cell: (row) => row.panels,
       sortable: true,
 
     },

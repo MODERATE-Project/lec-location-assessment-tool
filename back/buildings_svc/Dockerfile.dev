@@ -5,5 +5,5 @@ RUN pip install -r requirements.txt
 COPY src /buildings_svc/src
 COPY data /buildings_svc/data
 ENV FLASK_APP=buildings_svc:app
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["flask", "run", "--host=0.0.0.0", "--debug"]
 

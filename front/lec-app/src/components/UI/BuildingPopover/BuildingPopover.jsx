@@ -35,8 +35,8 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
           </div>
           <div className="info-item">
             <FaSolarPanel />
-            <span>Num. pannels</span>
-            <strong>{building.pannels.toFixed(2)}</strong>
+            <span>Number of Panels</span>
+            <strong>{building.panels.toFixed(2)}</strong>
             <span>units</span>
           </div>
           <div className="info-item">

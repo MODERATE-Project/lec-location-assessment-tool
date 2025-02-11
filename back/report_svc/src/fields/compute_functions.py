@@ -210,7 +210,7 @@ def compute_TOTAL_PANELES(args):
     municipality = args[0]
     data = _from_data(municipality)
 
-    value = np.sum(data['pannels'])
+    value = np.sum(data['panels'])
     log.info(f'value: {value}')
     return int(value)
 
