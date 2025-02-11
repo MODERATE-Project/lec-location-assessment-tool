@@ -50,7 +50,7 @@ const DTable = ({ data, onRowClicked }) => {
       
     },
     {
-      name: "Potential [kWh/m²]",
+      name: "Potential [kWh/m² year]",
       selector: (row) => parseFloat(row.MEAN),
       cell: (row) => parseFloat(row.MEAN).toFixed(5),
       sortable: true,

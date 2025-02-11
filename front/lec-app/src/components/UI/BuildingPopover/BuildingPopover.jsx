@@ -25,7 +25,7 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
             <FaBolt />
             <span>Potential</span>
             <strong>{building.MEAN.toFixed(2)}</strong>
-            <span>kWh/m²</span>
+            <span>kWh/m² year</span>
           </div>
           <div className="info-item">
             <FaSolarPanel />
