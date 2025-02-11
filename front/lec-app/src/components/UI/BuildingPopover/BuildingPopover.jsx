@@ -44,11 +44,11 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
             <span>Current Use</span>
             <strong>{building.currentUse}</strong>
           </div>
-          {/* <div className="info-item">
+          <div className="info-item">
             <FaIdCard />
-            <span>Reference</span>
-            <strong>{building.reference}</strong>
-          </div> */}
+            <span>Cadastral Reference</span>
+            <strong style={{wordBreak: 'break-all'}}>{building.reference}</strong>
+          </div>
           {/* <div className="info-item">
             <FaIdCard />
             <span>ID</span>
