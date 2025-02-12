@@ -39,7 +39,7 @@ const DTable = ({ data, onRowClicked }) => {
   const columns = [
     {
       name: "Current use",
-      selector: (row) => capitalizeCamel(row.currentUse),
+      selector: (row) => row.currentUse,
       sortable: true,
 
     },

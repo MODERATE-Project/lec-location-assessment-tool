@@ -43,7 +43,7 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
           <div className="info-item">
             <FaClipboard />
             <span>Current Use</span>
-            <strong>{capitalizeCamel(building.currentUse)}</strong>
+            <strong>{building.currentUse}</strong>
           </div>
           <div className="info-item">
             <FaIdCard />

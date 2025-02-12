@@ -129,6 +129,9 @@ function App() {
           maxValue: maxValue,
         });
 
+        data.buildings.map(b => {
+          b.currentUse = capitalizeCamel(b.currentUse); 
+        })
         setTableData(data); // Guarda los datos en el estado local
         setInitialTableData(data);
         setSelectedBuilding(null);
@@ -318,7 +321,7 @@ function App() {
             value={selectedBuildingTypes}
             onChange={(e) => setSelectedBuildingTypes(e.value)}
             options={buildingTypes.map(type => ({ 
-              label: capitalizeCamel(type), 
+              label: type, 
               value: type 
             }))}
             optionLabel="label"

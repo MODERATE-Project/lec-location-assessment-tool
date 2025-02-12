@@ -10,8 +10,9 @@ const VITE_GEOSERVER_API_URL = import.meta.env.VITE_GEOSERVER_API_URL || 'http:/
 const camelRegex = /([A-Z])/g;
 const firstCharRegex = /^./;
 function capitalizeCamel(str) {
-    console.log(`Capitalizando ${str}`);
-    return str.replace(camelRegex, ' $1').replace(firstCharRegex, c => c.toUpperCase());
+    let res = str.replace(camelRegex, ' $1').replace(firstCharRegex, c => c.toUpperCase());
+    console.log(`Capitalizando ${str} ⟶ ${res}`);
+    return res;
 }
 
 
