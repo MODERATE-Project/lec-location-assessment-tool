@@ -1,6 +1,7 @@
 import React from 'react';
 import './BuildingPopover.css';
 import { FaBuilding, FaBolt, FaSolarPanel, FaClipboard, FaMapMarkerAlt, FaLink, FaIdCard } from 'react-icons/fa';
+import { capitalizeCamel } from '../../../constants';
 
 const BuildingPopover = ({ building, position, onClose, color }) => {
   if (!building) return null;
@@ -42,7 +43,7 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
           <div className="info-item">
             <FaClipboard />
             <span>Current Use</span>
-            <strong>{building.currentUse}</strong>
+            <strong>{capitalizeCamel(building.currentUse)}</strong>
           </div>
           <div className="info-item">
             <FaIdCard />

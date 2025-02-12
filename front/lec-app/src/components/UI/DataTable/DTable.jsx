@@ -1,4 +1,5 @@
 import DataTable from "react-data-table-component";
+import { capitalizeCamel } from "../../../constants"
 
 const customStyles = {
 
@@ -38,7 +39,7 @@ const DTable = ({ data, onRowClicked }) => {
   const columns = [
     {
       name: "Current use",
-      selector: (row) => row.currentUse,
+      selector: (row) => capitalizeCamel(row.currentUse),
       sortable: true,
 
     },

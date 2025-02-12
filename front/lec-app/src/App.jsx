@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import DTable from "./components/UI/DataTable/DTable";
 import SearchBox from "./components/UI/SearchBox/SearchBox";
 import GradientColorBar from './components/UI/GradientColorBar/GradientColorBar';
-import { VITE_MUNICIPALITIES_API_URL, VITE_BUILDINGS_API_URL, VITE_REPORT_API_URL, VITE_GEOSERVER_API_URL } from "./constants"
+import { VITE_MUNICIPALITIES_API_URL, VITE_BUILDINGS_API_URL, VITE_REPORT_API_URL, VITE_GEOSERVER_API_URL, capitalizeCamel } from "./constants"
 import './App.css'
 import OlMap from "./components/OlMap/OlMap";
 import SortingCriteriaSelector from "./components/UI/SortingCriteriaSelector/SortingCriteriaSelector";
@@ -283,9 +283,6 @@ function App() {
     })
   };
 
-  function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 
   return (
@@ -321,7 +318,7 @@ function App() {
             value={selectedBuildingTypes}
             onChange={(e) => setSelectedBuildingTypes(e.value)}
             options={buildingTypes.map(type => ({ 
-              label: capitalize(type.replace(/([a-z])([A-Z])/g, '$1 $2')), 
+              label: capitalizeCamel(type), 
               value: type 
             }))}
             optionLabel="label"
