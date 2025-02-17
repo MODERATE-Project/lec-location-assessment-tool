@@ -14,6 +14,7 @@ jobs:
       gar_repo: ${{ vars.DEFAULT_GAR_REPOSITORY }}
       image_name: tool-lec-frontend
       working_dir: front/lec-app
+      file: front/lec-app/Dockerfile
       build_args: |
         VITE_MUNICIPALITIES_API_URL=/municipalities
         VITE_BUILDINGS_API_URL=/buildings
