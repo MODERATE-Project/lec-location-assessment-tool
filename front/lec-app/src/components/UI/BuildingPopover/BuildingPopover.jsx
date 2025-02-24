@@ -32,7 +32,7 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
             <FaSolarPanel />
             <span>Total Production</span>
             <strong>{building.production.toFixed(2)}</strong>
-            <span>MW/h per year</span>
+            <span>MWh per year</span>
           </div>
           <div className="info-item">
             <FaSolarPanel />
