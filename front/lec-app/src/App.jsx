@@ -33,6 +33,9 @@ function App() {
   const [areMapBuildingsVisible, setMapBuildingsVisible] = useState(false)
   const [buildingTypes, setBuildingTypes] = useState([])
   const [selectedBuildingTypes, setSelectedBuildingTypes] = useState([])
+  const [currentSortingWeights, setCurrentSortingWeights] = useState({
+    'production': 1  // Criterio por defecto
+  });
 
 
   const handleRowClick = (building) => {
@@ -72,7 +75,9 @@ function App() {
     }
     setIsLoading(true)
     const weights_mapped = mapWeightsToApi(sortingCriteria)
-
+    setCurrentSortingWeights(Object.fromEntries(
+      Object.entries(weights_mapped).filter(([_, weight]) => weight > 0)
+    ));
     // Realiza la llamada GET a la API del backend para obtener los datos
     const url = `${VITE_BUILDINGS_API_URL
       }/weighted-sort?municipio=${encodeURIComponent(selectedLocation)}&weights=${encodeURIComponent(JSON.stringify(weights_mapped))}`;
@@ -222,14 +227,11 @@ function App() {
     const url = `${VITE_REPORT_API_URL}`;
   
     const data = {
-      'MUNICIPALITY_TITLE': 'CREVILLENT',
-      'MUNICIPALITY': 'Crevillent',
-      'NUM_BUILDINGS': '12',
-      'PCT_1': '69',
-      'PCT_4': '13',
-      'PCT_5': '10',
-      'PCT_6': '8'
-    };
+      'MUNICIPALITY_TITLE': selectedLocation.toUpperCase(),
+      'MUNICIPALITY': selectedLocation,
+      'NUM_BUILDINGS': tableData.buildings.length.toString(),
+      'sortingCriteria': currentSortingWeights
+      };
   
     toast.promise(
     fetch(url, {
@@ -332,7 +334,7 @@ function App() {
         </>}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>
-      <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
+        <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
       <Toaster
         toastOptions={{
           style: {
