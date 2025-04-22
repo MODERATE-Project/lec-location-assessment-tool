@@ -1,6 +1,7 @@
 from fields.field_types import StaticField, ComputedField
 
 
+
 class FieldFactory:
     @staticmethod
     def create_from_dict(field_dict, yaml_data, compute_map):
@@ -10,10 +11,10 @@ class FieldFactory:
         """
         fields = []
 
-        # Mergea el YAML con el dict de entrada
-        full_field_dict = field_dict | yaml_data
+        # Mergea el YAML con el dict de entrada, prefiriendo valores no nulos
+        # full_field_dict = field_dict | yaml_data
 
-        for name, value in full_field_dict.items():
+        for name, value in yaml_data.items():
             if value is not None:
                 field = StaticField(name, value)
 

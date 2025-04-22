@@ -40,10 +40,15 @@ def compute_all(fields):
     for field in fields:
         field.compute(municipality)
 
+def _update_yaml(yaml_data, field_dict):
+    """Une dos diccionarios, prefiriendo valores de d2 (field_dict) sobre los de d1 (yaml_data),
+       y solo actualiza las claves existentes en d1 sin agregar nuevas claves de d2."""
+    return {k: field_dict[k] if k in field_dict else yaml_data[k] for k in yaml_data.keys()}
+
 
 def get_and_compute_as_needed(municipality, field_dict, base_dir="../data"):
 
-    yaml_data = get_yaml_parameters(municipality, base_dir)
+    yaml_data = _update_yaml(get_yaml_parameters(municipality, base_dir), field_dict)
 
     compute_map = load_functions_from_module('fields.compute_functions')
 
@@ -51,8 +56,8 @@ def get_and_compute_as_needed(municipality, field_dict, base_dir="../data"):
 
     for field in fields:
         log.info(f'Municipality: {municipality}')
-        field.compute(municipality, yaml_data)
-        yaml_data[field.name] = field.value
+        field.compute(municipality, yaml_data, field_dict) # NOTE: here is where we include data required by the compute functions
+        # yaml_data[field.name] = field.value
 
     save_yaml(str(municipality), yaml_data, base_dir=base_dir)
 
