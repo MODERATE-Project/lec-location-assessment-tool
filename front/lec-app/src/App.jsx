@@ -230,7 +230,8 @@ function App() {
       'MUNICIPALITY_TITLE': selectedLocation.toUpperCase(),
       'MUNICIPALITY': selectedLocation,
       'NUM_BUILDINGS': tableData.buildings.length.toString(),
-      'sortingCriteria': currentSortingWeights
+      'sortingCriteria': currentSortingWeights,
+      'isAreaSelected': isPolygonDrawn
       };
   
     toast.promise(
