@@ -9,7 +9,7 @@ import fields.field_manager as field_manager
 import logging
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=os.getenv("LOG_LEVEL", "DEBUG"),
     # Formato del mensaje
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',  # Formato de la fecha
@@ -24,7 +24,9 @@ app = Flask(__name__)
 CORS(app)
 
 BASE_DIR = '/report_svc/data'
-REPORT_FILE = os.getenv("REPORT_FILE", 'report_template.docx')
+REPORT_FILE_FULL = os.getenv("REPORT_FILE", 'report_template.docx')
+REPORT_FILE_AREA_SELECTED = os.getenv(
+    "REPORT_FILE_AREA_SELECTED", 'report_template_area_selected.docx')
 
 
 # buildings = get_buildings_data()
@@ -43,9 +45,7 @@ def replace_text_in_paragraphs(paragraphs, data):
     for paragraph in paragraphs:
         for key, value in data.items():
             key_pattern = f"${{{key}}}"
-            
             if key_pattern in paragraph.text:
-                
                 if "IMG" in key or "PLOT" in key:
 
                     # Clear the placeholder text
@@ -98,7 +98,14 @@ def get_report():
     municipality_parameters = field_manager.get_and_compute_as_needed(
         municipality=municipality, field_dict=data, base_dir=BASE_DIR)
 
-    doc_path = os.path.join(BASE_DIR, REPORT_FILE)
+    isAreaSelected = bool(data.get("isAreaSelected"))
+    if isAreaSelected:
+        report_file = REPORT_FILE_AREA_SELECTED
+    else:
+        report_file = REPORT_FILE_FULL
+    log.debug(f"Using report template file {report_file} because isAreaSelected is {isAreaSelected}")
+
+    doc_path = os.path.join(BASE_DIR, report_file)
     report_filled_path = os.path.join(BASE_DIR, 'generated_report.docx')
     pdf_path = os.path.join(BASE_DIR, 'generated_report.pdf')
 

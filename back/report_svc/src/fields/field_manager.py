@@ -38,7 +38,7 @@ def get_yaml_parameters(name, base_dir):
 
 def compute_all(fields):
     for field in fields:
-        field.compute(municipality)
+        field.compute(municipality, yaml_data, field_dict)
 
 def _update_yaml(yaml_data, field_dict):
     """Une dos diccionarios, prefiriendo valores de d2 (field_dict) sobre los de d1 (yaml_data),

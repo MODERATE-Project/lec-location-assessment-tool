@@ -69,6 +69,7 @@ services:
       - PYTHONPATH=/report_svc/src
       - REPORT_FILE=${REPORT_FILE}
       - BUILDINGS_API_URL=buildings_service:5000/buildings
+      - LOG_LEVEL=${LOG_LEVEL}
 
   geoserver:
     container_name: geoserver-instance

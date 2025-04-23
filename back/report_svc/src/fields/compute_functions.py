@@ -12,6 +12,7 @@ from matplotlib.ticker import FuncFormatter
 import seaborn as sns
 import io
 import numpy as np
+import json
 
 
 log = logging.getLogger(__name__)
@@ -301,3 +302,13 @@ def compute_RADIACION_SOLAR(args):
 
     mean_value = data['MEAN'].mean()
     return f"{mean_value:.2f}"
+
+
+def compute_SORTING_CRITERIA_LIST(args):
+    front_args = args[2]
+    criterios = front_args.get("sortingCriteria", {})
+    claves_ordenadas = sorted(criterios.keys(), key=lambda clave: criterios[clave])
+    # Start Generation Here
+    log.debug(f"claves_ordenadas: {claves_ordenadas}")
+    # End Generation Her
+    return str(claves_ordenadas) #FIXME retorna NULL
