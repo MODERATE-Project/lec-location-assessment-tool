@@ -66,7 +66,7 @@ services:
       - ${REPORT_SVC_PORT}:5000
     environment:
       - DEBUG=True
-      - PYTHONPATH=/buildings_svc/src
+      - PYTHONPATH=/report_svc/src
       - REPORT_FILE=${REPORT_FILE}
       - BUILDINGS_API_URL=buildings_service:5000/buildings
 
