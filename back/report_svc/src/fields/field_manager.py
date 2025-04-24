@@ -57,7 +57,7 @@ def get_and_compute_as_needed(municipality, field_dict, base_dir="../data"):
     for field in fields:
         log.info(f'Municipality: {municipality}')
         field.compute(municipality, yaml_data, field_dict) # NOTE: here is where we include data required by the compute functions
-        # yaml_data[field.name] = field.value
+        yaml_data[field.name] = field.value
 
     save_yaml(str(municipality), yaml_data, base_dir=base_dir)
 

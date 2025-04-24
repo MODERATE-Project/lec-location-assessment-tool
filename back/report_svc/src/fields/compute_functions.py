@@ -310,5 +310,7 @@ def compute_SORTING_CRITERIA_LIST(args):
     claves_ordenadas = sorted(criterios.keys(), key=lambda clave: criterios[clave])
     # Start Generation Here
     log.debug(f"claves_ordenadas: {claves_ordenadas}")
-    # End Generation Her
-    return str(claves_ordenadas) #FIXME retorna NULL
+
+    lineas = [f"{idx}.\t{clave}" for idx, clave in enumerate(claves_ordenadas, start=1)]
+
+    return '\n'.join(lineas)

@@ -33,9 +33,7 @@ function App() {
   const [areMapBuildingsVisible, setMapBuildingsVisible] = useState(false)
   const [buildingTypes, setBuildingTypes] = useState([])
   const [selectedBuildingTypes, setSelectedBuildingTypes] = useState([])
-  const [currentSortingWeights, setCurrentSortingWeights] = useState({
-    'production': 1  // Criterio por defecto
-  });
+  const [currentSortingWeights, setCurrentSortingWeights] = useState("1.\Total Production");
 
 
   const handleRowClick = (building) => {
@@ -75,9 +73,12 @@ function App() {
     }
     setIsLoading(true)
     const weights_mapped = mapWeightsToApi(sortingCriteria)
-    setCurrentSortingWeights(Object.fromEntries(
-      Object.entries(weights_mapped).filter(([_, weight]) => weight > 0)
-    ));
+    setCurrentSortingWeights(
+      Object.entries(sortingCriteria)
+        .filter(([_, weight]) => weight > 0)
+        .sort((a, b) => b[1] - a[1])
+        .map(([key, _], index) => `${index + 1}.\t${key}`).join("\n")
+    );
     // Realiza la llamada GET a la API del backend para obtener los datos
     const url = `${VITE_BUILDINGS_API_URL
       }/weighted-sort?municipio=${encodeURIComponent(selectedLocation)}&weights=${encodeURIComponent(JSON.stringify(weights_mapped))}`;
@@ -135,7 +136,7 @@ function App() {
         });
 
         data.buildings.map(b => {
-          b.currentUse = capitalizeCamel(b.currentUse); 
+          b.currentUse = capitalizeCamel(b.currentUse);
         })
         setTableData(data); // Guarda los datos en el estado local
         setInitialTableData(data);
@@ -143,7 +144,7 @@ function App() {
 
         const uniqueTypes = Array.from(new Set(data.buildings.map(b => b.currentUse)));
         setBuildingTypes(uniqueTypes);
-    
+
       })
       .catch((error) => {
         console.error("Hubo un error al obtener los datos:", error);
@@ -173,12 +174,12 @@ function App() {
 
   useEffect(() => {
     if (selectedBuildingTypes.length > 0) {
-        const filteredData = initialTableData.buildings.filter(b => selectedBuildingTypes.includes(b.currentUse));
-        setTableData({ buildings: filteredData });
+      const filteredData = initialTableData.buildings.filter(b => selectedBuildingTypes.includes(b.currentUse));
+      setTableData({ buildings: filteredData });
     } else {
-        setTableData(initialTableData);
+      setTableData(initialTableData);
     }
-}, [selectedBuildingTypes, initialTableData]);
+  }, [selectedBuildingTypes, initialTableData]);
 
 
   const handleDrawingToggleButtonChange = () => {
@@ -225,68 +226,68 @@ function App() {
 
   const generateReportProcedure = () => {
     const url = `${VITE_REPORT_API_URL}`;
-  
+
     const data = {
       'MUNICIPALITY_TITLE': selectedLocation.toUpperCase(),
       'MUNICIPALITY': selectedLocation,
       'NUM_BUILDINGS': tableData.buildings.length.toString(),
-      'sortingCriteria': currentSortingWeights,
+      'SORTING_CRITERIA_LIST': currentSortingWeights,
       'isAreaSelected': isPolygonDrawn
-      };
-  
+    };
+
     toast.promise(
-    fetch(url, {
-      method: 'POST', // Usamos el método POST
-      headers: {
-        'Content-Type': 'application/json', // Indicamos que enviamos JSON
-      },
-      body: JSON.stringify(data) // Enviamos los datos en el cuerpo de la solicitud
-    })
-    .then((res) => {
-      // Extraemos el nombre del archivo del header 'Content-Disposition'
-      const disposition = res.headers.get('Content-Disposition');
-      let filename = `report_${data['MUNICIPALITY']}.pdf`; // Nombre por defecto
-  
-      if (disposition && disposition.includes('filename')) {
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = filenameRegex.exec(disposition);
-        if (matches != null && matches[1]) { 
-          filename = matches[1].replace(/['"]/g, ''); // Limpiamos las comillas
-        }
-      }
-  
-      return res.blob().then(blob => {
+      fetch(url, {
+        method: 'POST', // Usamos el método POST
+        headers: {
+          'Content-Type': 'application/json', // Indicamos que enviamos JSON
+        },
+        body: JSON.stringify(data) // Enviamos los datos en el cuerpo de la solicitud
+      })
+        .then((res) => {
+          // Extraemos el nombre del archivo del header 'Content-Disposition'
+          const disposition = res.headers.get('Content-Disposition');
+          let filename = `report_${data['MUNICIPALITY']}.pdf`; // Nombre por defecto
+
+          if (disposition && disposition.includes('filename')) {
+            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            const matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) {
+              filename = matches[1].replace(/['"]/g, ''); // Limpiamos las comillas
+            }
+          }
+
+          return res.blob().then(blob => {
 
 
 
 
 
-        const url = window.URL.createObjectURL(blob); // Creamos el objeto URL temporal
+            const url = window.URL.createObjectURL(blob); // Creamos el objeto URL temporal
 
-        // const newTab = window.open(url, '_blank'); // si se quisiera mostrar el archivo en una nueva pestaña
-  
-        // Simulamos un clic para permitir la descarga con el nombre correcto
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename; // Asignamos el nombre correcto al archivo
-        document.body.appendChild(a); // Añadimos el enlace al DOM
-        a.click(); // Simulamos el clic para que se pueda descargar con el nombre correcto
-        a.remove(); // Removemos el enlace después del clic
-  
-        // Liberamos el objeto URL después de un tiempo
-        // newTab.onload = () => window.URL.revokeObjectURL(url);
-  
-      });
-    })
-    .catch(error => {
-      console.error('Error:', error); // Manejamos errores
-    })
-    ,
-    {
-      loading: 'Generating report, please wait...',
-      success: <b>Report generated. Downloading...</b>,
-      error: <b>Could not generate the report, please try again.</b>,
-    })
+            // const newTab = window.open(url, '_blank'); // si se quisiera mostrar el archivo en una nueva pestaña
+
+            // Simulamos un clic para permitir la descarga con el nombre correcto
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename; // Asignamos el nombre correcto al archivo
+            document.body.appendChild(a); // Añadimos el enlace al DOM
+            a.click(); // Simulamos el clic para que se pueda descargar con el nombre correcto
+            a.remove(); // Removemos el enlace después del clic
+
+            // Liberamos el objeto URL después de un tiempo
+            // newTab.onload = () => window.URL.revokeObjectURL(url);
+
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error); // Manejamos errores
+        })
+      ,
+      {
+        loading: 'Generating report, please wait...',
+        success: <b>Report generated. Downloading...</b>,
+        error: <b>Could not generate the report, please try again.</b>,
+      })
   };
 
 
@@ -320,12 +321,12 @@ function App() {
           {areMapBuildingsVisible && <GradientColorBar minValue={colorData.minValue} maxValue={colorData.maxValue} />}
           <DrawingToggleButton isDrawingEnabled={isDrawingEnabled} onChange={handleDrawingToggleButtonChange} />
           <MultiSelect
-            id = "buildingTypesSelector"
+            id="buildingTypesSelector"
             value={selectedBuildingTypes}
             onChange={(e) => setSelectedBuildingTypes(e.value)}
-            options={buildingTypes.map(type => ({ 
-              label: type, 
-              value: type 
+            options={buildingTypes.map(type => ({
+              label: type,
+              value: type
             }))}
             optionLabel="label"
             placeholder="Building type filter"
@@ -335,7 +336,7 @@ function App() {
         </>}
         {isPolygonDrawn && <CancellSelectionButton onClick={restoreBuildingsAndRemovePolygon} />}
       </OlMap>
-        <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
+      <DTable data={tableData.buildings} onRowClicked={handleRowClick} />
       <Toaster
         toastOptions={{
           style: {
