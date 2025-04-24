@@ -38,68 +38,83 @@ def _get_data(municipality):
         return None
 
 
-def _from_data(municipality):
+def _from_data(municipality, fields_dict):
     global data
 
-    if data is None:
-        data_df = _get_data(municipality)
-        data = data_df
-        return data_df
+    if fields_dict['isAreaSelected']:
+        return pd.json_normalize(fields_dict['selectedBuildings'])
     else:
-        return data
+        if data is None:
+            data_df = _get_data(municipality)
+            data = data_df
+            return data_df
+        else:
+            return data
+
+def compute_MUNICIPALITY(args):
+    return args[0]
+
+def compute_MUNICIPALITY_TITLE(args):
+    return args[0].upper()
 
 
 def compute_PCT_1(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     log.info(f"total: {total}")
-    percentage = len(df[df['currentUse'] == 'residential']) / total * 100
+    percentage = len(df[df['currentUse_normalized'].str.strip().str.lower() == 'residential']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_2(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'] == 'industrial']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'industrial']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_3(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'] == 'agriculture']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'agriculture']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_4(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    pct_industrial = len(df[df['currentUse'].isin(['industrial', 'agriculture'])]) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    pct_industrial = len(df[df['currentUse_normalized'].isin(['industrial', 'agriculture'])]) / total * 100
     
     return f"{pct_industrial:.2f}"
 
 
 def compute_PCT_5(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'].isin(['retail', 'office'])]) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'].isin(['retail', 'office'])]) / total * 100
     return f"{percentage:.2f}"
 
 
 
 def compute_PCT_6(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'] == 'publicServices']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'publicServices']) / total * 100
     return f"{percentage:.2f}"
 
 
@@ -109,16 +124,17 @@ def compute_PARAMETRO_3(_):
 
 
 def compute_NUM_BUILDINGS(args):
-    log.info(f'args: {args}')
-    municipality = args[0]
+    # log.info(f'args: {args}')
+    # municipality = args[0]
     # data = _from_data(municipality)
-    data = _get_data(f'{municipality}&filtered=false')
-    return len(data)
+    # data = _get_data(f'{municipality}&filtered=false')
+    # return len(data)
+    return args[2]['NUM_BUILDINGS']
 
 
 def compute_SURFACE(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
     total = data['AREA'].sum() / 1_000_000  # pasar a km2
     return f"{total:.2f}"
 
@@ -200,7 +216,7 @@ def compute_N_PARCELAS_NO_ADECUADAS(args):
 
 def compute_N_PARCELAS_ADECUADAS(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
 
     value = len(data[data.MEAN > 0])
     log.info(f'value: {value}')
@@ -209,7 +225,7 @@ def compute_N_PARCELAS_ADECUADAS(args):
 
 def compute_TOTAL_PANELES(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
 
     value = np.sum(data['panels'])
     log.info(f'value: {value}')
@@ -226,7 +242,7 @@ def compute_PCT_7(args):
 
 def compute_PLOT_APPROPIATE_ROOF_AREA(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
 
     df_grouped = df.groupby('currentUse').agg(
         area_total=('AREA', 'sum'),
@@ -255,7 +271,7 @@ def compute_PLOT_APPROPIATE_ROOF_AREA(args):
 
 def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
     
     data = []
     area_ranges = [(0, 100), (100, 300), (300, 800), (800, float('inf'))]
@@ -298,7 +314,7 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
 
 def compute_RADIACION_SOLAR(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
 
     mean_value = data['MEAN'].mean()
     return f"{mean_value:.2f}"
@@ -306,11 +322,12 @@ def compute_RADIACION_SOLAR(args):
 
 def compute_SORTING_CRITERIA_LIST(args):
     front_args = args[2]
-    criterios = front_args.get("sortingCriteria", {})
-    claves_ordenadas = sorted(criterios.keys(), key=lambda clave: criterios[clave])
+    criterios = front_args.get("SORTING_CRITERIA_LIST", {})
+    # claves_ordenadas = sorted(criterios.keys(), key=lambda clave: criterios[clave])
     # Start Generation Here
-    log.debug(f"claves_ordenadas: {claves_ordenadas}")
+    # log.debug(f"claves_ordenadas: {claves_ordenadas}")
 
-    lineas = [f"{idx}.\t{clave}" for idx, clave in enumerate(claves_ordenadas, start=1)]
+    # lineas = [f"{idx}.\t{clave}" for idx, clave in enumerate(claves_ordenadas, start=1)]
 
-    return '\n'.join(lineas)
+    # return '\n'.join(lineas)
+    return criterios

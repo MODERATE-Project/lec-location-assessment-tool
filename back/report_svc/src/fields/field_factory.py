@@ -13,9 +13,9 @@ class FieldFactory:
 
         # Mergea el YAML con el dict de entrada, prefiriendo valores no nulos
         # full_field_dict = field_dict | yaml_data
-
+        
         for name, value in yaml_data.items():
-            if value is not None:
+            if not field_dict['isAreaSelected'] and value is not None:
                 field = StaticField(name, value)
 
             else:

@@ -235,6 +235,10 @@ function App() {
       'isAreaSelected': isPolygonDrawn
     };
 
+    if (isPolygonDrawn){
+      data.selectedBuildings = tableData.buildings
+    }
+
     toast.promise(
       fetch(url, {
         method: 'POST', // Usamos el método POST
@@ -281,6 +285,7 @@ function App() {
         })
         .catch(error => {
           console.error('Error:', error); // Manejamos errores
+          throw error
         })
       ,
       {
