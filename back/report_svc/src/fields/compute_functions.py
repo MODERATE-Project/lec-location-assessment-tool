@@ -135,8 +135,19 @@ def compute_NUM_BUILDINGS(args):
 def compute_SURFACE(args):
     municipality = args[0]
     data = _from_data(municipality, args[2])
-    total = data['AREA'].sum() / 1_000_000  # pasar a km2
-    return f"{total:.2f}"
+    
+    total = data['AREA'].sum() / 1_000_000
+
+    if total == 0:
+        return "0.00"
+    max_decimales = 10
+    for decimales in range(2, max_decimales + 1):
+        formato = f".{decimales}f"
+        valor = format(total, formato)
+        partes = valor.split(".")
+        if partes[1] != "0" * decimales:
+            return valor
+    return format(total, ".2f")
 
 
 def compute_IMG_PARCELAS(args):
@@ -154,7 +165,7 @@ def compute_PLOT(args):
         else [compute_PCT_1(args), compute_PCT_4(args), compute_PCT_5(args), compute_PCT_6(args)]
 
     log.info(f'percentages: {percentages}')
-    labels = ['Residencial', 'Industrial', 'Comercial', 'Servicios Públicos']
+    labels = ['Residencial', 'Industrial', 'Comercial', 'Public services']
     colors = ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000']
 
     # Configurar el estilo de seaborn
@@ -285,7 +296,7 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
             data.append({'currentUse': use_type, 'Area Range': label, 'Percentage': percentage})
     df_plot = pd.DataFrame(data)
 
-    fig, ax = plt.subplots(figsize=(10, 8)) 
+    fig, ax = plt.subplots(figsize=(15, 10)) 
     sns.barplot(data=df_plot, x='Area Range', y='Percentage', hue='currentUse', ax=ax)
 
     ax.set_xlabel(None)
@@ -319,6 +330,20 @@ def compute_RADIACION_SOLAR(args):
     mean_value = data['MEAN'].mean()
     return f"{mean_value:.2f}"
 
+def compute_MIN_MEDIA_RS(args):
+    municipality = args[0]
+    data = _from_data(municipality, args[2])
+
+    mean_value = data['MEAN'].min()
+    return f"{mean_value:.2f}"
+
+def compute_MAX_MEDIA_RS(args):
+    municipality = args[0]
+    data = _from_data(municipality, args[2])
+
+    mean_value = data['MEAN'].max()
+    return f"{mean_value:.2f}"
+
 
 def compute_SORTING_CRITERIA_LIST(args):
     front_args = args[2]
@@ -331,3 +356,92 @@ def compute_SORTING_CRITERIA_LIST(args):
 
     # return '\n'.join(lineas)
     return criterios
+
+def compute_TOTAL_PANELES(args):
+    municipality = args[0]
+    front_args = args[2]
+    data = _from_data(municipality, front_args)
+
+    return str(data['panels'].sum())
+
+
+def compute_BUILDINGS_TABLE(args):
+    municipality = args[0]
+    front_args = args[2]
+    df = _from_data(municipality, front_args).head(n=10)
+
+    # Seleccionar y renombrar las columnas que queremos mostrar
+    df_display = df[["reference", "currentUse", "AREA", "MEAN", "production", "Porcentaje_poblacion", "Renta_media"]].copy()
+    
+    # Traducir los tipos de uso al español
+    # uso_map = {
+    #     'residential': 'Residential',
+    #     'industrial': 'Industrial',
+    #     'publicServices': 'Public services',
+    #     'retail': 'Retail',
+    #     'agriculture': 'Agriculture',
+    #     'office': 'Office'
+    # }
+    # df_display['currentUse'] = df_display['currentUse'].str.lower().map(uso_map)
+
+    # Formatear los números
+    col_numeric = ['AREA', 'MEAN', 'production', 'Renta_media']
+    df_display[col_numeric] = df_display[col_numeric].round(2)
+    
+    # Renombrar las columnas para mejor presentación
+    df_display.columns = "CADASTRAL ID", "Current Use", "SUITABLE AREA (m2)", "Mean Solar Radiation (kWh/m²/year)", "Energy Production Potential (MWh/year)", "Population density percentage", "Average Income (€)"
+
+
+    # Crear la estructura de la tabla
+    table_data = {
+        'table': {
+            'headers': df_display.columns.tolist(),
+            'rows': df_display.values.tolist()
+        }
+    }
+
+    return table_data
+
+
+def compute_PLOT_DISTRIB_MEAN_SOLAR(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+
+    mean_value = df['MEAN'].mean()
+
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Histograma
+    sns.histplot(df['MEAN'], kde=False, bins=50, color='skyblue', ax=ax)
+
+    # Línea vertical en la media
+    ax.axvline(mean_value, color='blue', linewidth=2)
+
+    # Etiquetas y título
+    ax.set_title("Distribución de la radiación solar media", fontsize=14)
+    ax.set_xlabel(None)
+    ax.set_ylabel("Recuento")
+
+    # Mejorar layout
+    plt.tight_layout()
+
+    # Guardar imagen
+    image_path = f"{municipality}_PLOT_DISTRIB_MEAN_SOLAR.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+    plt.close()
+
+    return image_path
+
+def compute_POTENCIAL_PRODUCCION(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    total = df['production'].sum()
+    return f"{total:.2f}"
+    
+
+def compute_CAPACIDAD(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    total = df['capacity_MWp'].sum()
+    return f"{total:.2f}"

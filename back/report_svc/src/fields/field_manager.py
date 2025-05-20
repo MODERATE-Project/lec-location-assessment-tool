@@ -33,7 +33,11 @@ def load_functions_from_module(module_name):
 
 def get_yaml_parameters(name, base_dir):
     yaml_filename = os.path.join(base_dir, f'parameters_{name}.yaml')
-    return load_yaml(yaml_filename)
+    load = load_yaml(yaml_filename)
+    if load is None:
+        yaml_filename = os.path.join(base_dir, f'parameters_{name.lower()}.yaml')
+        load = load_yaml(yaml_filename)
+    return load
 
 
 def compute_all(fields):
