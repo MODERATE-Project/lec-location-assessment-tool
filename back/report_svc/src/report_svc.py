@@ -99,7 +99,7 @@ def build_table_from_dict(table_dict):
     # Filas alternas
     for row_idx, row in enumerate(rows):
         row_cells = table.add_row().cells
-        bg_color = "FFFFFF" if row_idx % 2 == 0 else "f2f2f2"
+        bg_color = "f2f2f2" if row_idx % 2 == 0 else "FFFFFF"
 
         for i, val in enumerate(row):
             cell = row_cells[i]
