@@ -291,7 +291,7 @@ def get_report():
         files = {'document': file}
 
         # Realiza la solicitud POST al contenedor 'docx-to-pdf'
-        response = requests.post("http://docx-to-pdf-prod:8080/pdf", files=files)
+        response = requests.post("http://docx-to-pdf:8080/pdf", files=files)
 
         if response.ok:
 
