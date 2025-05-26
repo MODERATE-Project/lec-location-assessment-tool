@@ -199,7 +199,7 @@ def replace_text_in_paragraphs(paragraphs, data):
                     try:
                         with open(os.path.join(BASE_DIR, value), 'rb') as image_stream:
                             run.add_picture(image_stream, width=Inches(5.0))
-                    except FileNotFoundError | TypeError:
+                    except (FileNotFoundError, TypeError):
                         print(f"Error: No se pudo encontrar el archivo de imagen {value}")
 
                 else:
