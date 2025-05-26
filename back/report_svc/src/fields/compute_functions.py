@@ -460,7 +460,7 @@ def compute_PLOT_RADIACION_POR_USO(args):
     df['currentUse_normalized'] = df['currentUse_normalized'].replace('publicservices', 'public services')
     df_grouped = df.groupby('currentUse_normalized')['MEAN'].mean()
 
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(10, 7))
     df_grouped.plot(kind='bar', color='royalblue')
 
     # Añadir título y etiquetas
