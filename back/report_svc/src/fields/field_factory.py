@@ -15,7 +15,7 @@ class FieldFactory:
         # full_field_dict = field_dict | yaml_data
         
         for name, value in yaml_data.items():
-            if not field_dict['isAreaSelected'] and value is not None:
+            if not field_dict['isAreaSelected'] and value is not None and not name.startswith("PLOT"):
                 field = StaticField(name, value)
 
             else:

@@ -61,7 +61,7 @@ def compute_MUNICIPALITY_TITLE(args):
 def compute_PCT_1(args):
     municipality = args[0]
     df = _from_data(municipality, args[2])
-    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
     total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     log.info(f"total: {total}")
@@ -71,27 +71,27 @@ def compute_PCT_1(args):
 def compute_PCT_2(args):
     municipality = args[0]
     df = _from_data(municipality, args[2])
-    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     percentage = len(df[df['currentUse_normalized'] == 'industrial']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_3(args):
     municipality = args[0]
     df = _from_data(municipality, args[2])
-    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     percentage = len(df[df['currentUse_normalized'] == 'agriculture']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_4(args):
     municipality = args[0]
     df = _from_data(municipality, args[2])
-    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     pct_industrial = len(df[df['currentUse_normalized'].isin(['industrial', 'agriculture'])]) / total * 100
     
     return f"{pct_industrial:.2f}"
@@ -100,9 +100,9 @@ def compute_PCT_4(args):
 def compute_PCT_5(args):
     municipality = args[0]
     df = _from_data(municipality, args[2])
-    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     percentage = len(df[df['currentUse_normalized'].isin(['retail', 'office'])]) / total * 100
     return f"{percentage:.2f}"
 
@@ -111,10 +111,10 @@ def compute_PCT_5(args):
 def compute_PCT_6(args):
     municipality = args[0]
     df = _from_data(municipality, args[2])
-    df['currentUse_normalized'] = df['currentUse'].str.strip().str.lower()
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse_normalized'] == 'publicServices']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'publicservices']) / total * 100
     return f"{percentage:.2f}"
 
 
@@ -175,7 +175,7 @@ def compute_PLOT(args):
     fig = plt.figure(figsize=(10, 8))
 
     # Create pie chart
-    plt.pie(percentages, 
+    plt.pie(percentages,
             labels=labels,
             colors=colors,
             autopct='%1.0f%%',
@@ -259,7 +259,7 @@ def compute_PLOT_APPROPIATE_ROOF_AREA(args):
         area_total=('AREA', 'sum'),
     ).reset_index().sort_values(by='area_total', ascending=False)
 
-    df_grouped['currentUse'] = df_grouped['currentUse'].replace('publicServices', 'public services')
+    df_grouped['currentUse'] = df_grouped['currentUse'].replace('public Services', 'public services')
 
     plt.subplots(figsize=(10, 7))
     ax = sns.barplot(df_grouped, x='currentUse', y='area_total', hue='currentUse')
@@ -445,3 +445,40 @@ def compute_CAPACIDAD(args):
     df = _from_data(municipality, args[2])
     total = df['capacity_MWp'].sum()
     return f"{total:.2f}"
+
+
+def compute_PLOT_RADIACION_POR_USO(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
+
+    # df_grouped = df.groupby('currentUse_normalized').agg(
+    #     mean_radiation=('MEAN', 'mean'),
+    #     total_area=('AREA', 'sum')
+    # ).reset_index()
+
+    grouped = df.groupby('currentUse')['MEAN'].mean()
+
+    plt.figure(figsize=(8, 5))
+    grouped.plot(kind='bar', color='royalblue')
+
+    # Añadir título y etiquetas
+    plt.title('Radiación solar según uso de parcelas', fontsize=18)
+    plt.ylabel('Radiación solar media')
+    plt.xlabel('')
+    plt.xticks(rotation=0)
+    plt.ylim(1100, 1160)
+
+    plt.tight_layout()
+
+    # Guardar imagen
+    image_path = f"{municipality}_PLOT_RADIACION_POR_USO.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+    plt.close()
+
+    return image_path
+
+
+
+def compute_PLOT_POTENCIAL_POR_USO(args):
+    pass

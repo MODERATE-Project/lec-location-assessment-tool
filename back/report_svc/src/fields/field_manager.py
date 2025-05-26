@@ -59,9 +59,9 @@ def get_and_compute_as_needed(municipality, field_dict, base_dir="../data"):
     fields = FieldFactory.create_from_dict(field_dict, yaml_data, compute_map)
 
     for field in fields:
-        log.info(f'Municipality: {municipality}')
+        log.info(f'Municipality: {municipality} - checking field: {field.name}')
         field.compute(municipality, yaml_data, field_dict) # NOTE: here is where we include data required by the compute functions
-        if field.name in yaml_data:
+        if field.name in yaml_data:# and "TABLE" not in field.name:
             yaml_data[field.name] = field.value
 
     if not field_dict['isAreaSelected']:
