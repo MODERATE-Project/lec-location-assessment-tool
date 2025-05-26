@@ -199,7 +199,7 @@ def replace_text_in_paragraphs(paragraphs, data):
                     try:
                         with open(os.path.join(BASE_DIR, value), 'rb') as image_stream:
                             run.add_picture(image_stream, width=Inches(5.0))
-                    except FileNotFoundError:
+                    except FileNotFoundError | TypeError:
                         print(f"Error: No se pudo encontrar el archivo de imagen {value}")
 
                 else:
@@ -291,7 +291,7 @@ def get_report():
         files = {'document': file}
 
         # Realiza la solicitud POST al contenedor 'docx-to-pdf'
-        response = requests.post("http://docx-to-pdf:8080/pdf", files=files)
+        response = requests.post("http://docx-to-pdf-prod:8080/pdf", files=files)
 
         if response.ok:
 
