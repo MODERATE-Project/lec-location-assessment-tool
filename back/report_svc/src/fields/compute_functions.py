@@ -460,14 +460,14 @@ def compute_PLOT_RADIACION_POR_USO(args):
     df['currentUse_normalized'] = df['currentUse_normalized'].replace('publicservices', 'public services')
     df_grouped = df.groupby('currentUse_normalized')['MEAN'].mean()
 
-    plt.figure(figsize=(8, 7))
+    plt.figure(figsize=(10, 5))
     df_grouped.plot(kind='bar', color='royalblue')
 
     # Añadir título y etiquetas
     plt.title('Radiación solar según uso de parcelas', fontsize=18)
-    plt.ylabel('Radiación solar media')
+    plt.ylabel('Radiación solar media', fontsize=18)
     plt.xlabel('')
-    plt.xticks(rotation=45, ha='right')
+    plt.xticks(rotation=45, ha='right', fontsize=18)
 
 
     plt.tight_layout()
