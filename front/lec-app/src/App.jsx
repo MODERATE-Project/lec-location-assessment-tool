@@ -95,6 +95,9 @@ function App() {
         .then((data) => {
           if (data.buildings) {
             console.log('Fetching sorted: data:', data)
+            data.buildings.map(b => {
+              b.currentUse = capitalizeCamel(b.currentUse);
+            })
             setTableData(data); // Guarda los datos en el estado local
             setInitialTableData(data)
           }
