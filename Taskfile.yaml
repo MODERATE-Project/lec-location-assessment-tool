@@ -26,7 +26,7 @@ tasks:
     - docker compose -f ${PWD}/docker-compose.prod.yaml up -d --remove-orphans
 
   logs:
-    - docker compose -f ${PWD}/docker-compose.prod.yaml logs -f app municipalities_service buildings_service report_service
+    - docker compose -f ${PWD}/docker-compose.prod.yaml logs -f {{.CLI_ARGS}}
 
   stop-dev:
     - docker compose -f ${PWD}/docker-compose.dev.yaml down

@@ -14,8 +14,11 @@ import { createGradientFunction } from "./services/gradient";
 import ExportPanel from './components/UI/ExportPanel/ExportPanel';
 import { MultiSelect } from 'primereact/multiselect';
 import 'primereact/resources/themes/fluent-light/theme.css';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './components/UI/LanguageSelector/LanguageSelector';
 
 function App() {
+  const { t } = useTranslation();
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [initialTableData, setInitialTableData] = useState([]);
@@ -315,10 +318,11 @@ function App() {
         getColor={colorData.getColor}
         setMapBuildingsVisible={setMapBuildingsVisible}
       >
+        <LanguageSelector />
         <SearchBox onLocationSelected={handleMunicipioSelected} location={selectedLocation} />
         {tableData.buildings?.length > 0 && !selectedBuilding &&
           <div className="buildings-alert">
-            <p>Click on table rows or zoom in to see and interact with the buildings</p>
+            <p>{t("Click on table rows or zoom in to see and interact with the buildings")}</p>
           </div>}
         {tableData.buildings?.length > 0 && <>
           <ExportPanel exportFileProcedure={generateReportProcedure} />
@@ -330,11 +334,11 @@ function App() {
             value={selectedBuildingTypes}
             onChange={(e) => setSelectedBuildingTypes(e.value)}
             options={buildingTypes.map(type => ({
-              label: type,
+              label: t(type),
               value: type
             }))}
             optionLabel="label"
-            placeholder="Building type filter"
+            placeholder={t("Filter by building type")}
             className="w-full md:w-20rem"
           />
 

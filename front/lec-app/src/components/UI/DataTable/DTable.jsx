@@ -1,5 +1,6 @@
 import DataTable from "react-data-table-component";
 import { capitalizeCamel } from "../../../constants"
+import { useTranslation } from 'react-i18next';
 
 const customStyles = {
 
@@ -35,23 +36,24 @@ const customStyles = {
 };
 
 const DTable = ({ data, onRowClicked }) => {
+  const { t } = useTranslation();
 
   const columns = [
     {
-      name: "Current use",
+      name: t("Current use"),
       selector: (row) => row.currentUse,
       sortable: true,
 
     },
     {
-      name: "Production [MWh per year]",
+      name: t("Production [MWh per year]"),
       selector: (row) => parseFloat(row.production),
       cell: (row) => parseFloat(row.production).toFixed(5),
       sortable: true,
       
     },
     {
-      name: "Potential [kWh/m² per year]",
+      name: t("Potential [kWh/m² per year]"),
       selector: (row) => parseFloat(row.MEAN),
       cell: (row) => parseFloat(row.MEAN).toFixed(5),
       sortable: true,
@@ -64,62 +66,62 @@ const DTable = ({ data, onRowClicked }) => {
 
     // },
     {
-      name: "Panels",
+      name: t("Panels"),
       selector: (row) => parseInt(row.panels),
       cell: (row) => row.panels,
       sortable: true,
 
     },
     {
-      name: "Area [m²]",
+      name: t("Area [m²]"),
       selector: (row) => row.AREA,
       sortable: true,
 
     },
     {
-      name: "Average Income",
+      name: t("Average Income"),
       selector: (row) => row.Renta_media,
       sortable: true,
 
     },
     {
-      name: "Total Population",
+      name: t("Total Population"),
       selector: (row) => row.Total_poblacion,
       sortable: true,
 
     },
     {
-      name: "% Population",
+      name: t("% Population"),
       selector: (row) => row.Porcentaje_poblacion,
       sortable: true,
 
     },
     {
-      name: "% Single-Person Households",
+      name: t("% Single-Person Households"),
       selector: (row) => row.Porcentaje_Hogares_unipersonales,
       sortable: true,
 
     },
     {
-      name: "% Greater than 65",
+      name: t("% Greater than 65"),
       selector: (row) => row.Porcentaje_mayor_65,
       sortable: true,
 
     },
     {
-      name: "% less than 18",
+      name: t("% less than 18"),
       selector: (row) => row.Porcentaje_menor_18,
       sortable: true,
 
     },
     {
-      name: "Average Household Size",
+      name: t("Average Household Size"),
       selector: (row) => row.Tamaño_medio_hogar,
       sortable: true,
 
     },
     {
-      name: "Average age",
+      name: t("Average age"),
       selector: (row) => row.Total_edad_media,
       sortable: true,
 
@@ -139,6 +141,7 @@ const DTable = ({ data, onRowClicked }) => {
       resizableColumns
       showGridlines
       onRowClicked={onRowClicked}
+      noDataComponent={t("There are no records to display")}
     />
   );
 };

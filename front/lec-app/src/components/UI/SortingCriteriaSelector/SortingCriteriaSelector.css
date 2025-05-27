@@ -26,14 +26,14 @@
   user-select: none;
   /* flex-wrap: wrap; */
   flex-wrap: nowrap;
-  max-width: 400rem;
+  /* max-width: 400rem; */
 }
 
 .sorting-criteria-container p {
   margin: 0;
   /* border-bottom: 1px solid #ccc; */
   font-style: italic;
-  max-width: 430px;
+  max-width: 480px;
 
 }
 

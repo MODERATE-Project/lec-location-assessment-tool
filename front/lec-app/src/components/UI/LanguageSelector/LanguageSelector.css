@@ -1,0 +1,28 @@
+.language-selector {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 5px;
+}
+
+.lang-btn {
+  padding: 5px 10px;
+  border: 1px solid #003b49;
+  background-color: white;
+  color: #003b49;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+  background-color: #003b49;
+  color: white;
+}
+
+.lang-btn.active {
+  background-color: #003b49;
+  color: white;
+} 

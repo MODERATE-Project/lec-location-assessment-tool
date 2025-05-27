@@ -3,8 +3,10 @@ import Select, { createFilter } from "react-select";
 import "./SearchBox.css";
 import CustomMenuList from "./CustomMenuList";
 import { VITE_MUNICIPALITIES_API_URL } from '../../../constants.js'
+import { useTranslation } from 'react-i18next';
 
 const SearchBox = ({ onLocationSelected, location }) => {
+  const { t } = useTranslation();
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState();
 
@@ -50,7 +52,7 @@ const SearchBox = ({ onLocationSelected, location }) => {
         value={selectedOption}
         filterOption={createFilter({ ignoreAccents: true })}
         options={options}
-        placeholder="Select a municipality"
+        placeholder={t("Select a municipality")}
         onChange={(selectedOption) =>
           handleLocationSelected(selectedOption.value)
         }

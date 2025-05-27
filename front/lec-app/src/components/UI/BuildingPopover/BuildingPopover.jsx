@@ -2,8 +2,11 @@ import React from 'react';
 import './BuildingPopover.css';
 import { FaBuilding, FaBolt, FaSolarPanel, FaClipboard, FaMapMarkerAlt, FaLink, FaIdCard } from 'react-icons/fa';
 import { capitalizeCamel } from '../../../constants';
+import { useTranslation } from 'react-i18next';
 
 const BuildingPopover = ({ building, position, onClose, color }) => {
+  const { t } = useTranslation();
+  
   if (!building) return null;
 
   const colorUsable = color.luminance() < 0.8?color:color.darker()
@@ -11,43 +14,43 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
   return (
     <div className="popover" style={position ? { left: position[0], top: position[1], zIndex: 999 } : { }}>
       {!position && <div className="popover-title" style={color?{background:color, color: color.luminance() > 0.5? '#000000' : '#ffffff' }:{}}>
-        <h3><FaBuilding /> Selected Building</h3>
+        <h3><FaBuilding /> {t("Selected Building")}</h3>
         <button className="close-btn no-print" onClick={onClose}>&times;</button>
       </div>}
       <div className="popover-content">
         <div className="info-grid" style={color?{color:colorUsable}:{}}>
           <div className="info-item">
             <FaMapMarkerAlt />
-            <span>Area</span>
+            <span>{t("Area")}</span>
             <strong>{building.AREA.toFixed(2)}</strong> 
             <span>m²</span>
           </div>
           <div className="info-item">
             <FaBolt />
-            <span>Potential</span>
+            <span>{t("Potential")}</span>
             <strong>{building.MEAN.toFixed(2)}</strong>
-            <span>kWh/m² per year</span>
+            <span>{t("kWh/m² per year")}</span>
           </div>
           <div className="info-item">
             <FaSolarPanel />
-            <span>Total Production</span>
+            <span>{t("Total Production")}</span>
             <strong>{building.production.toFixed(2)}</strong>
-            <span>MWh per year</span>
+            <span>{t("MWh per year")}</span>
           </div>
           <div className="info-item">
             <FaSolarPanel />
-            <span>Number of Panels</span>
+            <span>{t("Number of Panels")}</span>
             <strong>{building.panels.toFixed(2)}</strong>
-            <span>units</span>
+            <span>{t("units")}</span>
           </div>
           <div className="info-item">
             <FaClipboard />
-            <span>Current Use</span>
+            <span>{t("Current Use")}</span>
             <strong>{building.currentUse}</strong>
           </div>
           <div className="info-item">
             <FaIdCard />
-            <span>Cadastral Reference</span>
+            <span>{t("Cadastral Reference")}</span>
             <strong style={{wordBreak: 'break-all'}}>{building.reference}</strong>
           </div>
           {/* <div className="info-item">
@@ -59,7 +62,7 @@ const BuildingPopover = ({ building, position, onClose, color }) => {
       </div>
       <div className="popover-footer no-print">
         <a href={building.informatio} target="_blank" rel="noopener noreferrer" className="cadastre-link" style={{color:colorUsable}}>
-          <FaLink /> View Cadastre
+          <FaLink /> {t("View Cadastre")}
         </a>
       </div>
     </div>
