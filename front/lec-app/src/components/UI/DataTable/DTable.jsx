@@ -41,7 +41,7 @@ const DTable = ({ data, onRowClicked }) => {
   const columns = [
     {
       name: t("Current use"),
-      selector: (row) => row.currentUse,
+      selector: (row) => t(row.currentUse),
       sortable: true,
 
     },
