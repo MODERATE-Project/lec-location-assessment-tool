@@ -129,7 +129,15 @@ def compute_NUM_BUILDINGS(args):
     # data = _from_data(municipality)
     # data = _get_data(f'{municipality}&filtered=false')
     # return len(data)
-    return args[2]['NUM_BUILDINGS']
+    # return args[2]['NUM_BUILDINGS']
+    municipality = args[0]
+    data = _get_data(f'{municipality}&filtered=false')
+
+    value = len(data)
+    log.info(f'value: {value}')
+    return int(value)
+
+
 
 
 def compute_SURFACE(args):
@@ -248,7 +256,7 @@ def compute_PCT_7(args):
     total = float(args[1]['NUM_BUILDINGS']) if 'NUM_BUILDINGS' in args[1] else compute_NUM_BUILDINGS(args)
     adecuadas = float(args[1]['N_PARCELAS_ADECUADAS']) if 'N_PARCELAS_ADECUADAS' in args[1] else compute_N_PARCELAS_ADECUADAS(args)
         
-    return "{:.2f}".format(adecuadas/total)
+    return "{:.2f}".format(adecuadas/total * 100)
 
 
 def compute_PLOT_APPROPIATE_ROOF_AREA(args):

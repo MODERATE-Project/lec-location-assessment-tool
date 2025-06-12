@@ -236,7 +236,7 @@ function App() {
     const data = {
       'MUNICIPALITY_TITLE': selectedLocation.toUpperCase(),
       'MUNICIPALITY': selectedLocation,
-      'NUM_BUILDINGS': tableData.buildings.length.toString(),
+      // 'NUM_BUILDINGS': tableData.buildings.length.toString(),
       'SORTING_CRITERIA_LIST': currentSortingWeights,
       'isAreaSelected': isPolygonDrawn
     };
