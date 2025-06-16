@@ -381,24 +381,16 @@ def compute_BUILDINGS_TABLE(args):
     # Seleccionar y renombrar las columnas que queremos mostrar
     df_display = df[["reference", "currentUse", "AREA", "MEAN", "production", "Porcentaje_poblacion", "Renta_media"]].copy()
     
-    # Traducir los tipos de uso al español
-    # uso_map = {
-    #     'residential': 'Residential',
-    #     'industrial': 'Industrial',
-    #     'publicServices': 'Public services',
-    #     'retail': 'Retail',
-    #     'agriculture': 'Agriculture',
-    #     'office': 'Office'
-    # }
-    # df_display['currentUse'] = df_display['currentUse'].str.lower().map(uso_map)
-
     # Formatear los números
     col_numeric = ['AREA', 'MEAN', 'production', 'Renta_media']
-    df_display[col_numeric] = df_display[col_numeric].round(2)
+    for col in col_numeric:
+        if col == 'Renta_media':
+            df_display[col] = df_display[col].apply(lambda x: f"{float(x) * 1000:,.2f}".rstrip('0').rstrip('.').replace(',', ' '))
+        else:
+            df_display[col] = df_display[col].apply(lambda x: f"{float(x):,.2f}".rstrip('0').rstrip('.').replace(',', ' '))
     
     # Renombrar las columnas para mejor presentación
-    df_display.columns = "CADASTRAL ID", "Current Use", "SUITABLE AREA (m2)", "Mean Solar Radiation (kWh/m²/year)", "Energy Production Potential (MWh/year)", "Population density percentage", "Average Income (€)"
-
+    df_display.columns = "CADASTRAL ID", "Current Use", "SUITABLE AREA (m2)", "Mean Solar Radiation (kWh/m²/year)", "Energy Production Potential (MWh/year)", "Population density percentage", "Net per capita income (€)"
 
     # Crear la estructura de la tabla
     table_data = {
