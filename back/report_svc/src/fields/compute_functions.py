@@ -42,14 +42,20 @@ def _from_data(municipality, fields_dict):
     global data
 
     if fields_dict['isAreaSelected']:
-        return pd.json_normalize(fields_dict['selectedBuildings'])
+        df = pd.json_normalize(fields_dict['selectedBuildings'])
     else:
         if data is None:
             data_df = _get_data(municipality)
             data = data_df
-            return data_df
+            df = data_df
         else:
-            return data
+            df = data
+
+    # Filtrar por tipos de edificios seleccionados si existen
+    if 'selectedBuildingTypes' in fields_dict and fields_dict['selectedBuildingTypes']:
+        df = df[df['currentUse'].isin(fields_dict['selectedBuildingTypes'])]
+
+    return df
 
 def compute_MUNICIPALITY(args):
     return args[0]
@@ -390,7 +396,7 @@ def compute_BUILDINGS_TABLE(args):
             df_display[col] = df_display[col].apply(lambda x: f"{float(x):,.2f}".rstrip('0').rstrip('.').replace(',', ' '))
     
     # Renombrar las columnas para mejor presentación
-    df_display.columns = "CADASTRAL ID", "Current Use", "SUITABLE AREA (m2)", "Mean Solar Radiation (kWh/m²/year)", "Energy Production Potential (MWh/year)", "Population density percentage", "Net per capita income (€)"
+    df_display.columns = "CADASTRAL ID", "Current Use", "SUITABLE AREA (m²)", "Mean Solar Radiation (kWh/m² per yr)", "Energy Production Potential (MWh/yr)", "Population density percentage", "Net per capita income (€)"
 
     # Crear la estructura de la tabla
     table_data = {

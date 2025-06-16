@@ -238,10 +238,10 @@ function App() {
       'MUNICIPALITY': selectedLocation,
       // 'NUM_BUILDINGS': tableData.buildings.length.toString(),
       'SORTING_CRITERIA_LIST': currentSortingWeights,
-      'isAreaSelected': isPolygonDrawn
+      'isAreaSelected': isPolygonDrawn || selectedBuildingTypes.length > 0,
     };
 
-    if (isPolygonDrawn){
+    if (isPolygonDrawn || selectedBuildingTypes.length > 0){
       data.selectedBuildings = tableData.buildings
     }
 
