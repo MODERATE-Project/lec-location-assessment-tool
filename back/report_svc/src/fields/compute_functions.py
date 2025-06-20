@@ -488,4 +488,30 @@ def compute_PLOT_RADIACION_POR_USO(args):
 
 
 def compute_PLOT_POTENCIAL_POR_USO(args):
-    pass
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
+    df['currentUse_normalized'] = df['currentUse_normalized'].replace('publicservices', 'public services')
+    df_grouped = df.groupby('currentUse_normalized')['production'].mean()
+    
+    plt.figure(figsize=(10, 7))
+    df_grouped.plot(kind='bar', color='royalblue')
+
+    # Añadir título y etiquetas
+    plt.title('Solar capacity potential', fontsize=18)
+    plt.ylabel('Potential photovoltaic capacity', fontsize=18)
+    plt.xlabel('')
+    plt.xticks(rotation=45, ha='right', fontsize=18)
+
+
+    plt.tight_layout()
+
+    # Guardar imagen
+    image_path = f"{municipality}_PLOT_POTENCIAL_POR_USO.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+    plt.close()
+
+    return image_path
+
+
+
