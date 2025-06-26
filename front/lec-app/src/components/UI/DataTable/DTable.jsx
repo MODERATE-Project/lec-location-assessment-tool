@@ -1,5 +1,6 @@
 import DataTable from "react-data-table-component";
 import { capitalizeCamel } from "../../../constants"
+import { useTranslation } from 'react-i18next';
 
 const customStyles = {
 
@@ -35,25 +36,26 @@ const customStyles = {
 };
 
 const DTable = ({ data, onRowClicked }) => {
+  const { t } = useTranslation();
 
   const columns = [
     {
-      name: "Current use",
-      selector: (row) => row.currentUse,
+      name: t("Current use"),
+      selector: (row) => t(row.currentUse),
       sortable: true,
 
     },
     {
-      name: "Production [MWh per year]",
+      name: t("Production [MWh per year]"),
       selector: (row) => parseFloat(row.production),
-      cell: (row) => parseFloat(row.production).toFixed(5),
+      cell: (row) => parseFloat(row.production).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
       
     },
     {
-      name: "Potential [kWh/m² per year]",
+      name: t("Potential [kWh/m² per year]"),
       selector: (row) => parseFloat(row.MEAN),
-      cell: (row) => parseFloat(row.MEAN).toFixed(5),
+      cell: (row) => parseFloat(row.MEAN).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
       
     },
@@ -64,63 +66,71 @@ const DTable = ({ data, onRowClicked }) => {
 
     // },
     {
-      name: "Panels",
+      name: t("Panels"),
       selector: (row) => parseInt(row.panels),
-      cell: (row) => row.panels,
+      cell: (row) => parseInt(row.panels).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 0}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "Area [m²]",
-      selector: (row) => row.AREA,
+      name: t("Area [m²]"),
+      selector: (row) => parseFloat(row.AREA),
+      cell: (row) => parseFloat(row.AREA).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "Average Income",
-      selector: (row) => row.Renta_media,
+      name: t("Average Income"),
+      selector: (row) => parseFloat(row.Renta_media) * 1000,
+      cell: (row) => (parseFloat(row.Renta_media) * 1000).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
+      sortable: true,
+    },
+    {
+      name: t("Total Population"),
+      selector: (row) => parseFloat(row.Total_poblacion),
+      cell: (row) => parseFloat(row.Total_poblacion).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "Total Population",
-      selector: (row) => row.Total_poblacion,
+      name: t("% Population"),
+      selector: (row) => parseFloat(row.Porcentaje_poblacion),
+      cell: (row) => parseFloat(row.Porcentaje_poblacion).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "% Population",
-      selector: (row) => row.Porcentaje_poblacion,
+      name: t("% Single-Person Households"),
+      selector: (row) => parseFloat(row.Porcentaje_Hogares_unipersonales),
+      cell: (row) => parseFloat(row.Porcentaje_Hogares_unipersonales).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "% Single-Person Households",
-      selector: (row) => row.Porcentaje_Hogares_unipersonales,
+      name: t("% Greater than 65"),
+      selector: (row) => parseFloat(row.Porcentaje_mayor_65),
+      cell: (row) => parseFloat(row.Porcentaje_mayor_65).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "% Greater than 65",
-      selector: (row) => row.Porcentaje_mayor_65,
+      name: t("% less than 18"),
+      selector: (row) => parseFloat(row.Porcentaje_menor_18),
+      cell: (row) => parseFloat(row.Porcentaje_menor_18).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "% less than 18",
-      selector: (row) => row.Porcentaje_menor_18,
+      name: t("Average Household Size"),
+      selector: (row) => parseFloat(row.Tamaño_medio_hogar),
+      cell: (row) => parseFloat(row.Tamaño_medio_hogar).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
     {
-      name: "Average Household Size",
-      selector: (row) => row.Tamaño_medio_hogar,
-      sortable: true,
-
-    },
-    {
-      name: "Average age",
-      selector: (row) => row.Total_edad_media,
+      name: t("Average age"),
+      selector: (row) => parseFloat(row.Total_edad_media),
+      cell: (row) => parseFloat(row.Total_edad_media).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 3}).replace(/,/g, ' '),
       sortable: true,
 
     },
@@ -139,6 +149,7 @@ const DTable = ({ data, onRowClicked }) => {
       resizableColumns
       showGridlines
       onRowClicked={onRowClicked}
+      noDataComponent={t("There are no records to display")}
     />
   );
 };

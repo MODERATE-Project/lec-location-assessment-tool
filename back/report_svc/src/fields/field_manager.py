@@ -33,28 +33,39 @@ def load_functions_from_module(module_name):
 
 def get_yaml_parameters(name, base_dir):
     yaml_filename = os.path.join(base_dir, f'parameters_{name}.yaml')
-    return load_yaml(yaml_filename)
+    load = load_yaml(yaml_filename)
+    if load is None:
+        yaml_filename = os.path.join(base_dir, f'parameters_{name.lower()}.yaml')
+        load = load_yaml(yaml_filename)
+    return load
 
 
 def compute_all(fields):
     for field in fields:
-        field.compute(municipality)
+        field.compute(municipality, yaml_data, field_dict)
+
+def _update_yaml(yaml_data, field_dict):
+    """Une dos diccionarios, prefiriendo valores de d2 (field_dict) sobre los de d1 (yaml_data),
+       y solo actualiza las claves existentes en d1 sin agregar nuevas claves de d2."""
+    return {k: field_dict[k] if k in field_dict else yaml_data[k] for k in yaml_data.keys()}
 
 
 def get_and_compute_as_needed(municipality, field_dict, base_dir="../data"):
 
-    yaml_data = get_yaml_parameters(municipality, base_dir)
+    yaml_data = _update_yaml(get_yaml_parameters(municipality, base_dir), field_dict)
 
     compute_map = load_functions_from_module('fields.compute_functions')
 
     fields = FieldFactory.create_from_dict(field_dict, yaml_data, compute_map)
 
     for field in fields:
-        log.info(f'Municipality: {municipality}')
-        field.compute(municipality, yaml_data)
-        yaml_data[field.name] = field.value
+        log.info(f'Municipality: {municipality} - checking field: {field.name}')
+        field.compute(municipality, yaml_data, field_dict) # NOTE: here is where we include data required by the compute functions
+        if field.name in yaml_data:# and "TABLE" not in field.name:
+            yaml_data[field.name] = field.value
 
-    save_yaml(str(municipality), yaml_data, base_dir=base_dir)
+    if not field_dict['isAreaSelected']:
+        save_yaml(str(municipality), yaml_data, base_dir=base_dir)
 
     return yaml_data
 

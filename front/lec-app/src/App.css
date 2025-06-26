@@ -8,11 +8,12 @@
 .buildings-alert {
   position: absolute;
   top: 10px;
-  left: 15px;
+  left: 180px;
   padding: 5px 35px;
   z-index: 1000;
   border-radius: 5px;
   background-color: white;
+  max-width: 410px;
 }
 
 

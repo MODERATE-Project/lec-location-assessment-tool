@@ -12,6 +12,7 @@ from matplotlib.ticker import FuncFormatter
 import seaborn as sns
 import io
 import numpy as np
+import json
 
 
 log = logging.getLogger(__name__)
@@ -37,68 +38,89 @@ def _get_data(municipality):
         return None
 
 
-def _from_data(municipality):
+def _from_data(municipality, fields_dict):
     global data
 
-    if data is None:
-        data_df = _get_data(municipality)
-        data = data_df
-        return data_df
+    if fields_dict['isAreaSelected']:
+        df = pd.json_normalize(fields_dict['selectedBuildings'])
     else:
-        return data
+        if data is None:
+            data_df = _get_data(municipality)
+            data = data_df
+            df = data_df
+        else:
+            df = data
+
+    # Filtrar por tipos de edificios seleccionados si existen
+    if 'selectedBuildingTypes' in fields_dict and fields_dict['selectedBuildingTypes']:
+        df = df[df['currentUse'].isin(fields_dict['selectedBuildingTypes'])]
+
+    return df
+
+def compute_MUNICIPALITY(args):
+    return args[0]
+
+def compute_MUNICIPALITY_TITLE(args):
+    return args[0].upper()
 
 
 def compute_PCT_1(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
     log.info(f"total: {total}")
-    percentage = len(df[df['currentUse'] == 'residential']) / total * 100
+    percentage = len(df[df['currentUse_normalized'].str.strip().str.lower() == 'residential']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_2(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'] == 'industrial']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'industrial']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_3(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'] == 'agriculture']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'agriculture']) / total * 100
     return f"{percentage:.2f}"
 
 def compute_PCT_4(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    pct_industrial = len(df[df['currentUse'].isin(['industrial', 'agriculture'])]) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
+    pct_industrial = len(df[df['currentUse_normalized'].isin(['industrial', 'agriculture'])]) / total * 100
     
     return f"{pct_industrial:.2f}"
 
 
 def compute_PCT_5(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'].isin(['retail', 'office'])]) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'].isin(['retail', 'office'])]) / total * 100
     return f"{percentage:.2f}"
 
 
 
 def compute_PCT_6(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
 
-    total = len(df[df['currentUse'].isin(['residential', 'industrial', 'publicServices', 'retail', 'agriculture', 'office'])])
-    percentage = len(df[df['currentUse'] == 'publicServices']) / total * 100
+    total = len(df[df['currentUse_normalized'].isin(['residential', 'industrial', 'publicservices', 'retail', 'agriculture', 'office'])])
+    percentage = len(df[df['currentUse_normalized'] == 'publicservices']) / total * 100
     return f"{percentage:.2f}"
 
 
@@ -108,18 +130,38 @@ def compute_PARAMETRO_3(_):
 
 
 def compute_NUM_BUILDINGS(args):
-    log.info(f'args: {args}')
-    municipality = args[0]
+    # log.info(f'args: {args}')
+    # municipality = args[0]
     # data = _from_data(municipality)
+    # data = _get_data(f'{municipality}&filtered=false')
+    # return len(data)
+    # return args[2]['NUM_BUILDINGS']
+    municipality = args[0]
     data = _get_data(f'{municipality}&filtered=false')
-    return len(data)
+
+    value = len(data)
+    log.info(f'value: {value}')
+    return int(value)
+
+
 
 
 def compute_SURFACE(args):
     municipality = args[0]
-    data = _from_data(municipality)
-    total = data['AREA'].sum() / 1_000_000  # pasar a km2
-    return f"{total:.2f}"
+    data = _from_data(municipality, args[2])
+    
+    total = data['AREA'].sum() / 1_000_000
+
+    if total == 0:
+        return "0.00"
+    max_decimales = 10
+    for decimales in range(2, max_decimales + 1):
+        formato = f".{decimales}f"
+        valor = format(total, formato)
+        partes = valor.split(".")
+        if partes[1] != "0" * decimales:
+            return valor
+    return format(total, ".2f")
 
 
 def compute_IMG_PARCELAS(args):
@@ -137,7 +179,7 @@ def compute_PLOT(args):
         else [compute_PCT_1(args), compute_PCT_4(args), compute_PCT_5(args), compute_PCT_6(args)]
 
     log.info(f'percentages: {percentages}')
-    labels = ['Residencial', 'Industrial', 'Comercial', 'Servicios Públicos']
+    labels = ['Residencial', 'Industrial', 'Comercial', 'Public services']
     colors = ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000']
 
     # Configurar el estilo de seaborn
@@ -147,7 +189,7 @@ def compute_PLOT(args):
     fig = plt.figure(figsize=(10, 8))
 
     # Create pie chart
-    plt.pie(percentages, 
+    plt.pie(percentages,
             labels=labels,
             colors=colors,
             autopct='%1.0f%%',
@@ -199,7 +241,7 @@ def compute_N_PARCELAS_NO_ADECUADAS(args):
 
 def compute_N_PARCELAS_ADECUADAS(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
 
     value = len(data[data.MEAN > 0])
     log.info(f'value: {value}')
@@ -208,7 +250,7 @@ def compute_N_PARCELAS_ADECUADAS(args):
 
 def compute_TOTAL_PANELES(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
 
     value = np.sum(data['panels'])
     log.info(f'value: {value}')
@@ -220,18 +262,18 @@ def compute_PCT_7(args):
     total = float(args[1]['NUM_BUILDINGS']) if 'NUM_BUILDINGS' in args[1] else compute_NUM_BUILDINGS(args)
     adecuadas = float(args[1]['N_PARCELAS_ADECUADAS']) if 'N_PARCELAS_ADECUADAS' in args[1] else compute_N_PARCELAS_ADECUADAS(args)
         
-    return "{:.2f}".format(adecuadas/total)
+    return "{:.2f}".format(adecuadas/total * 100)
 
 
 def compute_PLOT_APPROPIATE_ROOF_AREA(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
 
     df_grouped = df.groupby('currentUse').agg(
         area_total=('AREA', 'sum'),
     ).reset_index().sort_values(by='area_total', ascending=False)
 
-    df_grouped['currentUse'] = df_grouped['currentUse'].replace('publicServices', 'public services')
+    df_grouped['currentUse'] = df_grouped['currentUse'].replace('public Services', 'public services')
 
     plt.subplots(figsize=(10, 7))
     ax = sns.barplot(df_grouped, x='currentUse', y='area_total', hue='currentUse')
@@ -254,7 +296,7 @@ def compute_PLOT_APPROPIATE_ROOF_AREA(args):
 
 def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
     municipality = args[0]
-    df = _from_data(municipality)
+    df = _from_data(municipality, args[2])
     
     data = []
     area_ranges = [(0, 100), (100, 300), (300, 800), (800, float('inf'))]
@@ -268,7 +310,7 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
             data.append({'currentUse': use_type, 'Area Range': label, 'Percentage': percentage})
     df_plot = pd.DataFrame(data)
 
-    fig, ax = plt.subplots(figsize=(10, 8)) 
+    fig, ax = plt.subplots(figsize=(15, 10)) 
     sns.barplot(data=df_plot, x='Area Range', y='Percentage', hue='currentUse', ax=ax)
 
     ax.set_xlabel(None)
@@ -297,7 +339,179 @@ def compute_PLOT_DISTRIB_AREAS_POR_USO(args):
 
 def compute_RADIACION_SOLAR(args):
     municipality = args[0]
-    data = _from_data(municipality)
+    data = _from_data(municipality, args[2])
 
     mean_value = data['MEAN'].mean()
     return f"{mean_value:.2f}"
+
+def compute_MIN_MEDIA_RS(args):
+    municipality = args[0]
+    data = _from_data(municipality, args[2])
+
+    mean_value = data['MEAN'].min()
+    return f"{mean_value:.2f}"
+
+def compute_MAX_MEDIA_RS(args):
+    municipality = args[0]
+    data = _from_data(municipality, args[2])
+
+    mean_value = data['MEAN'].max()
+    return f"{mean_value:.2f}"
+
+
+def compute_SORTING_CRITERIA_LIST(args):
+    front_args = args[2]
+    criterios = front_args.get("SORTING_CRITERIA_LIST", {})
+    # claves_ordenadas = sorted(criterios.keys(), key=lambda clave: criterios[clave])
+    # Start Generation Here
+    # log.debug(f"claves_ordenadas: {claves_ordenadas}")
+
+    # lineas = [f"{idx}.\t{clave}" for idx, clave in enumerate(claves_ordenadas, start=1)]
+
+    # return '\n'.join(lineas)
+    return criterios
+
+def compute_TOTAL_PANELES(args):
+    municipality = args[0]
+    front_args = args[2]
+    data = _from_data(municipality, front_args)
+
+    return str(data['panels'].sum())
+
+
+def compute_BUILDINGS_TABLE(args):
+    municipality = args[0]
+    front_args = args[2]
+    df = _from_data(municipality, front_args).head(n=10)
+
+    # Seleccionar y renombrar las columnas que queremos mostrar
+    df_display = df[["reference", "currentUse", "AREA", "MEAN", "production", "Porcentaje_poblacion", "Renta_media"]].copy()
+    
+    # Formatear los números
+    col_numeric = ['AREA', 'MEAN', 'production', 'Renta_media']
+    for col in col_numeric:
+        if col == 'Renta_media':
+            df_display[col] = df_display[col].apply(lambda x: f"{float(x) * 1000:,.2f}".rstrip('0').rstrip('.').replace(',', ' '))
+        else:
+            df_display[col] = df_display[col].apply(lambda x: f"{float(x):,.2f}".rstrip('0').rstrip('.').replace(',', ' '))
+    
+    # Renombrar las columnas para mejor presentación
+    df_display.columns = "CADASTRAL ID", "Current Use", "SUITABLE AREA (m²)", "Mean Solar Radiation (kWh/m² per yr)", "Energy Production Potential (MWh/yr)", "Population density percentage", "Net per capita income (€)"
+
+    # Crear la estructura de la tabla
+    table_data = {
+        'table': {
+            'headers': df_display.columns.tolist(),
+            'rows': df_display.values.tolist()
+        }
+    }
+
+    return table_data
+
+
+def compute_PLOT_DISTRIB_MEAN_SOLAR(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+
+    mean_value = df['MEAN'].mean()
+
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Histograma
+    sns.histplot(df['MEAN'], kde=False, bins=50, color='skyblue', ax=ax)
+
+    # Línea vertical en la media
+    ax.axvline(mean_value, color='blue', linewidth=2)
+
+    # Etiquetas y título
+    ax.set_title("Distribución de la radiación solar media", fontsize=14)
+    ax.set_xlabel(None)
+    ax.set_ylabel("Recuento")
+
+    # Mejorar layout
+    plt.tight_layout()
+
+    # Guardar imagen
+    image_path = f"{municipality}_PLOT_DISTRIB_MEAN_SOLAR.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+    plt.close()
+
+    return image_path
+
+def compute_POTENCIAL_PRODUCCION(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    total = df['production'].sum()
+    return f"{total:.2f}"
+    
+
+def compute_CAPACIDAD(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    total = df['capacity_MWp'].sum()
+    return f"{total:.2f}"
+
+
+def compute_PLOT_RADIACION_POR_USO(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
+
+    # df_grouped = df.groupby('currentUse_normalized').agg(
+    #     mean_radiation=('MEAN', 'mean'),
+    #     total_area=('AREA', 'sum')
+    # ).reset_index()
+
+    df['currentUse_normalized'] = df['currentUse_normalized'].replace('publicservices', 'public services')
+    df_grouped = df.groupby('currentUse_normalized')['MEAN'].mean()
+
+    plt.figure(figsize=(10, 7))
+    df_grouped.plot(kind='bar', color='royalblue')
+
+    # Añadir título y etiquetas
+    plt.title('Radiación solar según uso de parcelas', fontsize=18)
+    plt.ylabel('Radiación solar media', fontsize=18)
+    plt.xlabel('')
+    plt.xticks(rotation=45, ha='right', fontsize=18)
+
+
+    plt.tight_layout()
+
+    # Guardar imagen
+    image_path = f"{municipality}_PLOT_RADIACION_POR_USO.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+    plt.close()
+
+    return image_path
+
+
+
+def compute_PLOT_POTENCIAL_POR_USO(args):
+    municipality = args[0]
+    df = _from_data(municipality, args[2])
+    df['currentUse_normalized'] = df['currentUse'].str.replace(r'\s+', '', regex=True).str.lower()
+    df['currentUse_normalized'] = df['currentUse_normalized'].replace('publicservices', 'public services')
+    df_grouped = df.groupby('currentUse_normalized')['production'].mean()
+    
+    plt.figure(figsize=(10, 7))
+    df_grouped.plot(kind='bar', color='royalblue')
+
+    # Añadir título y etiquetas
+    plt.title('Solar capacity potential', fontsize=18)
+    plt.ylabel('Potential photovoltaic capacity', fontsize=18)
+    plt.xlabel('')
+    plt.xticks(rotation=45, ha='right', fontsize=18)
+
+
+    plt.tight_layout()
+
+    # Guardar imagen
+    image_path = f"{municipality}_PLOT_POTENCIAL_POR_USO.png"
+    plt.savefig(path.join(BASE_DIR, image_path), format='png')
+    plt.close()
+
+    return image_path
+
+
+

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './SortingCriteriaSelector.css';
 import Loader from '../Loader';
 import { Collapse } from 'react-collapse';
@@ -6,23 +6,31 @@ import { MdDragIndicator } from "react-icons/md";
 import { LuTextCursorInput } from "react-icons/lu";
 import { TbDragDrop } from "react-icons/tb";
 import { ReactSortable } from "react-sortablejs";
-
+import { useTranslation } from 'react-i18next';
 
 const SortingCriteriaComponent = ({ onSort, isLoading }) => {
-
+  const { t, i18n } = useTranslation();
   const [advanced, setAdvanced] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const [sortableList, setSortableList] = useState([
-    { id: 1, value: 1, name: 'Total Production', checked: true },
-    { id: 2, value: 1, name: 'Potential', checked: false },
-    { id: 3, value: 1, name: 'Rent', checked: false },
-    { id: 4, value: 1, name: 'Age', checked: false },
-    { id: 5, value: 1, name: 'Population', checked: false },
-    { id: 6, value: 1, name: 'Single-person households', checked: false },
-    { id: 7, value: 1, name: 'Elderly Percentage', checked: false },
-    { id: 8, value: 1, name: 'Youth Percentage', checked: false },
-    { id: 9, value: 1, name: 'Average Persons Per Household', checked: false },
+    { id: 1, value: 1, name: 'Total Production',                displayName: t('Total Production'),               checked: true },
+    { id: 2, value: 1, name: 'Potential',                       displayName: t('Potential'),                      checked: false },
+    { id: 3, value: 1, name: 'Rent',                            displayName: t('Rent'),                           checked: false },
+    { id: 4, value: 1, name: 'Age',                             displayName: t('Age'),                            checked: false },
+    { id: 5, value: 1, name: 'Population',                      displayName: t('Population'),                     checked: false },
+    { id: 6, value: 1, name: 'Single-person households',        displayName: t('Single-person households'),       checked: false },
+    { id: 7, value: 1, name: 'Elderly Percentage',              displayName: t('Elderly Percentage'),             checked: false },
+    { id: 8, value: 1, name: 'Youth Percentage',                displayName: t('Youth Percentage'),               checked: false },
+    { id: 9, value: 1, name: 'Average Persons Per Household',   displayName: t('Average Persons Per Household'),  checked: false },
   ]);
+
+  // Actualizar los displayName cuando cambie el idioma
+  useEffect(() => {
+    setSortableList(prevList => prevList.map(item => ({
+      ...item,
+      displayName: t(item.name)
+    })));
+  }, [i18n.language, t]);
 
   const upperLimit = 10;
 
@@ -31,7 +39,6 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
     const uncheckedItems = list.filter(item => !item.checked);
     return [...checkedItems, ...uncheckedItems];
   }, []);
-
 
   // Function to handle importance assignment
   const handleImportanceChange = (index, importance) => {
@@ -52,7 +59,6 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   };
 
   const handleSort = () => {
-
     const checkedItems = sortableList.filter(i => i.checked);
     const sortValuesDict = sortableList.reduce((acc, item, idx) => {
       //   acc[item.name] = item.checked ? (advanced ? item.value : sortableList.length - idx - sortableList.lenght_but_only_checked_ones) : 0;
@@ -71,10 +77,8 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
         // Si el ítem no está marcado, el peso es 0
         acc[item.name] = 0;
       }
-
       return acc;
     }, {});
-
 
     onSort(sortValuesDict);
   };
@@ -84,8 +88,8 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   };
 
   const calculateFontSize = (index, totalItems) => {
-    const baseSize = .85; // Tamaño base en em
-    const increment = 0.4; // Incremento por elemento
+    const baseSize = .85;
+    const increment = 0.4;
     const scale = (totalItems - index) / totalItems;
     return baseSize + increment * scale;
   };
@@ -97,17 +101,14 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
   return (
     <div className="sorting-criteria-container">
       <div className="sorting-criteria-header" onClick={toggleAccordion}>
-
         <div>
-          <h2>Sorting Criteria</h2>
+          <h2>{t("Sorting Criteria")}</h2>
           <p>
             {advanced
-              ? `Select the importance of each variable on a scale from 0 to ${upperLimit}`
-              : 'Drag and drop each variable. The higher, the more important.'}
+              ? `${t("Select the importance of each variable on a scale from 0 to")} ${upperLimit}`
+              : t("Drag and drop each variable. The higher, the more important.")}
           </p>
         </div>
-
-        {/* oculto */}
         <button className="advanced-button" style={{ 'opacity': isOpened ? "1" : "0", display: "none" }} onClick={
           (e) => {
             e.stopPropagation();
@@ -116,7 +117,6 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
           {/* {advanced ? 'simple' : 'advanced'} */}
           {advanced ? <TbDragDrop /> : <LuTextCursorInput />}
         </button>
-
       </div>
 
       <Collapse isOpened={isOpened}>
@@ -135,8 +135,7 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
               <div key={item.id} className={`variable-row ${!item.checked ? 'unchecked-row' : ''}`} style={{ "paddingBottom": !advanced ? '2px' : '0' }} >
 
                 {!advanced && <MdDragIndicator className='drag-icon' />}
-                {/* {!advanced && <FaGripLines style={{ 'paddingRight': '15px' }} />} */}
-                <label htmlFor={item.name} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }}>{item.name}</label>
+                <label htmlFor={item.name} style={{ 'fontSize': advanced ? '1em' : `${calculateFontSize(index, sortableList.length)}em` }}>{item.displayName}</label>
                 {advanced && <input
                   type="number"
                   id={item.name}
@@ -157,7 +156,7 @@ const SortingCriteriaComponent = ({ onSort, isLoading }) => {
 
           <button className="sort-button dark" onClick={handleSort}>
             {isLoading && <Loader />}
-            Sort Table
+            {t("Sort Table")}
           </button>
         </div>}
       </Collapse >
