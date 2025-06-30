@@ -26,7 +26,11 @@ sns.set_theme(font_scale=1.2, context='talk', style='whitegrid')
 
 def _get_data(municipality):
     try:
-        url = f'http://{BUILDINGS_API_URL}?municipio={municipality}'
+        # Check if BUILDINGS_API_URL already contains a scheme
+        if BUILDINGS_API_URL.startswith(('http://', 'https://')):
+            url = f'{BUILDINGS_API_URL}?municipio={municipality}'
+        else:
+            url = f'http://{BUILDINGS_API_URL}?municipio={municipality}'
         response = requests.get(url)
         # Lanza una excepción si la respuesta tiene un código de error HTTP
         response.raise_for_status()
