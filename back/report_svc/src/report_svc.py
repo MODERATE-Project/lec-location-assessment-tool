@@ -61,7 +61,7 @@ REPORT_FILE_AREA_SELECTED = os.getenv(
 #             table.rows[row_idx].cells[col_idx].text = str(value)
 
 #     # 4. remove the placeholder paragraph
-#     # paragraph._element.getparent().remove(paragraph._element) # FIXME DEBUG PURPOSES
+#     # paragraph._element.getparent().remove(paragraph._element) 
 
 
 def build_table_from_dict(table_dict):
@@ -203,8 +203,10 @@ def replace_text_in_paragraphs(paragraphs, data):
                         print(f"Error: No se pudo encontrar el archivo de imagen {value}")
 
                 else:
-                    # paragraph.text = paragraph.text.replace(key_pattern, value) # FIXME: This is the correct final way
-                    paragraph.text = paragraph.text.replace(key, str(value))  # FIXME: This is used for testing
+                    if app.debug == True:
+                        paragraph.text = paragraph.text.replace(key, str(value))  # FIXME: This is used for testing
+                    else:
+                        paragraph.text = paragraph.text.replace(key_pattern, str(value)) # FIXME: This is the correct final way
 
 
 # def replace_text_in_tables(tables, data):
@@ -240,7 +242,7 @@ def get_report():
     #         '${PCT_1} ': '69',
     #         '${PCT_4} ': '13',
     #         '${PCT_5} ': '10',
-    #         '${PCT_6} ': '8' # NOTE: si pones el int en vez de string peta, para probar lo que pasa si el servicio de docx to pdf falla
+    #         '${PCT_6} ': '8' 
     #         }
 
     print('aqui van los datos', data)
