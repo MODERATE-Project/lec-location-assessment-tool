@@ -429,9 +429,9 @@ def compute_PLOT_DISTRIB_MEAN_SOLAR(args):
     ax.axvline(mean_value, color='blue', linewidth=2)
 
     # Etiquetas y título
-    ax.set_title("Distribución de la radiación solar media", fontsize=14)
+    ax.set_title("Distribution of mean solar radiation", fontsize=14)
     ax.set_xlabel(None)
-    ax.set_ylabel("Recuento")
+    ax.set_ylabel("Count")
 
     # Mejorar layout
     plt.tight_layout()
@@ -474,8 +474,8 @@ def compute_PLOT_RADIACION_POR_USO(args):
     df_grouped.plot(kind='bar', color='royalblue')
 
     # Añadir título y etiquetas
-    plt.title('Radiación solar según uso de parcelas', fontsize=18)
-    plt.ylabel('Radiación solar media', fontsize=18)
+    plt.title('Solar radiation by parcel use', fontsize=18)
+    plt.ylabel('Average solar radiation', fontsize=18)
     plt.xlabel('')
     plt.xticks(rotation=45, ha='right', fontsize=18)
 
