@@ -203,7 +203,7 @@ def compute_PLOT(args):
             counterclock=False)
 
     # Add title
-    plt.title('Área de tejado por uso')
+    plt.title('Roof area by use')
 
     # Equal aspect ratio ensures that pie is drawn as a circle
     plt.axis('equal')
