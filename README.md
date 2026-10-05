@@ -21,6 +21,25 @@ docker compose -f docker-compose.prod.yaml build --no-cache
 docker compose -f docker-compose.prod.yaml up
 ```
 
+## Container images
+The `docker-publish.yml` workflow builds the frontend and microservice images and publishes them as public packages on the GitHub Container Registry:
+
+- `ghcr.io/moderate-project/tool-lec-frontend`
+- `ghcr.io/moderate-project/tool-lec-municipalities-svc`
+- `ghcr.io/moderate-project/tool-lec-buildings-svc`
+- `ghcr.io/moderate-project/tool-lec-report-svc`
+
+| Event                         | Tags                                          |
+| ----------------------------- | --------------------------------------------- |
+| Push to `main`                | `main`, `latest`, `sha-<short-sha>`           |
+| Release tag (e.g. `v1.2.3`)   | `1.2.3`, `sha-<short-sha>`                    |
+| Pull request to `main`        | Built to validate the Dockerfiles, not pushed |
+
+No credentials are needed to pull them:
+```bash
+docker pull ghcr.io/moderate-project/tool-lec-frontend:latest
+```
+
 ## Running the tool
 Open the browser with the following link: http://localhost
 
