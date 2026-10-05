@@ -1,0 +1,83 @@
+name: Build and push Docker images to GitHub Container Registry (GHCR)
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: tool-lec-frontend
+            context: front/lec-app
+            # Relative paths baked into the bundle; nginx proxies them to
+            # the services (see default.conf.template).
+            build_args: |
+              VITE_MUNICIPALITIES_API_URL=/municipalities
+              VITE_BUILDINGS_API_URL=/buildings
+              VITE_REPORT_API_URL=/report
+              VITE_GEOSERVER_API_URL=/geoserver
+          - image: tool-lec-municipalities-svc
+            context: back/municipalities_svc
+          - image: tool-lec-buildings-svc
+            context: back/buildings_svc
+          - image: tool-lec-report-svc
+            context: back/report_svc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image }}
+          # Keep "latest" pointing at the tip of main; the default "auto"
+          # would also move it on every release tag push.
+          flavor: latest=false
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.context }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ matrix.build_args }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          platforms: linux/amd64
